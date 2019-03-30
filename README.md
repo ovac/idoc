@@ -12,7 +12,6 @@
 Automatically generate an interactive API documentation from your existing Laravel routes. Take a look at the [example documentation](https://www.ovac4u.com/idoc/index.html). Inspired by [Laravel Api Documentation Generator](mpociot/laravel-apidoc-generator)
 
 [![Build Status](https://travis-ci.org/ovac/idoc.svg?branch=master)](https://travis-ci.org/ovac/idoc)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/ovac/idoc/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/ovac/idoc/badges/quality-score.png?b=master)
 [![Coverage Status](https://coveralls.io/repos/github/ovac/idoc/badge.svg?branch=revert-1-analysis-XkyPYa)](https://coveralls.io/github/ovac/idoc?branch=revert-1-analysis-XkyPYa)
 [![Latest Stable Version](https://img.shields.io/github/release/ovac/idoc.svg)](https://packagist.org/packages/ovac/idoc)
 [![Packagist](https://poser.pugx.org/ovac/idoc/d/total.svg)](https://packagist.org/packages/ovac/idoc)
