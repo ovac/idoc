@@ -35,6 +35,8 @@ Automatically generate an interactive API documentation from your existing Larav
 Laravel IDoc generator (interactive documentation generator) is a seamless and complete plugin for generating API documentation from your Laravel's codebase. It is inspired by the laravel-apidoc-generator, ReDoc and the Open API initiative from Swagger. IDoc has been built with extendability so that it can easily adapt with your use case.
 
 
+![Demo](https://raw.githubusercontent.com/Rebilly/ReDoc/master/demo/redoc-demo.png)
+
 ## Features
 - Extremely easy deployment
 - Server Side Rendering ready
@@ -78,7 +80,7 @@ $app->configure('idoc');
 
 ## Usage
 ```bash 
-    php artisan idoc:generate
+$ php artisan idoc:generate
 ```
 
 ## Configuration
