@@ -51,8 +51,6 @@ Laravel IDoc generator (interactive documentation generator) is a seamless and c
 - Branding/customizations.
 
 
-`php artisan idoc:generate`
-
 ## Installation
 > Note: PHP 7 and Laravel 5.5 or higher are the minimum dependencies.
 
@@ -78,8 +76,12 @@ $app->register(\OVAC\IDoc\IDocServiceProvider::class);
 $app->configure('idoc');
 ```
 
-
 ## Usage
+```bash 
+    php artisan idoc:generate
+```
+
+## Configuration
 Before you can generate your documentation, you'll need to configure a few things in your `config/idoc.php`.
 - `output`
 This is the file path where the generated documentation will be written to. Default: **public/docs**
