@@ -1,11 +1,44 @@
-## Laravel API Documentation Generator
+<p align="center" style="border: 5px solid #000000">
+<a href="https://https://www.openapis.org/" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_200v1553974265/OpenAPI-Logo-Stacked-Pantone_mk65jw.png"></a>
+<a href="#" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_120/v1506828786/logo-composer-transparent_zjgal0.png"></a>
+<a href="#" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_200/v1506832992/laravel-logo_atlvfw.png"></a>
+<br>
+<a href="https://www.ovac4u.com/idoc" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/v1506828380/logo_size_invert_jelh74.jpg"></a>
+</p>
 
+---
+
+# Laravel IDoc - The API Documentation Generator
 Automatically generate an interactive API documentation from your existing Laravel routes. Take a look at the [example documentation](https://www.ovac4u.com/idoc/index.html). Inspired by [Laravel Api Documentation Generator](mpociot/laravel-apidoc-generator)
+
+[![Build Status](https://travis-ci.org/ovac/idoc.svg?branch=master)](https://travis-ci.org/ovac/idoc)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/ovac/idoc/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/ovac/idoc/badges/quality-score.png?b=master)
+[![Coverage Status](https://coveralls.io/repos/github/ovac/idoc/badge.svg?branch=revert-1-analysis-XkyPYa)](https://coveralls.io/github/ovac/idoc?branch=revert-1-analysis-XkyPYa)
+[![Latest Stable Version](https://img.shields.io/github/release/ovac/idoc.svg)](https://packagist.org/packages/ovac/idoc)
+[![Packagist](https://poser.pugx.org/ovac/idoc/d/total.svg)](https://packagist.org/packages/ovac/idoc)
+[![Packagist](https://img.shields.io/packagist/l/ovac/idoc.svg)](https://packagist.org/packages/ovac/idoc)
+[![Dependency Status](https://www.versioneye.com/user/projects/59cda451368b08320ffe7190/badge.svg)](https://www.versioneye.com/user/projects/59cda451368b08320ffe7190)
+
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/5322525b-9a9a-4019-82c4-b2ddc3de04fe/big.png)](https://insight.sensiolabs.com/projects/5322525b-9a9a-4019-82c4-b2ddc3de04fe)
+
+```md
+ Follow me anywhere @ovac4u                         | GitHub
+ _________                          _________       | Twitter
+|   ___   |.-----.--.--.---.-.----.|  |  |.--.--.   | Facboook
+|  |  _   ||  _  |  |  |  _  |  __||__    |  |  |   | Instagram
+|  |______||_____|\___/|___._|____|   |__||_____|   | Github + @ovac
+|_________|                        www.ovac4u.com   | Facebook + @ovacposts
+```
+
+## Introduction.
+
+Laravel IDoc generator (interactive documentation generator) is a seamless and complete plugin for generating API documentation from your Laravel's codebase. It is inspired by the laravel-apidoc-generator, ReDoc and the Open API initiative from Swagger. IDoc has been built with extendability so that it can easily adapt with your use case.
+
 
 `php artisan idoc:generate`
 
 ## Installation
-> Note: PHP 7 and Laravel 5.5 or higher are required.
+> Note: PHP 7 and Laravel 5.5 or higher are the minimum dependencies.
 
 ```sh
 $ composer require ovac/idoc
