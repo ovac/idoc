@@ -1,4 +1,5 @@
 <p align="center" style="border: 5px solid #000000">
+    <center>
 <a href="https://https://www.openapis.org/" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_100/v1553975330/C2I2EFN2_400x400_qcuyop.jpg"></a>
    
 <a href="#" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_120/v1506828786/logo-composer-transparent_zjgal0.png"></a>
@@ -6,7 +7,10 @@
 <br>
 <a href="https://www.ovac4u.com/idoc" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/v1506828380/logo_size_invert_jelh74.jpg"></a>
 
+<br/>
 <a href="https://https://www.openapis.org/" target="_blank"><img src="https://cdn-images-1.medium.com/fit/t/1600/480/1*Qf94xFwde421J_ZSmdPJDw.png"></a>
+
+</center>
 </p>
 
 ---
