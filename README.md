@@ -406,10 +406,6 @@ This software uses the following open source packages:
 - [Laravel Api Documentation Generator](mpociot/laravel-apidoc-generator)
 - [Laravel](https://laravel.com/)
 - [Ramsey UUID](https://github.com/ramsey/uuid)
-- [showdown](http://showdownjs.github.io/showdown/)
-- [CodeMirror](http://codemirror.net/)
-- Emojis are taken from [here](https://github.com/arvida/emoji-cheat-sheet.com)
-- [highlight.js](https://highlightjs.org/)
 
 ## You may also like...
 
