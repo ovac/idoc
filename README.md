@@ -7,8 +7,8 @@
 </p>
 
 
-<div align="center">
 
+<div align="center">
 
 [![Build Status](https://travis-ci.org/ovac/idoc.svg?branch=master)](https://travis-ci.org/ovac/idoc)
 [![Coverage Status](https://coveralls.io/repos/github/ovac/idoc/badge.svg?branch=revert-1-analysis-XkyPYa)](https://coveralls.io/github/ovac/idoc?branch=revert-1-analysis-XkyPYa)
@@ -17,13 +17,7 @@
 [![Packagist](https://img.shields.io/packagist/l/ovac/idoc.svg)](https://packagist.org/packages/ovac/idoc)
 [![Dependency Status](https://www.versioneye.com/user/projects/59cda451368b08320ffe7190/badge.svg)](https://www.versioneye.com/user/projects/59cda451368b08320ffe7190)
 
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/5322525b-9a9a-4019-82c4-b2ddc3de04fe/big.png)](https://insight.sensiolabs.com/projects/5322525b-9a9a-4019-82c4-b2ddc3de04fe)
-
-# Laravel IDoc - The API Documentation Generator
-Automatically generate an interactive API documentation from your existing Laravel routes. Take a look at the [example documentation](https://www.ovac4u.com/idoc/index.html). Inspired by [Laravel Api Documentation Generator](mpociot/laravel-apidoc-generator)
-
 </div>
-
 
 ```md
  Follow me anywhere @ovac4u                         | GitHub
@@ -33,6 +27,13 @@ Automatically generate an interactive API documentation from your existing Larav
 |  |______||_____|\___/|___._|____|   |__||_____|   | Github + @ovac
 |_________|                        www.ovac4u.com   | Facebook + @ovacposts
 ```
+
+
+<div align="center">
+# Laravel IDoc - The API Documentation Generator
+Automatically generate an interactive API documentation from your existing Laravel routes. Take a look at the [example documentation](https://www.ovac4u.com/idoc/index.html). Inspired by [Laravel Api Documentation Generator](mpociot/laravel-apidoc-generator)
+
+</div>
 
 
 ## Introduction.
