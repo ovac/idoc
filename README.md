@@ -51,7 +51,7 @@ Laravel IDoc generator (interactive documentation generator) is a seamless and c
 - OpenAPI 3.0 support
 - Neat **interactive** documentation for nested objects <br>
 ![](https://raw.githubusercontent.com/Rebilly/ReDoc/master/docs/images/nested-demo.gifdocs/images/nested-demo.gif)
-- Code samples support (via vendor extension) <br>
+- Automatic code sample support <br>
 ![](https://raw.githubusercontent.com/Rebilly/ReDoc/master/docs/images/code-samples-demo.gif)
 - Responsive three-panel design with menu/scrolling synchronization
 - Integrate API Introduction into side menu.
@@ -429,7 +429,9 @@ public function getUser(int $id)
 ```
 
 #### Generating responses automatically
-If you don't specify an example response using any of the above means, this package will attempt to get a sample response by making a request to the route (a "response call"). A few things to note about response calls:
+If you don't specify an example response using any of the above means, this package will attempt to get a 
+
+response by making a request to the route (a "response call"). A few things to note about response calls:
 - They are done within a database transaction and changes are rolled back afterwards.
 - The configuration for response calls is located in the `config/idoc.php`. They are configured within the `['apply']['response_calls']` section for each route group, allowing you to apply different settings for different sets of routes.
 - By default, response calls are only made for GET routes, but you can configure this. Set the `methods` key to an array of methods or '*' to mean all methods. Leave it as an empty array to turn off response calls for that route group.
@@ -462,9 +464,10 @@ The info file in the view folder can be further modified to add introductions an
 
 This software uses the following open source packages:
 
-- [Laravel Api Documentation Generator](mpociot/laravel-apidoc-generator)
 - [Laravel](https://laravel.com/)
+- [Redoc](https://github.com/Rebilly/ReDoc)
 - [Ramsey UUID](https://github.com/ramsey/uuid)
+
 
 ## You may also like...
 
