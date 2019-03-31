@@ -3,8 +3,8 @@
 namespace OVAC\IDoc;
 
 use Illuminate\Routing\Route;
-use Mpociot\ApiDoc\Tools\ResponseResolver;
 use Mpociot\Reflection\DocBlock;
+use OVAC\IDoc\Tools\ResponseResolver;
 use OVAC\IDoc\Tools\Traits\ParamHelpers;
 use ReflectionClass;
 use ReflectionMethod;
