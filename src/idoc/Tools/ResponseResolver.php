@@ -3,10 +3,10 @@
 namespace OVAC\IDoc\Tools;
 
 use Illuminate\Routing\Route;
-use Mpociot\ApiDoc\Tools\ResponseStrategies\ResponseCallStrategy;
-use Mpociot\ApiDoc\Tools\ResponseStrategies\ResponseFileStrategy;
-use Mpociot\ApiDoc\Tools\ResponseStrategies\ResponseTagStrategy;
-use Mpociot\ApiDoc\Tools\ResponseStrategies\TransformerTagsStrategy;
+use OVAC\IDoc\Tools\ResponseStrategies\ResponseCallStrategy;
+use OVAC\IDoc\Tools\ResponseStrategies\ResponseFileStrategy;
+use OVAC\IDoc\Tools\ResponseStrategies\ResponseTagStrategy;
+use OVAC\IDoc\Tools\ResponseStrategies\TransformerTagsStrategy;
 use Symfony\Component\HttpFoundation\Response;
 
 class ResponseResolver
