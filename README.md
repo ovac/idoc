@@ -1,23 +1,18 @@
-<p align="center" style="border: 5px solid #000000">
-    <a href="https://https://www.openapis.org/" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50/v1553976486/1_Qf94xFwde421J_ZSmdPJDw_soee3m.png"></a>
+<div align="center" style="border: 2px dotted #000000">
+    <a href="https://https://www.openapis.org/" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50/v1553976486/1_Qf94xFwde421J_ZSmdPJDw_soee3m.png" class="inline"></a>
     <br/>
-<a href="https://https://www.openapis.org/" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50/v1553975330/C2I2EFN2_400x400_qcuyop.jpg"></a><a href="#" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_120/v1506828786/logo-composer-transparent_zjgal0.png"></a><a href="#" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50,w_60,c_fill/v1506832992/laravel-logo_atlvfw.png"></a>
+<a href="https://https://www.openapis.org/" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50/v1553975330/C2I2EFN2_400x400_qcuyop.jpg" class="inline"></a><a href="#" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_120/v1506828786/logo-composer-transparent_zjgal0.png" class="inline"></a><a href="#" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50,w_60,c_fill/v1506832992/laravel-logo_atlvfw.png" class="inline"></a>
 <br>
-<a href="https://www.ovac4u.com/idoc" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/v1506828380/logo_size_invert_jelh74.jpg"></a>
-</p>
+<a href="https://www.ovac4u.com/idoc" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/v1506828380/logo_size_invert_jelh74.jpg" class="inline"></a>
+</div>
 
 
-
-<p align="center">
-
-[![Build Status](https://travis-ci.org/ovac/idoc.svg?branch=master)](https://travis-ci.org/ovac/idoc)
-[![Coverage Status](https://coveralls.io/repos/github/ovac/idoc/badge.svg?branch=revert-1-analysis-XkyPYa)](https://coveralls.io/github/ovac/idoc?branch=revert-1-analysis-XkyPYa)
-[![Latest Stable Version](https://img.shields.io/github/release/ovac/idoc.svg)](https://packagist.org/packages/ovac/idoc)
-[![Packagist](https://poser.pugx.org/ovac/idoc/d/total.svg)](https://packagist.org/packages/ovac/idoc)
-[![Packagist](https://img.shields.io/packagist/l/ovac/idoc.svg)](https://packagist.org/packages/ovac/idoc)
-[![Dependency Status](https://www.versioneye.com/user/projects/59cda451368b08320ffe7190/badge.svg)](https://www.versioneye.com/user/projects/59cda451368b08320ffe7190)
-
-</p>
+<p align="center"><a href="https://travis-ci.org/ovac/hubtel-payment"><img src="https://travis-ci.org/ovac/hubtel-payment.svg?branch=master" alt="Build Status" class="inline"></a>
+<a href="https://coveralls.io/github/ovac/hubtel-payment?branch=master"><img src="https://coveralls.io/repos/github/ovac/hubtel-payment/badge.svg?branch=master" alt="Coverage Status" class="inline"></a>
+<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/hubtel-payment/v/stable" alt="Latest Stable Version" class="inline"></a>
+<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/hubtel-payment/downloads" alt="Total Downloads" class="inline"></a>
+<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/hubtel-payment/license" alt="License" class="inline"></a>
+<a href="https://www.versioneye.com/user/projects/598fccd8368b081653c84e2e"><img src="https://www.versioneye.com/user/projects/598fccd8368b081653c84e2e/badge.svg" alt="Dependency Status" class="inline"></a></p>
 
 ```md
  Follow me anywhere @ovac4u                         | GitHub
@@ -28,12 +23,18 @@
 |_________|                        www.ovac4u.com   | Facebook + @ovacposts
 ```
 
-<p align="center">
-    
-# Laravel IDoc - The API Documentation Generator
-Automatically generate an interactive API documentation from your existing Laravel routes. Take a look at the [example documentation](https://www.ovac4u.com/idoc/index.html). Inspired by [Laravel Api Documentation Generator](mpociot/laravel-apidoc-generator)
+<br/>
+<br/>
 
-</p>
+<div align="center">
+    
+<h2>Laravel IDoc - The API Documentation Generator</h2>
+
+<p>Automatically generate an interactive API documentation from your existing Laravel routes. Take a look at the <a href="https://www.ovac4u.com/idoc/index.html">example documentation</a>. Inspired by <a href="mpociot/laravel-apidoc-generator">Laravel Api Documentation Generator</a></p>
+</div>
+
+<br/>
+<br/>
 
 
 ## Introduction.
@@ -47,12 +48,12 @@ Laravel IDoc generator (interactive documentation generator) is a seamless and c
 - Extremely easy deployment
 - Server Side Rendering ready
 - The widest OpenAPI v2.0 features support <br>
-![](https://raw.githubusercontent.com/Rebilly/ReDoc/master/docs/images/discriminator-demo.gif)
+![](https://raw.githubusercontent.com/Rebilly/ReDoc/master/docs/images/discriminator-demo.gif){.inline}
 - OpenAPI 3.0 support
 - Neat **interactive** documentation for nested objects <br>
-![](https://raw.githubusercontent.com/Rebilly/ReDoc/master/docs/images/nested-demo.gifdocs/images/nested-demo.gif)
+![](https://raw.githubusercontent.com/Rebilly/ReDoc/master/docs/images/nested-demo.gifdocs/images/nested-demo.gif){.inline}
 - Automatic code sample support <br>
-![](https://raw.githubusercontent.com/Rebilly/ReDoc/master/docs/images/code-samples-demo.gif)
+![](https://raw.githubusercontent.com/Rebilly/ReDoc/master/docs/images/code-samples-demo.gif){.inline}
 - Responsive three-panel design with menu/scrolling synchronization
 - Integrate API Introduction into side menu.
 - High-level grouping in side-menu.

@@ -1,0 +1,78 @@
+
+
+widgets:
+    addthis: ra-599a2b3ed56dd5f2
+    googleAnalytics: UA-104991685-1
+    googletag: GTM-TWFSSDL
+
+template:
+    url: https://github.com/moqmar/mintlook-couscous
+
+title: IDoc - Generate documentation for laravel API
+subTitle: Generate an interractive documentation for your new or existing laravel app with ease.
+
+# The left menu bar
+menu:
+    sections:
+        introduction:
+            name: Introduction
+            items:
+                home:
+                    text: Home
+                    relativeUrl:
+
+        links:
+            name: Links
+            items:
+                more-from-ovac:
+                    text: More open souce juice by OVAC4U
+                    absoluteUrl: https://www.ovac4u.com
+
+
+
+
+# Wondering what this file is?
+# See: https://github.com/ovac/ovac-couscous-theme
+# See: http://couscous.io
+
+# Base URL of the published website
+baseUrl: https://www.ovac4u.com/idoc
+
+# Used to link to the GitHub project
+github:
+    user: ovac
+    repo: idoc
+
+template:
+    url: https://github.com/moqmar/mintlook-couscous
+
+title: IDoc - Generate documentation for laravel API
+subTitle: Generate an interactive documentation for your new or existing laravel app with ease.
+logo: https://res.cloudinary.com/ovac/image/upload/h_300,w_300,c_fill,r_max,bo_20px_solid_white/aboust_ey5v1v.jpg # Icon URL
+color: "#d21"   # Accent color
+
+languages: ["en", "de"] # List of supported languages. Comment out to disable language selection.
+defaultLanguage: world  # Default language icon, and the value of the html lang attribute. It is recommended to set this even (especially) if you're not using language selection.
+
+search: true # Enable search
+scripts:
+    after:
+        - php .couscous/generated/.scripts/generate-search-index.php # Required for search
+        - rm -rf .couscous/generated/.scripts # Clean up unneccessary files
+
+sidebar:
+    - title: About mintlook
+    - subtitle: Links
+    - text: Homepage
+      page: / # relative link
+    - line: true
+    - text: More open souce juice by OVAC4U
+      link: https://www.ovac4u.com
+    - html: |
+            <p>Follow us on <a href="">Facebook</a>, <a href="">Twitter</a>, and other <a href="">social networks</a>.</p>
+# you can also define the sidebar per language
+sidebar:
+  de:
+    - title: Über mintlook
+  default: # fallback for all other languages
+    - title: About mintlook
