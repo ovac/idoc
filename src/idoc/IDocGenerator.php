@@ -4,6 +4,7 @@ namespace OVAC\IDoc;
 
 use Illuminate\Routing\Route;
 use Mpociot\Reflection\DocBlock;
+use Mpociot\Reflection\DocBlock\Tag;
 use OVAC\IDoc\Tools\ResponseResolver;
 use OVAC\IDoc\Tools\Traits\ParamHelpers;
 use ReflectionClass;
