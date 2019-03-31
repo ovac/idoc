@@ -1,0 +1,462 @@
+<!doctype html>
+<html class="lazyload">
+    <head>
+        <title>README · IDoc - Generate documentation for laravel API</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+                <link rel="icon" type="image/png" href="https://www.ovac4u.com/idoc/icon.png">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Share:400|Jaldi:400,700|Fira+Mono:400,700">
+        <link rel="stylesheet" href="https://www.ovac4u.com/idoc/assets/base.css">
+        <link rel="stylesheet" href="https://www.ovac4u.com/idoc/assets/lindoc.css">
+        <style>
+            a,.results strong{color:#d21}
+            button,input[type=submit],input[type=button],input[type=reset],.button,.search input[type=submit]{background-color:#d21}
+            .search input[type=text]:focus,.results,.results strong{border-color:#d21 !important}
+            @media screen and (min-width:1450px){.livetoc a.active{ color:#d21}}
+        </style>
+        <script>
+            // Parent Elements - e.P("body") - https://gist.github.com/moqmar/0995cf6595201f7a062fb173cb4ab938
+            (function(E){E.matches||(E.matches=E.matchesSelector||E.msMatchesSelector||E.webkitMatchesSelector)})(Element.prototype)
+            Element.prototype.P=function(s){var e=this
+            if(!s||typeof s=="number")for(var i=0;i<(s||1);i++)e=e?e.parentElement:e
+            else if(typeof s=="string")while(e&&!e.matches(s))e=e.parentElement
+            else while(e&&e!=s)e=e.parentElement
+            return e}
+        </script>
+    </head>
+    <body>
+        <header>
+            <h1>
+                <a href="https://www.ovac4u.com/idoc/"><img src="https://res.cloudinary.com/ovac/image/upload/h_300,w_300,c_fill,r_max,bo_20px_solid_white/aboust_ey5v1v.jpg" alt="IDoc - Generate documentation for laravel API"></a>
+            </h1>
+            <!-- THIS DOCUMENT IS INDEXED -->
+            <div class="search" role="search"><form data-baseurl="https://www.ovac4u.com/idoc" onsubmit="search(this); return false;">
+                <input type="text" class="search-query" oninput="search(this.parentElement)" placeholder="Search...">
+                <input type="submit" value="➜">
+            </form><div class="results"></div></div>
+            <div class="language">
+                <input type="checkbox" id="language-select">
+                <label for="language-select"><img src="https://www.ovac4u.com/idoc/assets/flags/world.png"></label>
+                <div class="language-select-popup" data-default-language="world">
+                    <a href="https://www.ovac4u.com/idoc/en/"><img src="https://www.ovac4u.com/idoc/assets/flags/en.png"></a>
+                    <a href="https://www.ovac4u.com/idoc/de/"><img src="https://www.ovac4u.com/idoc/assets/flags/de.png"></a>
+                </div>
+                <script>
+                    document.getElementById("language-select").checked = false;
+                    window.addEventListener("click", function(event) {
+                        if (!event.target.P(".language")) document.getElementById("language-select").checked = false;
+                    })
+                </script>
+            </div>
+            <nav class="breadcrumbs">
+                <a href="https://www.ovac4u.com/idoc/">IDoc - Generate documentation for laravel API</a>
+            </nav>
+        </header>
+
+        <main>
+            <aside class="toc"><ul></ul></aside>
+            <article>
+                <template search-description></template>
+
+<!-- CONTENT START -->
+<div align="center" style="border: 2px dotted #000000">
+    <a href="https://https://www.openapis.org/" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50/v1553976486/1_Qf94xFwde421J_ZSmdPJDw_soee3m.png" class="inline"></a>
+    <br>
+<a href="https://https://www.openapis.org/" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50/v1553975330/C2I2EFN2_400x400_qcuyop.jpg" class="inline"></a><a href="#" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_120/v1506828786/logo-composer-transparent_zjgal0.png" class="inline"></a><a href="#" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50,w_60,c_fill/v1506832992/laravel-logo_atlvfw.png" class="inline"></a>
+<br>
+<a href="https://www.ovac4u.com/idoc" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/v1506828380/logo_size_invert_jelh74.jpg" class="inline"></a>
+</div>
+<p align="center"><a href="https://travis-ci.org/ovac/hubtel-payment"><img src="https://travis-ci.org/ovac/hubtel-payment.svg?branch=master" alt="Build Status" class="inline"></a>
+<a href="https://coveralls.io/github/ovac/hubtel-payment?branch=master"><img src="https://coveralls.io/repos/github/ovac/hubtel-payment/badge.svg?branch=master" alt="Coverage Status" class="inline"></a>
+<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/hubtel-payment/v/stable" alt="Latest Stable Version" class="inline"></a>
+<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/hubtel-payment/downloads" alt="Total Downloads" class="inline"></a>
+<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/hubtel-payment/license" alt="License" class="inline"></a>
+<a href="https://www.versioneye.com/user/projects/598fccd8368b081653c84e2e"><img src="https://www.versioneye.com/user/projects/598fccd8368b081653c84e2e/badge.svg" alt="Dependency Status" class="inline"></a></p>
+<pre><code class="language-md"> Follow me anywhere @ovac4u                         | GitHub
+ _________                          _________       | Twitter
+|   ___   |.-----.--.--.---.-.----.|  |  |.--.--.   | Facboook
+|  |  _   ||  _  |  |  |  _  |  __||__    |  |  |   | Instagram
+|  |______||_____|\___/|___._|____|   |__||_____|   | Github + @ovac
+|_________|                        www.ovac4u.com   | Facebook + @ovacposts</code></pre>
+<p><br/>
+<br/></p>
+<div align="center">
+
+<h2 id="laravel-idoc---the-api-documentation-generator">Laravel IDoc - The API Documentation Generator</h2>
+
+<p>Automatically generate an interactive API documentation from your existing Laravel routes. Take a look at the <a href="https://www.ovac4u.com/idoc/index.html">example documentation</a>. Inspired by <a href="mpociot/laravel-apidoc-generator">Laravel Api Documentation Generator</a></p>
+</div>
+<p><br/>
+<br/></p>
+<h2 id="introduction">Introduction.</h2>
+<p>Laravel IDoc generator (interactive documentation generator) is a seamless and complete plugin for generating API documentation from your Laravel's codebase. It is inspired by the laravel-apidoc-generator, ReDoc and the Open API initiative from Swagger. IDoc has been built with extendability so that it can easily adapt with your use case.</p>
+<p><img src="https://raw.githubusercontent.com/Rebilly/ReDoc/master/demo/redoc-demo.png" alt="Demo" /></p>
+<h2 id="features">Features</h2>
+<ul>
+<li>Extremely easy deployment</li>
+<li>Server Side Rendering ready</li>
+<li>The widest OpenAPI v2.0 features support <br>
+<img src="https://raw.githubusercontent.com/Rebilly/ReDoc/master/docs/images/discriminator-demo.gif" alt="" class="inline" /></li>
+<li>OpenAPI 3.0 support</li>
+<li>Neat <strong>interactive</strong> documentation for nested objects <br>
+<img src="https://raw.githubusercontent.com/Rebilly/ReDoc/master/docs/images/nested-demo.gifdocs/images/nested-demo.gif" alt="" class="inline" /></li>
+<li>Automatic code sample support <br>
+<img src="https://raw.githubusercontent.com/Rebilly/ReDoc/master/docs/images/code-samples-demo.gif" alt="" class="inline" /></li>
+<li>Responsive three-panel design with menu/scrolling synchronization</li>
+<li>Integrate API Introduction into side menu.</li>
+<li>High-level grouping in side-menu.</li>
+<li>Branding/customizations.</li>
+</ul>
+<h2 id="installation">Installation</h2>
+<blockquote>
+<p>Note: PHP 7 and Laravel 5.5 or higher are the minimum dependencies.</p>
+</blockquote>
+<pre><code class="language-sh">$ composer require ovac/idoc</code></pre>
+<h3 id="laravel">Laravel</h3>
+<p>Publish the config file by running:</p>
+<pre><code class="language-bash">php artisan vendor:publish --tag=idoc-config</code></pre>
+<p>This will create an <code>idoc.php</code> file in your <code>config</code> folder.</p>
+<h3 id="lumen">Lumen</h3>
+<ul>
+<li>Register the service provider in your <code>bootstrap/app.php</code>:
+<pre><code class="language-php">$app-&gt;register(\OVAC\IDoc\IDocServiceProvider::class);</code></pre></li>
+<li>Copy the config file from <code>vendor/ovac/idoc/config/idoc.php</code> to your project as <code>config/idoc.php</code>. Then add to your <code>bootstrap/app.php</code>:
+<pre><code class="language-php">$app-&gt;configure('idoc');</code></pre></li>
+</ul>
+<h2 id="usage">Usage</h2>
+<pre><code class="language-bash">$ php artisan idoc:generate</code></pre>
+<h2 id="configuration">Configuration</h2>
+<p>Before you can generate your documentation, you'll need to configure a few things in your <code>config/idoc.php</code>.</p>
+<ul>
+<li>
+<p><code>output</code>
+This is the file path where the generated documentation will be written to. Default: <strong>public/docs</strong></p>
+</li>
+<li>
+<p><code>collection</code>
+This package can automatically generate an Open-API 3.0 specification file for your routes, along with the documentation. This section is where you can configure if you want a download button visible on the documentation.</p>
+</li>
+<li>
+<p><code>router</code>
+The router to use when processing the route (can be Laravel or Dingo. Defaults to <strong>Laravel</strong>)</p>
+</li>
+<li>
+<p><code>logo</code>
+You can specify your custom logo to be used on the generated documentation. A relative or absolute url to the logo image.</p>
+</li>
+<li><code>routes</code>
+This is where you specify what rules documentation should be generated for. You specify routes to be parsed by defining conditions that the routes should meet and rules that should be applied when generating documentation. These conditions and rules are specified in groups, allowing you to apply different rules to different routes.</li>
+</ul>
+<p>For instance, suppose your configuration looks like this:</p>
+<pre><code class="language-php">return [
+     //...,
+
+     'routes' =&gt; [
+          [
+              'match' =&gt; [
+                  'domains' =&gt; ['*'],
+                  'prefixes' =&gt; ['api/*', 'v2-api/*'],
+                  'versions' =&gt; ['v1'],
+              ],
+              'include' =&gt; ['users.index', 'healthcheck*'],
+              'exclude' =&gt; ['users.create', 'admin.*'],
+              'apply' =&gt; [
+                  'headers' =&gt; [
+                      'Authorization' =&gt; 'Bearer: {token}',
+                  ],
+              ],
+          ],
+];</code></pre>
+<p>This means documentation will be generated for routes in all domains ('&ast;' is a wildcard meaning 'any character') which match any of the patterns 'api/&ast;' or 'v2-api/&ast;', excluding the 'users.create' route and any routes whose names begin with <code>admin.</code>, and including the 'users.index' route and any routes whose names begin with <code>healthcheck.</code>. (The <code>versions</code> key is ignored unless you are using Dingo router).
+Also, in the generated documentation, these routes will have the header 'Authorization: Bearer: {token}' added to the example requests.</p>
+<p>You can also separate routes into groups to apply different rules to them:</p>
+<pre><code class="language-php">&lt;?php
+return [
+     //...,
+
+     'routes' =&gt; [
+          [
+              'match' =&gt; [
+                  'domains' =&gt; ['v1.*'],
+                  'prefixes' =&gt; ['*'],
+              ],
+              'include' =&gt; [],
+              'exclude' =&gt; [],
+              'apply' =&gt; [
+                  'headers' =&gt; [
+                      'Token' =&gt; '{token}',
+                      'Version' =&gt; 'v1',
+                  ],
+              ],
+          ],
+          [
+              'match' =&gt; [
+                  'domains' =&gt; ['v2.*'],
+                  'prefixes' =&gt; ['*'],
+              ],
+              'include' =&gt; [],
+              'exclude' =&gt; [],
+              'apply' =&gt; [
+                  'headers' =&gt; [
+                      'Authorization' =&gt; 'Bearer: {token}',
+                      'Api-Version' =&gt; 'v2',
+                  ],
+              ],
+          ],
+];</code></pre>
+<p>With the configuration above, routes on the <code>v1.*</code> domain will have the <code>Token</code> and <code>Version</code> headers applied, while routes on the <code>v2.*</code> domain will have the <code>Authorization</code> and <code>Api-Version</code> headers applied.</p>
+<blockquote>
+<p>Note: the <code>include</code> and <code>exclude</code> items are arrays of route names. THe &ast; wildcard is supported.
+Note: If you're using DIngo router, the <code>versions</code> parameter is required in each route group. This parameter does not support wildcards. Each version must be listed explicitly,</p>
+</blockquote>
+<p>To generate your API documentation, use the <code>idoc:generate</code> artisan command.</p>
+<pre><code class="language-sh">$ php artisan idoc:generate
+</code></pre>
+<p>It will generate documentation using your specified configuration.</p>
+<h2 id="documenting-your-api">Documenting your API</h2>
+<p>This package uses these resources to generate the API documentation:</p>
+<h3 id="grouping-endpoints">Grouping endpoints</h3>
+<p>This package uses the HTTP controller doc blocks to create a table of contents and show descriptions for your API methods.</p>
+<p>Using <code>@group</code> in a controller doc block creates a Group within the API documentation. All routes handled by that controller will be grouped under this group in the sidebar. The short description after the <code>@group</code> should be unique to allow anchor tags to navigate to this section. A longer description can be included below. Custom formatting and <code>&lt;aside&gt;</code> tags are also supported. (see the <a href="http://marcelpociot.de/documentarian/installation/markdown_syntax">Documentarian docs</a>)</p>
+<blockquote>
+<p>Note: using <code>@group</code> is optional. Ungrouped routes will be placed in a &quot;general&quot; group.</p>
+</blockquote>
+<p>Above each method within the controller you wish to include in your API documentation you should have a doc block. This should include a unique short description as the first entry. An optional second entry can be added with further information. Both descriptions will appear in the API documentation in a different format as shown below.
+You can also specify an <code>@group</code> on a single method to override the group defined at the controller level.</p>
+<pre><code class="language-php">/**
+ * @group User management
+ *
+ * APIs for managing users
+ */
+class UserController extends Controller
+{
+
+    /**
+     * Create a user
+     *
+     * [Insert optional longer description of the API endpoint here.]
+     *
+     */
+     public function createUser()
+     {
+
+     }
+
+    /**
+     * @group Account management
+     *
+     */
+     public function changePassword()
+     {
+
+     }
+}</code></pre>
+<!-- **Result:** 
+![Doc block result](http://headsquaredsoftware.co.uk/images/api_generator_docblock.png) -->
+<h3 id="specifying-request-parameters">Specifying request parameters</h3>
+<p>To specify a list of valid parameters your API route accepts, use the <code>@bodyParam</code> and <code>@queryParam</code> annotations.</p>
+<ul>
+<li>The <code>@bodyParam</code> annotation takes the name of the parameter, its type, an optional &quot;required&quot; label, and then its description. </li>
+<li>The <code>@queryParam</code> annotation takes the name of the parameter, an optional &quot;required&quot; label, and then its description</li>
+</ul>
+<pre><code class="language-php">/**
+ * @bodyParam title string required The title of the post.
+ * @bodyParam body string required The title of the post.
+ * @bodyParam type string The type of post to create. Defaults to 'textophonious'.
+ * @bodyParam author_id int the ID of the author
+ * @bodyParam thumbnail image This is required if the post type is 'imagelicious'.
+ */
+public function createPost()
+{
+    // ...
+}
+
+/**
+ * @queryParam sort Field to sort by
+ * @queryParam page The page number to return
+ * @queryParam fields required The fields to include
+ */
+public function listPosts()
+{
+    // ...
+}</code></pre>
+<p>They will be included in the generated documentation text and example requests.</p>
+<p><strong>Result:</strong></p>
+<p><img src="body_params.png" alt="" /></p>
+<p>Note: a random value will be used as the value of each parameter in the example requests. If you'd like to specify an example value, you can do so by adding <code>Example: your-example</code> to the end of your description. For instance:</p>
+<pre><code class="language-php">    /**
+     * @queryParam location_id required The id of the location.
+     * @queryParam user_id required The id of the user. Example: me
+     * @queryParam page required The page number. Example: 4
+     * @bodyParam user_id int required The id of the user. Example: 9
+     * @bodyParam room_id string The id of the room.
+     * @bodyParam forever boolean Whether to ban the user forever. Example: false
+     */</code></pre>
+<p>Note: You can also add the <code>@bodyParam</code> annotations to a <code>\Illuminate\Foundation\Http\FormRequest</code> subclass:</p>
+<pre><code class="language-php">/**
+ * @bodyParam title string required The title of the post.
+ * @bodyParam body string required The title of the post.
+ * @bodyParam type string The type of post to create. Defaults to 'textophonious'.
+ * @bodyParam author_id int the ID of the author
+ * @bodyParam thumbnail image This is required if the post type is 'imagelicious'.
+ */
+class MyRequest extends \Illuminate\Foundation\Http\FormRequest
+{
+
+}
+
+public function createPost(MyRequest $request)
+{
+    // ...
+}</code></pre>
+<h3 id="indicating-auth-status">Indicating auth status</h3>
+<p>You can use the <code>@authenticated</code> annotation on a method to indicate if the endpoint is authenticated. A &quot;Requires authentication&quot; badge will be added to that route in the generated documentation.</p>
+<h3 id="providing-an-example-response">Providing an example response</h3>
+<p>You can provide an example response for a route. This will be displayed in the examples section. There are several ways of doing this.</p>
+<h4 id="response">@response</h4>
+<p>You can provide an example response for a route by using the <code>@response</code> annotation with valid JSON:</p>
+<pre><code class="language-php">/**
+ * @response {
+ *  "id": 4,
+ *  "name": "Jessica Jones",
+ *  "roles": ["admin"]
+ * }
+ */
+public function show($id)
+{
+    return User::find($id);
+}</code></pre>
+<p>Moreover, you can define multiple <code>@response</code> tags as well as the HTTP status code related to a particular response (if no status code set, <code>200</code> will be returned):</p>
+<pre><code class="language-php">/**
+ * @response {
+ *  "id": 4,
+ *  "name": "Jessica Jones",
+ *  "roles": ["admin"]
+ * }
+ * @response 404 {
+ *  "message": "No query results for model [\App\User]"
+ * }
+ */
+public function show($id)
+{
+    return User::findOrFail($id);
+}</code></pre>
+<h4 id="transformer-transformercollection-and-transformermodel">@transformer, @transformerCollection, and @transformerModel</h4>
+<p>You can define the transformer that is used for the result of the route using the <code>@transformer</code> tag (or <code>@transformerCollection</code> if the route returns a list). The package will attempt to generate an instance of the model to be transformed using the following steps, stopping at the first successful one:</p>
+<ol>
+<li>Check if there is a <code>@transformerModel</code> tag to define the model being transformed. If there is none, use the class of the first parameter to the transformer's <code>transform()</code> method.</li>
+<li>Get an instance of the model from the Eloquent model factory</li>
+<li>If the parameter is an Eloquent model, load the first from the database.</li>
+<li>Create an instance using <code>new</code>.</li>
+</ol>
+<p>Finally, it will pass in the model to the transformer and display the result of that as the example response.</p>
+<p>For example:</p>
+<pre><code class="language-php">/**
+ * @transformercollection \App\Transformers\UserTransformer
+ * @transformerModel \App\User
+ */
+public function listUsers()
+{
+    //...
+}
+
+/**
+ * @transformer \App\Transformers\UserTransformer
+ */
+public function showUser(User $user)
+{
+    //...
+}
+
+/**
+ * @transformer \App\Transformers\UserTransformer
+ * @transformerModel \App\User
+ */
+public function showUser(int $id)
+{
+    // ...
+}</code></pre>
+<p>For the first route above, this package will generate a set of two users then pass it through the transformer. For the last two, it will generate a single user and then pass it through the transformer.</p>
+<blockquote>
+<p>Note: for transformer support, you need to install the league/fractal package</p>
+</blockquote>
+<pre><code class="language-bash">composer require league/fractal</code></pre>
+<h4 id="responsefile">@responseFile</h4>
+<p>For large response bodies, you may want to use a dump of an actual response. You can put this response in a file (as a JSON string) within your Laravel storage directory and link to it. For instance, we can put this response in a file named <code>users.get.json</code> in <code>storage/responses</code>:</p>
+<pre><code>{"id":5,"name":"Jessica Jones","gender":"female"}</code></pre>
+<p>Then in your controller, link to it by:</p>
+<pre><code class="language-php">/**
+ * @responseFile responses/users.get.json
+ */
+public function getUser(int $id)
+{
+  // ...
+}</code></pre>
+<p>The package will parse this response and display in the examples for this route.</p>
+<p>Similarly to <code>@response</code> tag, you can provide multiple <code>@responseFile</code> tags along with the HTTP status code of the response:</p>
+<pre><code class="language-php">/**
+ * @responseFile responses/users.get.json
+ * @responseFile 404 responses/model.not.found.json
+ */
+public function getUser(int $id)
+{
+  // ...
+}</code></pre>
+<h4 id="generating-responses-automatically">Generating responses automatically</h4>
+<p>If you don't specify an example response using any of the above means, this package will attempt to get a </p>
+<p>response by making a request to the route (a &quot;response call&quot;). A few things to note about response calls:</p>
+<ul>
+<li>They are done within a database transaction and changes are rolled back afterwards.</li>
+<li>The configuration for response calls is located in the <code>config/idoc.php</code>. They are configured within the <code>['apply']['response_calls']</code> section for each route group, allowing you to apply different settings for different sets of routes.</li>
+<li>By default, response calls are only made for GET routes, but you can configure this. Set the <code>methods</code> key to an array of methods or '*' to mean all methods. Leave it as an empty array to turn off response calls for that route group.</li>
+<li>Parameters in URLs (example: <code>/users/{user}</code>, <code>/orders/{id?}</code>) will be replaced with '1' by default. You can configure this, however. Put the parameter names (including curly braces and question marks) as the keys and their replacements as the values in the <code>bindings</code> key.</li>
+<li>You can configure environment variables (this is useful so you can prevent external services like notifications from being triggered). By default the APP_ENV is set to 'documentation'. You can add more variables in the <code>env</code> key.</li>
+<li>By default, the package will generate dummy values for your documented body and query parameters and send in the request. (If you specified example values using <code>@bodyParam</code> or <code>@queryParam</code>, those will be used instead.) You can configure what headers and additional query and parameters should be sent when making the request (the <code>headers</code>, <code>query</code>, and <code>body</code> keys respectively).</li>
+</ul>
+<h3 id="open-api-30-spec-file">Open-API 3.0 spec file</h3>
+<p>The generator automatically creates an Open-API 3.0 spec file, which you can import to use within any external api application.</p>
+<p>The default base URL added to the spec file will be that found in your Laravel <code>config/app.php</code> file. This will likely be <code>http://localhost</code>. If you wish to change this setting you can directly update the url or link this config value to your environment file to make it more flexible (as shown below):</p>
+<pre><code class="language-php">'url' =&gt; env('APP_URL', 'http://yourappdefault.app'),</code></pre>
+<p>If you are referring to the environment setting as shown above, then you should ensure that you have updated your <code>.env</code> file to set the APP_URL value as appropriate. Otherwise the default value (<code>http://yourappdefault.app</code>) will be used in your spec file. Example environment value:</p>
+<pre><code>APP_URL=http://yourapp.app</code></pre>
+<h2 id="further-modification">Further modification</h2>
+<p>The info file in the view folder can be further modified to add introductions and further documentation.</p>
+<h2 id="credits">Credits</h2>
+<p>This software uses the following open source packages:</p>
+<ul>
+<li><a href="https://laravel.com/">Laravel</a></li>
+<li><a href="https://github.com/Rebilly/ReDoc">Redoc</a></li>
+<li><a href="https://github.com/ramsey/uuid">Ramsey UUID</a></li>
+</ul>
+<h2 id="you-may-also-like">You may also like...</h2>
+<ul>
+<li><a href="mpociot/laravel-apidoc-generator">Laravel Api Documentation Generator</a> - A laravel api documentation generator.</li>
+</ul>
+<h2 id="license">License</h2>
+<p>MIT</p>
+<!-- CONTENT END -->
+
+            </article>
+            <aside class="sidebar">
+                <hr>
+                <h2>About mintlook</h2>
+                <h3>Links</h3>
+                <div class="bulletlink"><a href="https://www.ovac4u.com/idoc/">Homepage</a></div>
+                <hr>
+                <div class="bulletlink"><a href="https://www.ovac4u.com">More open souce juice by OVAC4U</a></div>
+                <p>Follow us on <a href="">Facebook</a>, <a href="">Twitter</a>, and other <a href="">social networks</a>.</p>
+
+            </aside>
+        </main>
+
+        <script src="https://www.ovac4u.com/idoc/assets/toc.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/plugins/autoloader/prism-autoloader.min.js"></script>
+        <script>Prism.plugins.autoloader.languages_path = "https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/";</script>
+        <link rel="stylesheet" href="https://www.ovac4u.com/idoc/assets/prism.css">
+
+        <script src="https://cdn.jsdelivr.net/npm/js-search@1.4.2/dist/umd/js-search.min.js"></script>
+        <script src="https://www.ovac4u.com/idoc/assets/search.js"></script>
+    </body>
+</html>

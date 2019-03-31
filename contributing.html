@@ -1,0 +1,136 @@
+<!doctype html>
+<html class="lazyload">
+    <head>
+        <title>CONTRIBUTING · IDoc - Generate documentation for laravel API</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+                <link rel="icon" type="image/png" href="https://www.ovac4u.com/idoc/icon.png">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Share:400|Jaldi:400,700|Fira+Mono:400,700">
+        <link rel="stylesheet" href="https://www.ovac4u.com/idoc/assets/base.css">
+        <link rel="stylesheet" href="https://www.ovac4u.com/idoc/assets/lindoc.css">
+        <style>
+            a,.results strong{color:#d21}
+            button,input[type=submit],input[type=button],input[type=reset],.button,.search input[type=submit]{background-color:#d21}
+            .search input[type=text]:focus,.results,.results strong{border-color:#d21 !important}
+            @media screen and (min-width:1450px){.livetoc a.active{ color:#d21}}
+        </style>
+        <script>
+            // Parent Elements - e.P("body") - https://gist.github.com/moqmar/0995cf6595201f7a062fb173cb4ab938
+            (function(E){E.matches||(E.matches=E.matchesSelector||E.msMatchesSelector||E.webkitMatchesSelector)})(Element.prototype)
+            Element.prototype.P=function(s){var e=this
+            if(!s||typeof s=="number")for(var i=0;i<(s||1);i++)e=e?e.parentElement:e
+            else if(typeof s=="string")while(e&&!e.matches(s))e=e.parentElement
+            else while(e&&e!=s)e=e.parentElement
+            return e}
+        </script>
+    </head>
+    <body>
+        <header>
+            <h1>
+                <a href="https://www.ovac4u.com/idoc/"><img src="https://res.cloudinary.com/ovac/image/upload/h_300,w_300,c_fill,r_max,bo_20px_solid_white/aboust_ey5v1v.jpg" alt="IDoc - Generate documentation for laravel API"></a>
+            </h1>
+            <!-- THIS DOCUMENT IS INDEXED -->
+            <div class="search" role="search"><form data-baseurl="https://www.ovac4u.com/idoc" onsubmit="search(this); return false;">
+                <input type="text" class="search-query" oninput="search(this.parentElement)" placeholder="Search...">
+                <input type="submit" value="➜">
+            </form><div class="results"></div></div>
+            <div class="language">
+                <input type="checkbox" id="language-select">
+                <label for="language-select"><img src="https://www.ovac4u.com/idoc/assets/flags/world.png"></label>
+                <div class="language-select-popup" data-default-language="world">
+                    <a href="https://www.ovac4u.com/idoc/en/CONTRIBUTING.html"><img src="https://www.ovac4u.com/idoc/assets/flags/en.png"></a>
+                    <a href="https://www.ovac4u.com/idoc/de/CONTRIBUTING.html"><img src="https://www.ovac4u.com/idoc/assets/flags/de.png"></a>
+                </div>
+                <script>
+                    document.getElementById("language-select").checked = false;
+                    window.addEventListener("click", function(event) {
+                        if (!event.target.P(".language")) document.getElementById("language-select").checked = false;
+                    })
+                </script>
+            </div>
+            <nav class="breadcrumbs">
+                <a href="https://www.ovac4u.com/idoc/">IDoc - Generate documentation for laravel API</a> » <strong>CONTRIBUTING</strong>
+            </nav>
+        </header>
+
+        <main>
+            <aside class="toc"><ul></ul></aside>
+            <article>
+                <template search-description></template>
+
+<!-- CONTENT START -->
+<h1 id="contributing">Contributing</h1>
+<p>Contributions are <strong>welcome</strong> and will be fully <strong>credited</strong>.</p>
+<p>Please read and understand the contribution guide before creating an issue or pull request.</p>
+<h2 id="etiquette">Etiquette</h2>
+<p>This project is open source, and as such, the maintainers give their free time to build and maintain the source code
+held within. They make the code freely available in the hope that it will be of use to other developers. It would be
+extremely unfair for them to suffer abuse or anger for their hard work.</p>
+<p>Please be considerate towards maintainers when raising issues or presenting pull requests. Let's show the
+world that developers are civilized and selfless people.</p>
+<p>It's the duty of the maintainer to ensure that all submissions to the project are of sufficient
+quality to benefit the project. Many developers have different skillsets, strengths, and weaknesses. Respect the maintainer's decision, and do not be upset or abusive if your submission is not used.</p>
+<h2 id="viability">Viability</h2>
+<p>When requesting or submitting new features, first consider whether it might be useful to others. Open
+source projects are used by many developers, who may have entirely different needs to your own. Think about
+whether or not your feature is likely to be used by other users of the project.</p>
+<h2 id="procedure">Procedure</h2>
+<p>Before filing an issue:</p>
+<ul>
+<li>Attempt to replicate the problem, to ensure that it wasn't a coincidental incident.</li>
+<li>Check to make sure your feature suggestion isn't already present within the project.</li>
+<li>Check the pull requests tab to ensure that the bug doesn't have a fix in progress.</li>
+<li>Check the pull requests tab to ensure that the feature isn't already in progress.</li>
+</ul>
+<p>Before submitting a pull request:</p>
+<ul>
+<li>Check the codebase to ensure that your feature doesn't already exist.</li>
+<li>Check the pull requests to ensure that another person hasn't already submitted the feature or fix.</li>
+</ul>
+<h2 id="requirements">Requirements</h2>
+<p>If the project maintainer has any additional requirements, you will find them listed here.</p>
+<ul>
+<li>
+<p><strong><a href="https://github.com/php-fig/fig-standards/blob/master/accepted/psr-2-coding-style-guide.html">PSR-2 Coding Standard</a></strong> - The easiest way to apply the conventions is to install <a href="http://pear.php.net/package/PHP_CodeSniffer">PHP Code Sniffer</a>.</p>
+</li>
+<li>
+<p><strong>Add tests!</strong> - Your patch won't be accepted if it doesn't have tests.</p>
+</li>
+<li>
+<p><strong>Document any change in behaviour</strong> - Make sure the <code>README.md</code> and any other relevant documentation are kept up-to-date.</p>
+</li>
+<li>
+<p><strong>Consider our release cycle</strong> - We try to follow <a href="http://semver.org/">SemVer v2.0.0</a>. Randomly breaking public APIs is not an option.</p>
+</li>
+<li>
+<p><strong>One pull request per feature</strong> - If you want to do more than one thing, send multiple pull requests.</p>
+</li>
+<li><strong>Send coherent history</strong> - Make sure each individual commit in your pull request is meaningful. If you had to make multiple intermediate commits while developing, please <a href="http://www.git-scm.com/book/en/v2/Git-Tools-Rewriting-History#Changing-Multiple-Commit-Messages">squash them</a> before submitting.</li>
+</ul>
+<p><strong>Happy coding</strong>!</p>
+<!-- CONTENT END -->
+
+            </article>
+            <aside class="sidebar">
+                <hr>
+                <h2>About mintlook</h2>
+                <h3>Links</h3>
+                <div class="bulletlink"><a href="https://www.ovac4u.com/idoc/">Homepage</a></div>
+                <hr>
+                <div class="bulletlink"><a href="https://www.ovac4u.com">More open souce juice by OVAC4U</a></div>
+                <p>Follow us on <a href="">Facebook</a>, <a href="">Twitter</a>, and other <a href="">social networks</a>.</p>
+
+            </aside>
+        </main>
+
+        <script src="https://www.ovac4u.com/idoc/assets/toc.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/plugins/autoloader/prism-autoloader.min.js"></script>
+        <script>Prism.plugins.autoloader.languages_path = "https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/";</script>
+        <link rel="stylesheet" href="https://www.ovac4u.com/idoc/assets/prism.css">
+
+        <script src="https://cdn.jsdelivr.net/npm/js-search@1.4.2/dist/umd/js-search.min.js"></script>
+        <script src="https://www.ovac4u.com/idoc/assets/search.js"></script>
+    </body>
+</html>

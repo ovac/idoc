@@ -1,0 +1,136 @@
+/*
+  BASE.CSS
+  ‾‾‾‾‾‾‾‾
+  Simple but beautiful styling for all basic HTML elements. Useful as a basic stylesheet to build upon.
+  
+  Version 0.4
+  Created by Moritz Marquardt, mo-mar.de
+  Licensed under CC0 - https://creativecommons.org/publicdomain/zero/1.0/
+
+  Provided classes:
+   inline          - Only applies to IMG elements. Don't stretch images to the full width but keep them inline.
+   float-<l|r>     - Float an element to the left or right.
+   limit           - Only take up up to 30% of the parent width. Useful for floating images.
+   clearfix[-l|-r] - Clear the float alignment.
+   align-<l|c|r|j> - Set text alignment to left/center/right/justify
+   table           - Every table should be wrapped by a div with this class to make the table responsive.
+   button          - Make an element (e.g. a link) look like a button.
+
+  Recommended body layout for text-only pages:
+   body { padding: 15px; max-width: 900px; margin: 0 auto; }
+
+  Default fonts:
+   Jaldi      Text and Forms  https://fonts.google.com/specimen/Jaldi
+   Share      Headlines       https://fonts.google.com/specimen/Share
+   Fira Mono  Code Blocks     https://fonts.google.com/specimen/Fira+Mono
+
+  Import the default fonts:
+   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Share:400|Jaldi:400,700|Fira+Mono:400,700">
+
+  Use custom fonts:
+   html                  { font-family: Main Font;  }
+   h1,h2,h3,h4,h5,h6     { font-family: Title Font; }
+   pre,code,kbd,samp,var { font-family: Code Font;  }
+
+  Default colors:
+   #ffffff  Root Background (HTML element) and Button Text Color
+   #181818  Text Color
+   #595959  Secondary Text Color (Address, Blockquote, ...)
+   #036dff  Link & Accent Foreground Color
+   #7E38FF  Visited Link Color
+   #e7e9ec  Accent Background Color
+   #f9fafb  Light Accent Background Color
+   #ced1d4  Accent Border Color
+
+  To set custom colors, either replace them in base.css, or use the following rules to override them:
+   html { color: Font Color; background: Root Background; }
+   figcaption,address,table caption,blockquote { color: Secondary Color; }
+   a { color: Link Color; }
+   button,input[type=submit],input[type=button],input[type=reset],.button { background: Link Color; }
+   button:hover,button:focus,.button:hover,.button:focus,input[type=submit]:hover,input[type=submit]:focus,input[type=button]:hover,input[type=button]:focus,input[type=reset]:hover,input[type=reset]:focus { background: Darker Shade Of The Link Color; }
+   button,input[type=submit],input[type=button],input[type=reset],.button { color: Button Text Color; }
+   @media not print{a:visited { color: Visited Link Color; }}
+   pre,code,kbd,samp,var,blockquote,hr,button[disabled],.button[disabled],input[type=submit][disabled],input[type=button][disabled],input[type=reset][disabled] { background: Accent Background Color; }
+   pre,code,kbd,samp,var { color: Text On Accent Background Color; }
+   blockquote { color: Light Text On Accent Background Color; }
+   button[disabled],.button[disabled],input[type=submit][disabled],input[type=button][disabled],input[type=reset][disabled] { Very Light Text On Accent Background Color; }
+   table tbody tr:nth-child(even) td,table tbody tr:nth-child(even) th,fieldset,fieldset legend { background: Light Accent Background Color; }
+   table td,table th,fieldset legend:before { border-color: Accent Border Color; }
+  To get the darker shade of the link color, you can go to http://www.colorhexa.com/<Link-Color> and copy the value of the third "Monochromatic Color" listed there under "Color Schemes".
+
+*/
+
+/* normalize.css v4.1.1 | MIT License | github.com/necolas/normalize.css */
+progress,sub,sup{vertical-align:baseline}button,hr,input{overflow:visible}html{font-family:sans-serif;line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}body{margin:0} figcaption, menu,article,aside,details,figure,footer,header,main,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block}audio:not([controls]){display:none;height:0} [hidden],template{display:none}a{background-color:transparent;-webkit-text-decoration-skip:objects}a:active,a:hover{outline-width:0}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted}b,strong{font-weight:bolder}dfn{font-style:italic}h1{font-size:2em;margin:.67em 0}mark{background-color:#ff0;color:#000}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative}sub{bottom:-.25em}sup{top:-.5em}img{border-style:none}svg:not(:root){overflow:hidden}code,kbd,pre,samp{font-family:monospace,monospace;font-size:1em}figure{margin:1em 40px}hr{box-sizing:content-box;height:0}button,input,optgroup,select,textarea{font:inherit;margin:0}optgroup{font-weight:700}button,input{}button,select{text-transform:none}[type=submit], [type=reset],button,html [type=button]{-webkit-appearance:button}[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner,button::-moz-focus-inner{border-style:none;padding:0}[type=button]:-moz-focusring,[type=reset]:-moz-focusring,[type=submit]:-moz-focusring,button:-moz-focusring{outline:ButtonText dotted 1px}fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}legend{box-sizing:border-box;color:inherit;display:table;max-width:100%;padding:0;white-space:normal}textarea{overflow:auto}[type=checkbox],[type=radio]{box-sizing:border-box;padding:0}[type=number]::-webkit-inner-spin-button,[type=number]::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}[type=search]::-webkit-search-cancel-button,[type=search]::-webkit-search-decoration{-webkit-appearance:none}::-webkit-input-placeholder{color:inherit;opacity:.54}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}
+
+/* General font and colors */
+html { font-family: Jaldi, sans-serif; font-size: 19px; line-height: 1.5; color: #181818; background: #fff; }
+
+/* Headlines */
+h1, h2, h3, h4, h5, h6 { font-family: Share, sans-serif; font-weight: 400; line-height: 1.1; margin: 25px 0 10px; }
+h1 { font-size: 2.5em; }
+h2 { font-size: 2.0em; }
+h3 { font-size: 1.75em; }
+h4 { font-size: 1.5em; }
+h5 { font-size: 1.2em; }
+h6 { font-size: 1.0em; }
+
+/* Element margins */
+p, pre, table, ul, ol, blockquote, figure, fieldset { margin: 10px 0 25px }
+
+/* Inline elements */
+a { color: #04AB90; text-decoration: underline; cursor: pointer; }
+/*@media not print { a:visited { color: #7E38FF; }}*/
+figcaption, address, table caption { color: #595959; font-style: italic; font-size: 0.9em; }
+
+/* Code */
+pre, code, kbd, samp, var { font-family: Fira Mono, monospace; font-size: 0.85em; background: #e7e9ec; color: #000; border-radius: 3px; padding: 2px 3px; white-space: pre-wrap; word-wrap: break-word; border: 1px solid #ced1d4; }
+pre { padding: 15px; overflow: auto; }
+pre code { padding: 0; border: none; background: transparent; font-size: 1em; }
+
+/* Block elements */
+img:not(.inline), svg:not(.inline):not(.svg-inline--fa), video:not(.inline), audio:not(.inline), iframe:not(.inline), embed:not(.inline), object:not(.inline) { display: block; width: 100%; border-radius: 3px } /* Add the inline class to make images inline instead of a block. */
+.limit { max-width: 30%; }
+.float-r { float: right; }
+.float-l { float: left; }
+.clearfix:after, .clearfix-l:after, .clearfix-r:after { content: ""; clear: both; display: block; visibility: hidden; height: 0; } /* You can also add the "clearfix" class to an element with the "float" class, and even control the sides to be cleared by adding "r" or "l" */
+.clearfix-r:after { clear: right; }
+.clearfix-l:after { clear: left; }
+
+/* Paragraphs */
+p { margin: 10px 0 25px; }
+blockquote { border-left: 5px solid #e7e9ec; margin-left: 15px; padding: 0px 15px; color: #595959; }
+hr { border: none; outline: none; height: 3px; background: #e7e9ec; }
+.align-l { text-align: left; }
+.align-c { text-align: center; }
+.align-r { text-align: right; }
+.align-j { text-align: justify; }
+
+/* Lists */
+ul, ol { padding: 0; padding-left: 1em; }
+ul ul, ul ol, ol ul, ol ol { margin: 0; } /* Nested lists */
+ul { list-style: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 4' width='6' height='8'><circle cx='1' cy='1' r='1' fill='#181818'/></svg>"); } /* A bit of a smaller bullet */
+ol { list-style: decimal; }
+
+/* Tables */
+.table { overflow-y: hidden; overflow-x: auto; padding: 0 2px; } /* Responsive Tables: <div class="table"><table>...</table></div> */
+table { border-collapse: collapse; min-width: 100%; }
+table td, table th { border: 1px solid #ced1d4; padding: 5px; text-align: left; }
+table tbody tr:nth-child(even) td, table tbody tr:nth-child(even) th { background: #f9fafb; }
+table caption { text-align: left; caption-side: bottom; }
+
+/* Forms */
+input:not([type=submit]):not([type=button]):not([type=reset]):not([type=checkbox]):not([type=radio]), textarea, select { display: block; font: inherit; box-sizing: border-box; background: #fff; border: 1px solid #ced1d4; padding: 1px 5px; width: 100%; margin-bottom: 10px; }
+select[size] { padding: 0; }
+textarea { min-height: 80px; resize: vertical; }
+label { display: block; }
+button, input[type=submit], input[type=button], input[type=reset], .button { font: inherit; background: #04AB90; color: #fff; text-decoration: none; border: none; display: inline-block; padding: 5px 15px; cursor: pointer; }
+button:hover, button:focus, .button:hover, .button:focus, input[type=submit]:hover, input[type=submit]:focus, input[type=button]:hover, input[type=button]:focus, input[type=reset]:hover, input[type=reset]:focus { opacity: 0.8; outline: none !important; }
+button[disabled], .button[disabled], input[type=submit][disabled], input[type=button][disabled], input[type=reset][disabled] { background: #e7e9ec; color: #aaa !important; cursor: default; }
+fieldset { background: #f9fafb; border: 1px solid #ced1d4; }
+fieldset legend { position: relative; background: #f9fafb; padding: 2px 10px; }
+fieldset legend:before { content: ""; position: absolute; top: -1px; left: -1px; right: -1px; bottom: 50%; border: 1px solid #ced1d4; border-bottom: none; }
+
+/* Definition Lists */
+dt { font-style: italic; font-weight: bold; margin-top: 5px; }
+dd { color: #595959; }
