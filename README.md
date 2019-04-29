@@ -92,17 +92,57 @@ $ php artisan idoc:generate
 
 ## Configuration
 Before you can generate your documentation, you'll need to configure a few things in your `config/idoc.php`.
+
+- `logo`
+You can specify your custom logo to be used on the generated documentation. A relative or absolute url to the logo image.
+```php
+    'logo' => 'https://res.cloudinary.com/ovac/image/upload/h_300,w_380,c_fill,r_30,bo_20px_solid_white/aboust_ey5v1v.jpg',
+```
+
+- `title`
+Here, you can specify the title to place on the documentation page.
+```php
+    'title' => 'iDoc API Reference',
+ ```
+ 
+ - `description`
+ This will place a discription on top of the documnetation.
+ ```php
+ 'description' => 'iDoc Api secification and documentation.',
+ ```
+ 
+ - `documentation-route`
+This will be used to register the necessary routes for the package. Default: **idoc**
+ ```php
+ 'documentation-route' => 'idoc',
+ ```
+ 
 - `output`
 This is the file path where the generated documentation will be written to. Default: **public/docs**
+
+
+ ```
+ 
+- `output`
+The servers array can be used to add multiple endpoints on the documentation so that the user can switch between endpoints. For example, This could be a test server and the live server.
+ ```php
+'servers' => [
+    [
+        'url' => 'https://www.ovac4u.com',
+        'description' => 'App live server.',
+    ],
+    [
+        'url' => 'https://test.ovac4u.com',
+        'description' => 'App test server.',
+    ],
+],
+```
 
 - `collection`
 This package can automatically generate an Open-API 3.0 specification file for your routes, along with the documentation. This section is where you can configure if you want a download button visible on the documentation.
 
 - `router`
 The router to use when processing the route (can be Laravel or Dingo. Defaults to **Laravel**)
-
-- `logo`
-You can specify your custom logo to be used on the generated documentation. A relative or absolute url to the logo image.
 
 - `routes`
 This is where you specify what rules documentation should be generated for. You specify routes to be parsed by defining conditions that the routes should meet and rules that should be applied when generating documentation. These conditions and rules are specified in groups, allowing you to apply different rules to different routes.
@@ -113,22 +153,131 @@ For instance, suppose your configuration looks like this:
 return [
      //...,
   
-     'routes' => [
-          [
-              'match' => [
-                  'domains' => ['*'],
-                  'prefixes' => ['api/*', 'v2-api/*'],
-                  'versions' => ['v1'],
-              ],
-              'include' => ['users.index', 'healthcheck*'],
-              'exclude' => ['users.create', 'admin.*'],
-              'apply' => [
-                  'headers' => [
-                      'Authorization' => 'Bearer: {token}',
-                  ],
-              ],
-          ],
-];
+     /*
+     * The routes for which documentation should be generated.
+     * Each group contains rules defining which routes should be included ('match', 'include' and 'exclude' sections)
+     * and rules which should be applied to them ('apply' section).
+     */
+    'routes' => [
+        [
+            /*
+             * Specify conditions to determine what routes will be parsed in this group.
+             * A route must fulfill ALL conditions to pass.
+             */
+            'match' => [
+
+                /*
+                 * Match only routes whose domains match this pattern (use * as a wildcard to match any characters).
+                 */
+                'domains' => [
+                    '*',
+                    // 'domain1.*',
+                ],
+
+                /*
+                 * Match only routes whose paths match this pattern (use * as a wildcard to match any characters).
+                 */
+                'prefixes' => [
+                    'api/*',
+                ],
+
+                /*
+                 * Match only routes registered under this version. This option is ignored for Laravel router.
+                 * Note that wildcards are not supported.
+                 */
+                'versions' => [
+                    'v1',
+                ],
+            ],
+
+            /*
+             * Include these routes when generating documentation,
+             * even if they did not match the rules above.
+             * Note that the route must be referenced by name here (wildcards are supported).
+             */
+            'include' => [
+                // 'users.index', 'healthcheck*'
+            ],
+
+            /*
+             * Exclude these routes when generating documentation,
+             * even if they matched the rules above.
+             * Note that the route must be referenced by name here (wildcards are supported).
+             */
+            'exclude' => [
+                // 'users.create', 'admin.*'
+            ],
+
+            /*
+             * Specify rules to be applied to all the routes in this group when generating documentation
+             */
+            'apply' => [
+                /*
+                 * Specify headers to be added to the example requests
+                 */
+                'headers' => [
+                    'Authorization' => 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJod',
+                    // 'Api-Version' => 'v2',
+                ],
+
+                /*
+                 * If no @response or @transformer declaratons are found for the route,
+                 * we'll try to get a sample response by attempting an API call.
+                 * Configure the settings for the API call here,
+                 */
+                'response_calls' => [
+                    /*
+                     * API calls will be made only for routes in this group matching these HTTP methods (GET, POST, etc).
+                     * List the methods here or use '*' to mean all methods. Leave empty to disable API calls.
+                     */
+                    'methods' => ['*'],
+
+                    /*
+                     * For URLs which have parameters (/users/{user}, /orders/{id?}),
+                     * specify what values the parameters should be replaced with.
+                     * Note that you must specify the full parameter, including curly brackets and question marks if any.
+                     */
+                    'bindings' => [
+                        // '{user}' => 1
+                    ],
+
+                    /*
+                     * Environment variables which should be set for the API call.
+                     * This is a good place to ensure that notifications, emails
+                     * and other external services are not triggered during the documentation API calls
+                     */
+                    'env' => [
+                        'APP_ENV' => 'documentation',
+                        'APP_DEBUG' => false,
+                        // 'env_var' => 'value',
+                    ],
+
+                    /*
+                     * Headers which should be sent with the API call.
+                     */
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Accept' => 'application/json',
+                        // 'key' => 'value',
+                    ],
+
+                    /*
+                     * Query parameters which should be sent with the API call.
+                     */
+                    'query' => [
+                        // 'key' => 'value',
+                    ],
+
+                    /*
+                     * Body parameters which should be sent with the API call.
+                     */
+                    'body' => [
+                        // 'key' => 'value',
+                    ],
+                ],
+            ],
+        ],
+    ],
 ```
 
 This means documentation will be generated for routes in all domains ('&ast;' is a wildcard meaning 'any character') which match any of the patterns 'api/&ast;' or 'v2-api/&ast;', excluding the 'users.create' route and any routes whose names begin with `admin.`, and including the 'users.index' route and any routes whose names begin with `healthcheck.`. (The `versions` key is ignored unless you are using Dingo router).
