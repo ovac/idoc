@@ -6,12 +6,9 @@
 <a href="https://www.ovac4u.com/idoc" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/v1506828380/logo_size_invert_jelh74.jpg" class="inline"></a>
 </div>
 
-
-<p align="center"><a href="https://travis-ci.org/ovac/hubtel-payment"><img src="https://travis-ci.org/ovac/hubtel-payment.svg?branch=master" alt="Build Status" class="inline"></a>
-<a href="https://coveralls.io/github/ovac/hubtel-payment?branch=master"><img src="https://coveralls.io/repos/github/ovac/hubtel-payment/badge.svg?branch=master" alt="Coverage Status" class="inline"></a>
-<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/hubtel-payment/v/stable" alt="Latest Stable Version" class="inline"></a>
-<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/hubtel-payment/downloads" alt="Total Downloads" class="inline"></a>
-<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/hubtel-payment/license" alt="License" class="inline"></a>
+<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/idoc/v/stable" alt="Latest Stable Version" class="inline"></a>
+<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/idoc/downloads" alt="Total Downloads" class="inline"></a>
+<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/idoc/license" alt="License" class="inline"></a>
 <a href="https://www.versioneye.com/user/projects/598fccd8368b081653c84e2e"><img src="https://www.versioneye.com/user/projects/598fccd8368b081653c84e2e/badge.svg" alt="Dependency Status" class="inline"></a></p>
 
 ```md
