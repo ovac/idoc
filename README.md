@@ -96,13 +96,13 @@ Before you can generate your documentation, you'll need to configure a few thing
 - `logo`
 You can specify your custom logo to be used on the generated documentation. A relative or absolute url to the logo image.
 ```php
-    'logo' => 'https://res.cloudinary.com/ovac/image/upload/h_300,w_380,c_fill,r_30,bo_20px_solid_white/aboust_ey5v1v.jpg',
+'logo' => 'https://res.cloudinary.com/ovac/image/upload/h_300,w_380,c_fill,r_30,bo_20px_solid_white/aboust_ey5v1v.jpg',
 ```
 
 - `title`
 Here, you can specify the title to place on the documentation page.
 ```php
-    'title' => 'iDoc API Reference',
+'title' => 'iDoc API Reference',
  ```
  
  - `description`
