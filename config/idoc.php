@@ -6,9 +6,9 @@ return [
     | iDoc Domain
     |--------------------------------------------------------------------------
     |
-    | This is the subdomain where iDoc will be accessible from. If the setting
-    | is null, iDoc will reside under the same domain as the application.
-    | Otherwise, this value will be used as the subdomain.
+    | This is the subdomain where the documentation will be accessible from.
+    | If the setting is null, iDoc will reside under the same domain as the
+    | application. otherwise, this value will be used as the subdomain.
     |
      */
 
@@ -19,8 +19,8 @@ return [
     | iDoc Path
     |--------------------------------------------------------------------------
     |
-    | This is the URI path where iDoc will be accessible from. Feel free
-    | to change this path to anything you like.
+    | This is the URI path where the documentation will be accessible from.
+    | Feel free to change this path to anything you like.
     |
      */
 
