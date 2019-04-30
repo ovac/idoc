@@ -109,10 +109,10 @@ Here, you can specify the title to place on the documentation page.
  'description' => 'iDoc Api secification and documentation.',
  ```
  
- - `documentation-route`
+ - `path`
 This will be used to register the necessary routes for the package. Default: **idoc**
  ```php
- 'documentation-route' => 'idoc',
+ 'path' => 'idoc',
  ```
  
 - `output`
@@ -295,10 +295,6 @@ class UserController extends Controller
 }
 ```
 
-<!-- **Result:** 
-
-![Doc block result](http://headsquaredsoftware.co.uk/images/api_generator_docblock.png) -->
-
 ### Specifying request parameters
 
 To specify a list of valid parameters your API route accepts, use the `@bodyParam`, `@queryParam` and `@pathParam` annotations.
@@ -391,9 +387,8 @@ class ItemController extends Controller
 
 They will be included in the generated documentation text and example requests.
 
-**Result:**
-
-![](body_params.png)
+**Result:** 
+![Result](https://res.cloudinary.com/ovac/image/upload/w_1000/v1556624368/Screen_Shot_2019-04-30_at_11.36.16_AM_ewombw.png)
 
 Note: a random value will be used as the value of each parameter in the example requests. If you'd like to specify an example value, you can do so by adding `Example: your-example` to the end of your description. For instance:
 
