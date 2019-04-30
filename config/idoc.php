@@ -76,16 +76,18 @@ return [
     | iDoc collection/output path
     |--------------------------------------------------------------------------
     |
-    | The output path for the generated API collection file. This path is
-    | relative to the public path. TO disable the  the open-api-3
-    | download button on the documentation, the collectons
-    | option should be set to false.
+    | The output path for the generated Open API 3.0 collection file.
+    | This path is relative to the public path.
+    |
+    | In order To disable the  the open-api-3 download button
+    | on the  documentation, the `hide_download_button`
+    | option should be set to true.
     |
      */
 
     'output' => '',
 
-    'collections' => true,
+    'hide_download_button' => false,
 
     /*
     |--------------------------------------------------------------------------

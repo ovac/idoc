@@ -31,7 +31,7 @@
           "redocExport": "RedocPro",
           "layout": { "scope": "section" },
           "unstable_externalDescription": '{{route('idoc.info')}}',
-          "hideDownloadButton" : {{(bool) config('idoc.collections')}}
+          "hideDownloadButton" : {{config('idoc.hide_download_button') ?: 0}}
         },
         document.getElementById("redoc_container")
       );
