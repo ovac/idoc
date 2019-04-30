@@ -13,23 +13,23 @@
 </p>
 
 ```md
-                    Follow me anywhere @ovac4u                         | GitHub
-                    _________                          _________       | Twitter
-                   |   ___   |.-----.--.--.---.-.----.|  |  |.--.--.   | Facboook
-                   |  |  _   ||  _  |  |  |  _  |  __||__    |  |  |   | Instagram
-                   |  |______||_____|\___/|___._|____|   |__||_____|   | Github + @ovac
-                   |_________|                        www.ovac4u.com   | Facebook + @ovacposts
+              Follow me anywhere @ovac4u                         | GitHub
+              _________                          _________       | Twitter
+             |   ___   |.-----.--.--.---.-.----.|  |  |.--.--.   | Facboook
+             |  |  _   ||  _  |  |  |  _  |  __||__    |  |  |   | Instagram
+             |  |______||_____|\___/|___._|____|   |__||_____|   | Github + @ovac
+             |_________|                        www.ovac4u.com   | Facebook + @ovacposts
 ```
 
 <br/>
 <br/>
 
-<p align="center">
+<div align="center">
     
 <h2>Laravel IDoc - The API Documentation Generator</h2>
 
 <p>Automatically generate an interactive API documentation from your existing Laravel routes. Take a look at the <a href="https://www.ovac4u.com/idoc/index.html">example documentation</a>. Inspired by <a href="mpociot/laravel-apidoc-generator">Laravel Api Documentation Generator</a></p>
-</p>
+</div>
 
 <br/>
 <br/>
