@@ -2,6 +2,7 @@
 
 namespace OVAC\IDoc;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class IDocServiceProvider extends ServiceProvider
@@ -13,23 +14,13 @@ class IDocServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Route::middlewareGroup('idoc', config('idoc.middleware', []));
 
-        $this->mergeConfigFrom(__DIR__ . '/../../config/idoc.php', 'idoc');
+        $this->registerRoutes();
+        $this->registerPublishing();
+
         $this->loadTranslationsFrom(__DIR__ . '/../../resources/lang', 'idoc');
         $this->loadViewsFrom(__DIR__ . '/../../resources/views/', 'idoc');
-        $this->loadRoutesFrom(__DIR__ . '/../../resources/routes/idoc.php', 'idoc');
-
-        $this->publishes([
-            __DIR__ . '/../../resources/lang' => $this->resourcePath('lang/vendor/idoc'),
-        ], 'idoc-language');
-
-        $this->publishes([
-            __DIR__ . '/../../resources/views' => $this->resourcePath('views/vendor/idoc'),
-        ], 'idoc-views');
-
-        $this->publishes([
-            __DIR__ . '/../../config/idoc.php' => app()->basePath() . '/config/idoc.php',
-        ], 'idoc-config');
 
         if ($this->app->runningInConsole()) {
             $this->commands([
@@ -39,13 +30,61 @@ class IDocServiceProvider extends ServiceProvider
     }
 
     /**
+     * Get the iDoc route group configuration array.
+     *
+     * @return array
+     */
+    private function registerRoutes()
+    {
+        Route::group($this->routeConfiguration(), function () {
+            $this->loadRoutesFrom(__DIR__ . '/../../resources/routes/idoc.php', 'idoc');
+        });
+    }
+
+    /**
+     * Register the package's publishable resources.
+     *
+     * @return void
+     */
+    private function registerPublishing()
+    {
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/../../resources/lang' => $this->resourcePath('lang/vendor/idoc'),
+            ], 'idoc-language');
+
+            $this->publishes([
+                __DIR__ . '/../../resources/views' => $this->resourcePath('views/vendor/idoc'),
+            ], 'idoc-views');
+
+            $this->publishes([
+                __DIR__ . '/../../config/idoc.php' => app()->basePath() . '/config/idoc.php',
+            ], 'idoc-config');
+        }
+    }
+
+    /**
+     * Get the iDoc route group configuration array.
+     *
+     * @return array
+     */
+    private function routeConfiguration()
+    {
+        return [
+            'domain' => config('idoc.domain', null),
+            'prefix' => config('idoc.path'),
+            'middleware' => 'idoc',
+        ];
+    }
+
+    /**
      * Register the API doc commands.
      *
      * @return void
      */
     public function register()
     {
-        //
+        $this->mergeConfigFrom(__DIR__ . '/../../config/idoc.php', 'idoc');
     }
 
     /**

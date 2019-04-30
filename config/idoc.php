@@ -1,67 +1,159 @@
 <?php
 
 return [
+    /*
+    |--------------------------------------------------------------------------
+    | iDoc Domain
+    |--------------------------------------------------------------------------
+    |
+    | This is the subdomain where iDoc will be accessible from. If the setting
+    | is null, iDoc will reside under the same domain as the application.
+    | Otherwise, this value will be used as the subdomain.
+    |
+     */
+
+    'domain' => null,
 
     /*
-     * Custom logo url.
+    |--------------------------------------------------------------------------
+    | iDoc Path
+    |--------------------------------------------------------------------------
+    |
+    | This is the URI path where iDoc will be accessible from. Feel free
+    | to change this path to anything you like.
+    |
      */
+
+    'path' => 'idoc',
+
+    /*
+    |--------------------------------------------------------------------------
+    | iDoc Route Middleware
+    |--------------------------------------------------------------------------
+    |
+    | These middleware will be assigned to the iDoc route, giving you
+    | the chance to add your own or change the idoc middleware.
+    |
+     */
+
+    'middleware' => [
+        'web',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | iDoc logo url
+    |--------------------------------------------------------------------------
+    |
+    | This is the logo configuration for the documentation. The logo expects
+    | an absolute or relative url to a logo image while the color will
+    | fill any space left depending on the log size.
+    |
+     */
+
     'logo' => 'https://res.cloudinary.com/ovac/image/upload/h_300,w_380,c_fill,r_30,bo_20px_solid_white/aboust_ey5v1v.jpg',
 
-    /*
-     * Custom logo url.
-     */
     'color' => '',
 
-    /**
-     * Title of the docyment,
+    /*
+    |--------------------------------------------------------------------------
+    | iDoc Title / Description
+    |--------------------------------------------------------------------------
+    |
+    | This is the title and description that will be visible on the
+    | documentation.
+    |
      */
+
     'title' => 'iDoc API Reference',
 
-    /**
-     * Api description
-     */
     'description' => 'iDoc Api secification and documentation.',
 
-    /**
-     * The version for this documentation,
-     */
     'version' => 'v1',
 
-    /**
-     * Documentation route.
-     */
-    'documentation-route' => 'idoc',
-
     /*
-     * The router to be used (Laravel or Dingo).
+    |--------------------------------------------------------------------------
+    | iDoc collection/output path
+    |--------------------------------------------------------------------------
+    |
+    | The output path for the generated API collection file. This path is
+    | relative to the public path. TO disable the  the open-api-3
+    | download button on the documentation, the collectons
+    | option should be set to false.
+    |
      */
-    'router' => 'laravel',
 
-    /*
-     * Generate a Postman and Open API collection in addition to HTML docs.
-     */
+    'output' => '',
+
     'collections' => true,
 
     /*
-     * The output path for the generated API collection file.
+    |--------------------------------------------------------------------------
+    | iDoc router
+    |--------------------------------------------------------------------------
+    |
+    | The application's router.  (Laravel or Dingo).
+    |
      */
-    'output' => '',
 
-    /**
-     * Servers to add to the documentatiopn
+    'router' => 'laravel',
+
+    /*
+    |--------------------------------------------------------------------------
+    | iDoc servers
+    |--------------------------------------------------------------------------
+    |
+    | The servers that should be added to the documentation. Each should have
+    | a server hostname (and path if neccessary) and a discription of the
+    | host. eg: one for test and another for production.
+    |
      */
+
     'servers' => [
         [
             'url' => config('app.url'),
             'description' => 'Documentation generator server.',
         ],
+        [
+            'url' => 'http://test.example.com',
+            'description' => 'Test server.',
+        ],
     ],
 
     /*
-     * The routes for which documentation should be generated.
-     * Each group contains rules defining which routes should be included ('match', 'include' and 'exclude' sections)
-     * and rules which should be applied to them ('apply' section).
+    |--------------------------------------------------------------------------
+    | iDoc languages tab.
+    |--------------------------------------------------------------------------
+    | Each tab is used to generate a request template for a given language.
+    | New languages can be added and the existing ones modified after.
+    |
+    | You can add or edit new languages tabs by publishing the view files
+    | and editing them or adding custom view files to:
+    |
+    |    'resources/views/vendor/idoc/languages/*.blade.php',
+    |
+    | where * is the name of the language you wish to add.
+    |
+    | Don't forget to add here too when done.
+    |
      */
+
+    'language-tabs' => [
+        'bash' => 'Bash',
+        'javascript' => 'Javascript',
+        'php' => 'PHP',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | iDoc routes: The routes for which documentation should be generated.
+    |--------------------------------------------------------------------------
+    | Each group contains rules defining which routes should be included
+    | ('match', 'include' and 'exclude' sections) and rules which
+    | should be applied to them ('apply' section).
+    |
+     */
+
     'routes' => [
         [
             /*
@@ -181,11 +273,5 @@ return [
                 ],
             ],
         ],
-    ],
-
-    'language-tabs' => [
-        'bash' => 'Bash',
-        'javascript' => 'Javascript',
-        'php' => 'PHP',
     ],
 ];

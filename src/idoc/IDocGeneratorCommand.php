@@ -343,7 +343,7 @@ class IDocGeneratorCommand extends Command
                                 'x-code-samples' => collect(config('idoc.language-tabs'))->map(function ($name, $lang) use ($route) {
                                     return [
                                         'lang' => $name,
-                                        'source' => view('idoc::partials.routes.' . $lang, compact('route'))->render(),
+                                        'source' => view('idoc::languages.' . $lang, compact('route'))->render(),
                                     ];
                                 })->values()->toArray(),
                             ]
