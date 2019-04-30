@@ -28,7 +28,7 @@
     
 <h2>Laravel IDoc - The API Documentation Generator</h2>
 
-<p>Automatically generate an interactive API documentation from your existing Laravel routes. Take a look at the <a href="https://www.ovac4u.com/idoc/index.html">example documentation</a>. Inspired by <a href="mpociot/laravel-apidoc-generator">Laravel Api Documentation Generator</a></p>
+<p>Automatically generate an interactive API documentation from your existing Laravel routes. Take a look at the <a href="https://www.ovac4u.com/idoc/live">example documentation</a>. Inspired by <a href="mpociot/laravel-apidoc-generator">Laravel Api Documentation Generator</a></p>
 </div>
 
 <br/>
