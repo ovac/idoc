@@ -59,33 +59,29 @@
                 <template search-description></template>
 
 <!-- CONTENT START -->
-<div align="center" style="border: 2px dotted #000000">
+<p align="center" style="border: 2px dotted #000000">
     <a href="https://https://www.openapis.org/" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50/v1553976486/1_Qf94xFwde421J_ZSmdPJDw_soee3m.png" class="inline"></a>
     <br>
 <a href="https://https://www.openapis.org/" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50/v1553975330/C2I2EFN2_400x400_qcuyop.jpg" class="inline"></a><a href="#" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_120/v1506828786/logo-composer-transparent_zjgal0.png" class="inline"></a><a href="#" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50,w_60,c_fill/v1506832992/laravel-logo_atlvfw.png" class="inline"></a>
-<br>
-<a href="https://www.ovac4u.com/idoc" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/v1506828380/logo_size_invert_jelh74.jpg" class="inline"></a>
-</div>
-<p align="center"><a href="https://travis-ci.org/ovac/hubtel-payment"><img src="https://travis-ci.org/ovac/hubtel-payment.svg?branch=master" alt="Build Status" class="inline"></a>
-<a href="https://coveralls.io/github/ovac/hubtel-payment?branch=master"><img src="https://coveralls.io/repos/github/ovac/hubtel-payment/badge.svg?branch=master" alt="Coverage Status" class="inline"></a>
-<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/hubtel-payment/v/stable" alt="Latest Stable Version" class="inline"></a>
-<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/hubtel-payment/downloads" alt="Total Downloads" class="inline"></a>
-<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/hubtel-payment/license" alt="License" class="inline"></a>
-<a href="https://www.versioneye.com/user/projects/598fccd8368b081653c84e2e"><img src="https://www.versioneye.com/user/projects/598fccd8368b081653c84e2e/badge.svg" alt="Dependency Status" class="inline"></a></p>
-<pre><code class="language-md"> Follow me anywhere @ovac4u                         | GitHub
- _________                          _________       | Twitter
-|   ___   |.-----.--.--.---.-.----.|  |  |.--.--.   | Facboook
-|  |  _   ||  _  |  |  |  _  |  __||__    |  |  |   | Instagram
-|  |______||_____|\___/|___._|____|   |__||_____|   | Github + @ovac
-|_________|                        www.ovac4u.com   | Facebook + @ovacposts</code></pre>
+    <br>
+    <a href="https://www.ovac4u.com/idoc" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/r_200,w_300,h_50,c_fill/v1506828380/logo_size_invert_jelh74.jpg" class="inline"></a>
+</p>
+<p align="center">
+<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/idoc/v/stable" alt="Latest Stable Version" class="inline"></a>
+<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/idoc/downloads" alt="Total Downloads" class="inline"></a>
+<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/idoc/license" alt="License" class="inline"></a>
+</p>
+<pre><code class="language-md">                    Follow me anywhere @ovac4u                         | GitHub
+                    _________                          _________       | Twitter
+                   |   ___   |.-----.--.--.---.-.----.|  |  |.--.--.   | Facboook
+                   |  |  _   ||  _  |  |  |  _  |  __||__    |  |  |   | Instagram
+                   |  |______||_____|\___/|___._|____|   |__||_____|   | Github + @ovac
+                   |_________|                        www.ovac4u.com   | Facebook + @ovacposts</code></pre>
 <p><br/>
 <br/></p>
-<div align="center">
+<p align="center">
 
-<h2 id="laravel-idoc---the-api-documentation-generator">Laravel IDoc - The API Documentation Generator</h2>
-
-<p>Automatically generate an interactive API documentation from your existing Laravel routes. Take a look at the <a href="https://www.ovac4u.com/idoc/index.html">example documentation</a>. Inspired by <a href="mpociot/laravel-apidoc-generator">Laravel Api Documentation Generator</a></p>
-</div>
+</p>
 <p><br/>
 <br/></p>
 <h1 id="introduction">Introduction.</h1>
@@ -129,8 +125,43 @@
 <p>Before you can generate your documentation, you'll need to configure a few things in your <code>config/idoc.php</code>.</p>
 <ul>
 <li>
+<p><code>logo</code>
+You can specify your custom logo to be used on the generated documentation. A relative or absolute url to the logo image.</p>
+<pre><code class="language-php">'logo' =&gt; 'https://res.cloudinary.com/ovac/image/upload/h_300,w_380,c_fill,r_30,bo_20px_solid_white/aboust_ey5v1v.jpg',</code></pre>
+</li>
+<li>
+<p><code>title</code>
+Here, you can specify the title to place on the documentation page.</p>
+<pre><code class="language-php">'title' =&gt; 'iDoc API Reference',</code></pre>
+<ul>
+<li>
+<p><code>description</code>
+This will place a discription on top of the documnetation.</p>
+<pre><code class="language-php">'description' =&gt; 'iDoc Api secification and documentation.',</code></pre>
+</li>
+<li><code>documentation-route</code>
+This will be used to register the necessary routes for the package. Default: <strong>idoc</strong>
+<pre><code class="language-php">'documentation-route' =&gt; 'idoc',</code></pre></li>
+</ul>
+</li>
+<li>
 <p><code>output</code>
 This is the file path where the generated documentation will be written to. Default: <strong>public/docs</strong></p>
+<pre><code></code></pre>
+</li>
+<li>
+<p><code>output</code>
+The servers array can be used to add multiple endpoints on the documentation so that the user can switch between endpoints. For example, This could be a test server and the live server.</p>
+<pre><code class="language-php">'servers' =&gt; [
+[
+    'url' =&gt; 'https://www.ovac4u.com',
+    'description' =&gt; 'App live server.',
+],
+[
+    'url' =&gt; 'https://test.ovac4u.com',
+    'description' =&gt; 'App test server.',
+],
+],</code></pre>
 </li>
 <li>
 <p><code>collection</code>
@@ -140,10 +171,6 @@ This package can automatically generate an Open-API 3.0 specification file for y
 <p><code>router</code>
 The router to use when processing the route (can be Laravel or Dingo. Defaults to <strong>Laravel</strong>)</p>
 </li>
-<li>
-<p><code>logo</code>
-You can specify your custom logo to be used on the generated documentation. A relative or absolute url to the logo image.</p>
-</li>
 <li><code>routes</code>
 This is where you specify what rules documentation should be generated for. You specify routes to be parsed by defining conditions that the routes should meet and rules that should be applied when generating documentation. These conditions and rules are specified in groups, allowing you to apply different rules to different routes.</li>
 </ul>
@@ -151,22 +178,131 @@ This is where you specify what rules documentation should be generated for. You 
 <pre><code class="language-php">return [
      //...,
 
-     'routes' =&gt; [
-          [
-              'match' =&gt; [
-                  'domains' =&gt; ['*'],
-                  'prefixes' =&gt; ['api/*', 'v2-api/*'],
-                  'versions' =&gt; ['v1'],
-              ],
-              'include' =&gt; ['users.index', 'healthcheck*'],
-              'exclude' =&gt; ['users.create', 'admin.*'],
-              'apply' =&gt; [
-                  'headers' =&gt; [
-                      'Authorization' =&gt; 'Bearer: {token}',
-                  ],
-              ],
-          ],
-];</code></pre>
+     /*
+     * The routes for which documentation should be generated.
+     * Each group contains rules defining which routes should be included ('match', 'include' and 'exclude' sections)
+     * and rules which should be applied to them ('apply' section).
+     */
+    'routes' =&gt; [
+        [
+            /*
+             * Specify conditions to determine what routes will be parsed in this group.
+             * A route must fulfill ALL conditions to pass.
+             */
+            'match' =&gt; [
+
+                /*
+                 * Match only routes whose domains match this pattern (use * as a wildcard to match any characters).
+                 */
+                'domains' =&gt; [
+                    '*',
+                    // 'domain1.*',
+                ],
+
+                /*
+                 * Match only routes whose paths match this pattern (use * as a wildcard to match any characters).
+                 */
+                'prefixes' =&gt; [
+                    'api/*',
+                ],
+
+                /*
+                 * Match only routes registered under this version. This option is ignored for Laravel router.
+                 * Note that wildcards are not supported.
+                 */
+                'versions' =&gt; [
+                    'v1',
+                ],
+            ],
+
+            /*
+             * Include these routes when generating documentation,
+             * even if they did not match the rules above.
+             * Note that the route must be referenced by name here (wildcards are supported).
+             */
+            'include' =&gt; [
+                // 'users.index', 'healthcheck*'
+            ],
+
+            /*
+             * Exclude these routes when generating documentation,
+             * even if they matched the rules above.
+             * Note that the route must be referenced by name here (wildcards are supported).
+             */
+            'exclude' =&gt; [
+                // 'users.create', 'admin.*'
+            ],
+
+            /*
+             * Specify rules to be applied to all the routes in this group when generating documentation
+             */
+            'apply' =&gt; [
+                /*
+                 * Specify headers to be added to the example requests
+                 */
+                'headers' =&gt; [
+                    'Authorization' =&gt; 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJod',
+                    // 'Api-Version' =&gt; 'v2',
+                ],
+
+                /*
+                 * If no @response or @transformer declaratons are found for the route,
+                 * we'll try to get a sample response by attempting an API call.
+                 * Configure the settings for the API call here,
+                 */
+                'response_calls' =&gt; [
+                    /*
+                     * API calls will be made only for routes in this group matching these HTTP methods (GET, POST, etc).
+                     * List the methods here or use '*' to mean all methods. Leave empty to disable API calls.
+                     */
+                    'methods' =&gt; ['*'],
+
+                    /*
+                     * For URLs which have parameters (/users/{user}, /orders/{id?}),
+                     * specify what values the parameters should be replaced with.
+                     * Note that you must specify the full parameter, including curly brackets and question marks if any.
+                     */
+                    'bindings' =&gt; [
+                        // '{user}' =&gt; 1
+                    ],
+
+                    /*
+                     * Environment variables which should be set for the API call.
+                     * This is a good place to ensure that notifications, emails
+                     * and other external services are not triggered during the documentation API calls
+                     */
+                    'env' =&gt; [
+                        'APP_ENV' =&gt; 'documentation',
+                        'APP_DEBUG' =&gt; false,
+                        // 'env_var' =&gt; 'value',
+                    ],
+
+                    /*
+                     * Headers which should be sent with the API call.
+                     */
+                    'headers' =&gt; [
+                        'Content-Type' =&gt; 'application/json',
+                        'Accept' =&gt; 'application/json',
+                        // 'key' =&gt; 'value',
+                    ],
+
+                    /*
+                     * Query parameters which should be sent with the API call.
+                     */
+                    'query' =&gt; [
+                        // 'key' =&gt; 'value',
+                    ],
+
+                    /*
+                     * Body parameters which should be sent with the API call.
+                     */
+                    'body' =&gt; [
+                        // 'key' =&gt; 'value',
+                    ],
+                ],
+            ],
+        ],
+    ],</code></pre>
 <p>This means documentation will be generated for routes in all domains ('&ast;' is a wildcard meaning 'any character') which match any of the patterns 'api/&ast;' or 'v2-api/&ast;', excluding the 'users.create' route and any routes whose names begin with <code>admin.</code>, and including the 'users.index' route and any routes whose names begin with <code>healthcheck.</code>. (The <code>versions</code> key is ignored unless you are using Dingo router).
 Also, in the generated documentation, these routes will have the header 'Authorization: Bearer: {token}' added to the example requests.</p>
 <p>You can also separate routes into groups to apply different rules to them:</p>
