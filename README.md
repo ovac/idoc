@@ -1,10 +1,10 @@
-<div align="center" style="border: 2px dotted #000000">
+<p align="center" style="border: 2px dotted #000000">
     <a href="https://https://www.openapis.org/" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50/v1553976486/1_Qf94xFwde421J_ZSmdPJDw_soee3m.png" class="inline"></a>
     <br/>
 <a href="https://https://www.openapis.org/" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50/v1553975330/C2I2EFN2_400x400_qcuyop.jpg" class="inline"></a><a href="#" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_120/v1506828786/logo-composer-transparent_zjgal0.png" class="inline"></a><a href="#" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50,w_60,c_fill/v1506832992/laravel-logo_atlvfw.png" class="inline"></a>
-<br>
-<a href="https://www.ovac4u.com/idoc" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/v1506828380/logo_size_invert_jelh74.jpg" class="inline"></a>
-</div>
+    <br/>
+    <a href="https://www.ovac4u.com/idoc" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/r_200,w_300,h_50,c_fill/v1506828380/logo_size_invert_jelh74.jpg" class="inline"></a>
+</p>
 
 <p align="center">
 <a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/idoc/v/stable" alt="Latest Stable Version" class="inline"></a>
@@ -13,23 +13,23 @@
 </p>
 
 ```md
- Follow me anywhere @ovac4u                         | GitHub
- _________                          _________       | Twitter
-|   ___   |.-----.--.--.---.-.----.|  |  |.--.--.   | Facboook
-|  |  _   ||  _  |  |  |  _  |  __||__    |  |  |   | Instagram
-|  |______||_____|\___/|___._|____|   |__||_____|   | Github + @ovac
-|_________|                        www.ovac4u.com   | Facebook + @ovacposts
+                         Follow me anywhere @ovac4u                         | GitHub
+                         _________                          _________       | Twitter
+                        |   ___   |.-----.--.--.---.-.----.|  |  |.--.--.   | Facboook
+                        |  |  _   ||  _  |  |  |  _  |  __||__    |  |  |   | Instagram
+                        |  |______||_____|\___/|___._|____|   |__||_____|   | Github + @ovac
+                        |_________|                        www.ovac4u.com   | Facebook + @ovacposts
 ```
 
 <br/>
 <br/>
 
-<div align="center">
+<p align="center">
     
 <h2>Laravel IDoc - The API Documentation Generator</h2>
 
 <p>Automatically generate an interactive API documentation from your existing Laravel routes. Take a look at the <a href="https://www.ovac4u.com/idoc/index.html">example documentation</a>. Inspired by <a href="mpociot/laravel-apidoc-generator">Laravel Api Documentation Generator</a></p>
-</div>
+</p>
 
 <br/>
 <br/>
@@ -624,4 +624,6 @@ This software uses the following open source packages:
 ## License
 
 MIT
+
+
 
