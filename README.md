@@ -385,7 +385,7 @@ class ItemController extends Controller
 They will be included in the generated documentation text and example requests.
 
 **Result:** 
-![Result](https://res.cloudinary.com/ovac/image/upload/w_1000/v1556624368/Screen_Shot_2019-04-30_at_11.36.16_AM_ewombw.png)
+![Result](https://res.cloudinary.com/ovac/image/upload/v1556662864/shadow_image_103039_ssqirj.png)
 
 Note: a random value will be used as the value of each parameter in the example requests. If you'd like to specify an example value, you can do so by adding `Example: your-example` to the end of your description. For instance:
 
