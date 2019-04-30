@@ -6,10 +6,11 @@
 <a href="https://www.ovac4u.com/idoc" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/v1506828380/logo_size_invert_jelh74.jpg" class="inline"></a>
 </div>
 
+<p align="center">
 <a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/idoc/v/stable" alt="Latest Stable Version" class="inline"></a>
 <a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/idoc/downloads" alt="Total Downloads" class="inline"></a>
 <a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/idoc/license" alt="License" class="inline"></a>
-<a href="https://www.versioneye.com/user/projects/598fccd8368b081653c84e2e"><img src="https://www.versioneye.com/user/projects/598fccd8368b081653c84e2e/badge.svg" alt="Dependency Status" class="inline"></a></p>
+</p>
 
 ```md
  Follow me anywhere @ovac4u                         | GitHub
