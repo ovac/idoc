@@ -91,6 +91,12 @@ $ php artisan idoc:generate
 ## Configuration
 Before you can generate your documentation, you'll need to configure a few things in your `config/idoc.php`.
 
+ - `path`
+This will be used to register the necessary routes for the package. Default: **idoc**
+ ```php
+ 'path' => 'idoc',
+ ```
+
 - `logo`
 You can specify your custom logo to be used on the generated documentation. A relative or absolute url to the logo image.
 ```php
@@ -109,19 +115,10 @@ Here, you can specify the title to place on the documentation page.
  'description' => 'iDoc Api secification and documentation.',
  ```
  
- - `path`
-This will be used to register the necessary routes for the package. Default: **idoc**
- ```php
- 'path' => 'idoc',
- ```
- 
 - `output`
 This is the file path where the generated documentation will be written to. Default: **public/docs**
-
-
- ```
  
-- `output`
+- `servers`
 The servers array can be used to add multiple endpoints on the documentation so that the user can switch between endpoints. For example, This could be a test server and the live server.
  ```php
 'servers' => [
