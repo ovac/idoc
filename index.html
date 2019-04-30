@@ -218,92 +218,7 @@ This is where you specify what rules documentation should be generated for. You 
                 ],
             ],
 
-            /*
-             * Include these routes when generating documentation,
-             * even if they did not match the rules above.
-             * Note that the route must be referenced by name here (wildcards are supported).
-             */
-            'include' =&gt; [
-                // 'users.index', 'healthcheck*'
-            ],
-
-            /*
-             * Exclude these routes when generating documentation,
-             * even if they matched the rules above.
-             * Note that the route must be referenced by name here (wildcards are supported).
-             */
-            'exclude' =&gt; [
-                // 'users.create', 'admin.*'
-            ],
-
-            /*
-             * Specify rules to be applied to all the routes in this group when generating documentation
-             */
-            'apply' =&gt; [
-                /*
-                 * Specify headers to be added to the example requests
-                 */
-                'headers' =&gt; [
-                    'Authorization' =&gt; 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJod',
-                    // 'Api-Version' =&gt; 'v2',
-                ],
-
-                /*
-                 * If no @response or @transformer declaratons are found for the route,
-                 * we'll try to get a sample response by attempting an API call.
-                 * Configure the settings for the API call here,
-                 */
-                'response_calls' =&gt; [
-                    /*
-                     * API calls will be made only for routes in this group matching these HTTP methods (GET, POST, etc).
-                     * List the methods here or use '*' to mean all methods. Leave empty to disable API calls.
-                     */
-                    'methods' =&gt; ['*'],
-
-                    /*
-                     * For URLs which have parameters (/users/{user}, /orders/{id?}),
-                     * specify what values the parameters should be replaced with.
-                     * Note that you must specify the full parameter, including curly brackets and question marks if any.
-                     */
-                    'bindings' =&gt; [
-                        // '{user}' =&gt; 1
-                    ],
-
-                    /*
-                     * Environment variables which should be set for the API call.
-                     * This is a good place to ensure that notifications, emails
-                     * and other external services are not triggered during the documentation API calls
-                     */
-                    'env' =&gt; [
-                        'APP_ENV' =&gt; 'documentation',
-                        'APP_DEBUG' =&gt; false,
-                        // 'env_var' =&gt; 'value',
-                    ],
-
-                    /*
-                     * Headers which should be sent with the API call.
-                     */
-                    'headers' =&gt; [
-                        'Content-Type' =&gt; 'application/json',
-                        'Accept' =&gt; 'application/json',
-                        // 'key' =&gt; 'value',
-                    ],
-
-                    /*
-                     * Query parameters which should be sent with the API call.
-                     */
-                    'query' =&gt; [
-                        // 'key' =&gt; 'value',
-                    ],
-
-                    /*
-                     * Body parameters which should be sent with the API call.
-                     */
-                    'body' =&gt; [
-                        // 'key' =&gt; 'value',
-                    ],
-                ],
-            ],
+            //...
         ],
     ],</code></pre>
 <p>This means documentation will be generated for routes in all domains ('&ast;' is a wildcard meaning 'any character') which match any of the patterns 'api/&ast;' or 'v2-api/&ast;', excluding the 'users.create' route and any routes whose names begin with <code>admin.</code>, and including the 'users.index' route and any routes whose names begin with <code>healthcheck.</code>. (The <code>versions</code> key is ignored unless you are using Dingo router).
@@ -393,38 +308,96 @@ class UserController extends Controller
 <!-- **Result:** 
 ![Doc block result](http://headsquaredsoftware.co.uk/images/api_generator_docblock.png) -->
 <h3 id="specifying-request-parameters">Specifying request parameters</h3>
-<p>To specify a list of valid parameters your API route accepts, use the <code>@bodyParam</code> and <code>@queryParam</code> annotations.</p>
+<p>To specify a list of valid parameters your API route accepts, use the <code>@bodyParam</code>, <code>@queryParam</code> and <code>@pathParam</code> annotations.</p>
 <ul>
 <li>The <code>@bodyParam</code> annotation takes the name of the parameter, its type, an optional &quot;required&quot; label, and then its description. </li>
 <li>The <code>@queryParam</code> annotation takes the name of the parameter, an optional &quot;required&quot; label, and then its description</li>
+<li>The <code>@pathParam</code> annotation takes the name of the parameter, an optional &quot;required&quot; label, and then its description</li>
 </ul>
-<pre><code class="language-php">/**
- * @bodyParam title string required The title of the post.
- * @bodyParam body string required The title of the post.
- * @bodyParam type string The type of post to create. Defaults to 'textophonious'.
- * @bodyParam author_id int the ID of the author
- * @bodyParam thumbnail image This is required if the post type is 'imagelicious'.
- */
-public function createPost()
-{
-    // ...
-}
-
+<pre><code class="language-php">
 /**
- * @queryParam sort Field to sort by
- * @queryParam page The page number to return
- * @queryParam fields required The fields to include
+ * @group Items
  */
-public function listPosts()
+class ItemController extends Controller
 {
-    // ...
-}</code></pre>
+
+    /**
+     * List items
+     *
+     * Get a list of items.
+     *
+     * @authenticated
+     * @responseFile responses/items.index.json
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        //...
+    }
+
+    /**
+     * Store item
+     *
+     * Add a new item to the items collection.
+     *
+     * @bodyParam name string required
+     * The name of the item. Example: Samsung Galaxy s10
+     *
+     * @bodyParam price number required
+     * The price of the item. Example: 100.00
+     *
+     * @authenticated
+     * @response {
+     *      "status": 200,
+     *      "success": true,
+     *      "data": {
+     *          "id": 10,
+     *          "price": 100.00,
+     *          "name": "Samsung Galaxy s10"
+     *      }
+     * }
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        //...
+    }
+
+    /**
+     * Get item
+     *
+     * Get item by it's unique ID.
+     *
+     * @pathParam item integer required
+     * The ID of the item to retrieve. Example: 10
+     *
+     * @response {
+     *      "status": 200,
+     *      "success": true,
+     *      "data": {
+     *          "id": 10,
+     *          "price": 100.00,
+     *          "name": "Samsung Galaxy s10"
+     *      }
+     * }
+     * @authenticated
+     *
+     * @param  \App\Item  $item
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Item $item)
+    {
+        //...
+    }</code></pre>
 <p>They will be included in the generated documentation text and example requests.</p>
 <p><strong>Result:</strong></p>
 <p><img src="body_params.png" alt="" /></p>
 <p>Note: a random value will be used as the value of each parameter in the example requests. If you'd like to specify an example value, you can do so by adding <code>Example: your-example</code> to the end of your description. For instance:</p>
 <pre><code class="language-php">    /**
-     * @queryParam location_id required The id of the location.
+     * @pathParam location_id required The id of the location.
      * @queryParam user_id required The id of the user. Example: me
      * @queryParam page required The page number. Example: 4
      * @bodyParam user_id int required The id of the user. Example: 9
@@ -449,7 +422,7 @@ public function createPost(MyRequest $request)
     // ...
 }</code></pre>
 <h3 id="indicating-auth-status">Indicating auth status</h3>
-<p>You can use the <code>@authenticated</code> annotation on a method to indicate if the endpoint is authenticated. A &quot;Requires authentication&quot; badge will be added to that route in the generated documentation.</p>
+<p>You can use the <code>@authenticated</code> annotation on a method to indicate if the endpoint is authenticated. A field for authentication token will be made available and marked as required on the interractive documentation.</p>
 <h3 id="providing-an-example-response">Providing an example response</h3>
 <p>You can provide an example response for a route. This will be displayed in the examples section. There are several ways of doing this.</p>
 <h4 id="response">@response</h4>
