@@ -188,92 +188,7 @@ return [
                 ],
             ],
 
-            /*
-             * Include these routes when generating documentation,
-             * even if they did not match the rules above.
-             * Note that the route must be referenced by name here (wildcards are supported).
-             */
-            'include' => [
-                // 'users.index', 'healthcheck*'
-            ],
-
-            /*
-             * Exclude these routes when generating documentation,
-             * even if they matched the rules above.
-             * Note that the route must be referenced by name here (wildcards are supported).
-             */
-            'exclude' => [
-                // 'users.create', 'admin.*'
-            ],
-
-            /*
-             * Specify rules to be applied to all the routes in this group when generating documentation
-             */
-            'apply' => [
-                /*
-                 * Specify headers to be added to the example requests
-                 */
-                'headers' => [
-                    'Authorization' => 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJod',
-                    // 'Api-Version' => 'v2',
-                ],
-
-                /*
-                 * If no @response or @transformer declaratons are found for the route,
-                 * we'll try to get a sample response by attempting an API call.
-                 * Configure the settings for the API call here,
-                 */
-                'response_calls' => [
-                    /*
-                     * API calls will be made only for routes in this group matching these HTTP methods (GET, POST, etc).
-                     * List the methods here or use '*' to mean all methods. Leave empty to disable API calls.
-                     */
-                    'methods' => ['*'],
-
-                    /*
-                     * For URLs which have parameters (/users/{user}, /orders/{id?}),
-                     * specify what values the parameters should be replaced with.
-                     * Note that you must specify the full parameter, including curly brackets and question marks if any.
-                     */
-                    'bindings' => [
-                        // '{user}' => 1
-                    ],
-
-                    /*
-                     * Environment variables which should be set for the API call.
-                     * This is a good place to ensure that notifications, emails
-                     * and other external services are not triggered during the documentation API calls
-                     */
-                    'env' => [
-                        'APP_ENV' => 'documentation',
-                        'APP_DEBUG' => false,
-                        // 'env_var' => 'value',
-                    ],
-
-                    /*
-                     * Headers which should be sent with the API call.
-                     */
-                    'headers' => [
-                        'Content-Type' => 'application/json',
-                        'Accept' => 'application/json',
-                        // 'key' => 'value',
-                    ],
-
-                    /*
-                     * Query parameters which should be sent with the API call.
-                     */
-                    'query' => [
-                        // 'key' => 'value',
-                    ],
-
-                    /*
-                     * Body parameters which should be sent with the API call.
-                     */
-                    'body' => [
-                        // 'key' => 'value',
-                    ],
-                ],
-            ],
+            //...
         ],
     ],
 ```
@@ -386,33 +301,92 @@ class UserController extends Controller
 
 ### Specifying request parameters
 
-To specify a list of valid parameters your API route accepts, use the `@bodyParam` and `@queryParam` annotations.
+To specify a list of valid parameters your API route accepts, use the `@bodyParam`, `@queryParam` and `@pathParam` annotations.
 - The `@bodyParam` annotation takes the name of the parameter, its type, an optional "required" label, and then its description. 
 - The `@queryParam` annotation takes the name of the parameter, an optional "required" label, and then its description
+- The `@pathParam` annotation takes the name of the parameter, an optional "required" label, and then its description
 
 
 ```php
-/**
- * @bodyParam title string required The title of the post.
- * @bodyParam body string required The title of the post.
- * @bodyParam type string The type of post to create. Defaults to 'textophonious'.
- * @bodyParam author_id int the ID of the author
- * @bodyParam thumbnail image This is required if the post type is 'imagelicious'.
- */
-public function createPost()
-{
-    // ...
-}
 
 /**
- * @queryParam sort Field to sort by
- * @queryParam page The page number to return
- * @queryParam fields required The fields to include
+ * @group Items
  */
-public function listPosts()
+class ItemController extends Controller
 {
-    // ...
-}
+
+    /**
+     * List items
+     *
+     * Get a list of items.
+     *
+     * @authenticated
+     * @responseFile responses/items.index.json
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        //...
+    }
+
+    /**
+     * Store item
+     *
+     * Add a new item to the items collection.
+     *
+     * @bodyParam name string required
+     * The name of the item. Example: Samsung Galaxy s10
+     *
+     * @bodyParam price number required
+     * The price of the item. Example: 100.00
+     *
+     * @authenticated
+     * @response {
+     *      "status": 200,
+     *      "success": true,
+     *      "data": {
+     *          "id": 10,
+     *          "price": 100.00,
+     *          "name": "Samsung Galaxy s10"
+     *      }
+     * }
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        //...
+    }
+
+
+    /**
+     * Get item
+     *
+     * Get item by it's unique ID.
+     *
+     * @pathParam item integer required
+     * The ID of the item to retrieve. Example: 10
+     *
+     * @response {
+     *      "status": 200,
+     *      "success": true,
+     *      "data": {
+     *          "id": 10,
+     *          "price": 100.00,
+     *          "name": "Samsung Galaxy s10"
+     *      }
+     * }
+     * @authenticated
+     *
+     * @param  \App\Item  $item
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Item $item)
+    {
+        //...
+    }
 ```
 
 They will be included in the generated documentation text and example requests.
@@ -425,7 +399,7 @@ Note: a random value will be used as the value of each parameter in the example 
 
 ```php
     /**
-     * @queryParam location_id required The id of the location.
+     * @pathParam location_id required The id of the location.
      * @queryParam user_id required The id of the user. Example: me
      * @queryParam page required The page number. Example: 4
      * @bodyParam user_id int required The id of the user. Example: 9
@@ -456,7 +430,7 @@ public function createPost(MyRequest $request)
 ```
 
 ### Indicating auth status
-You can use the `@authenticated` annotation on a method to indicate if the endpoint is authenticated. A "Requires authentication" badge will be added to that route in the generated documentation.
+You can use the `@authenticated` annotation on a method to indicate if the endpoint is authenticated. A field for authentication token will be made available and marked as required on the interractive documentation.
 
 ### Providing an example response
 You can provide an example response for a route. This will be displayed in the examples section. There are several ways of doing this.
@@ -624,6 +598,3 @@ This software uses the following open source packages:
 ## License
 
 MIT
-
-
-
