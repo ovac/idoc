@@ -30,7 +30,7 @@
           "pathInMiddlePanel": true,
           "redocExport": "RedocPro",
           "layout": { "scope": "section" },
-          "unstable_externalDescription": '{{route('idoc.info')}}',
+          "unstable_externalDescription": '{{route('info')}}',
           "hideDownloadButton" : {{config('idoc.hide_download_button') ?: 0}}
         },
         document.getElementById("redoc_container")

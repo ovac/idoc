@@ -74,6 +74,7 @@ class IDocServiceProvider extends ServiceProvider
             'domain' => config('idoc.domain', null),
             'prefix' => config('idoc.path'),
             'middleware' => 'idoc',
+            'as' => 'idoc.',
         ];
     }
 
