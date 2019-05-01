@@ -83,7 +83,7 @@
 
 <h2 id="laravel-idoc---the-api-documentation-generator">Laravel IDoc - The API Documentation Generator</h2>
 
-<p>Automatically generate an interactive API documentation from your existing Laravel routes. Take a look at the <a href="https://www.ovac4u.com/idoc/index.html">example documentation</a>. Inspired by <a href="mpociot/laravel-apidoc-generator">Laravel Api Documentation Generator</a></p>
+<p>Automatically generate an interactive API documentation from your existing Laravel routes. Take a look at the <a href="https://www.ovac4u.com/idoc/live">example documentation</a>. Inspired by <a href="mpociot/laravel-apidoc-generator">Laravel Api Documentation Generator</a></p>
 </div>
 <p><br/>
 <br/></p>
@@ -127,6 +127,11 @@
 <h2 id="configuration">Configuration</h2>
 <p>Before you can generate your documentation, you'll need to configure a few things in your <code>config/idoc.php</code>.</p>
 <ul>
+<li><code>path</code>
+This will be used to register the necessary routes for the package. Default: <strong>idoc</strong>
+<pre><code class="language-php">'path' =&gt; 'idoc',</code></pre></li>
+</ul>
+<ul>
 <li>
 <p><code>logo</code>
 You can specify your custom logo to be used on the generated documentation. A relative or absolute url to the logo image.</p>
@@ -137,23 +142,17 @@ You can specify your custom logo to be used on the generated documentation. A re
 Here, you can specify the title to place on the documentation page.</p>
 <pre><code class="language-php">'title' =&gt; 'iDoc API Reference',</code></pre>
 <ul>
-<li>
-<p><code>description</code>
-This will place a discription on top of the documnetation.</p>
-<pre><code class="language-php">'description' =&gt; 'iDoc Api secification and documentation.',</code></pre>
-</li>
-<li><code>documentation-route</code>
-This will be used to register the necessary routes for the package. Default: <strong>idoc</strong>
-<pre><code class="language-php">'documentation-route' =&gt; 'idoc',</code></pre></li>
+<li><code>description</code>
+This will place a discription on top of the documnetation.
+<pre><code class="language-php">'description' =&gt; 'iDoc Api secification and documentation.',</code></pre></li>
 </ul>
 </li>
 <li>
 <p><code>output</code>
 This is the file path where the generated documentation will be written to. Default: <strong>public/docs</strong></p>
-<pre><code></code></pre>
 </li>
 <li>
-<p><code>output</code>
+<p><code>servers</code>
 The servers array can be used to add multiple endpoints on the documentation so that the user can switch between endpoints. For example, This could be a test server and the live server.</p>
 <pre><code class="language-php">'servers' =&gt; [
 [
@@ -305,8 +304,6 @@ class UserController extends Controller
 
      }
 }</code></pre>
-<!-- **Result:** 
-![Doc block result](http://headsquaredsoftware.co.uk/images/api_generator_docblock.png) -->
 <h3 id="specifying-request-parameters">Specifying request parameters</h3>
 <p>To specify a list of valid parameters your API route accepts, use the <code>@bodyParam</code>, <code>@queryParam</code> and <code>@pathParam</code> annotations.</p>
 <ul>
@@ -393,8 +390,8 @@ class ItemController extends Controller
         //...
     }</code></pre>
 <p>They will be included in the generated documentation text and example requests.</p>
-<p><strong>Result:</strong></p>
-<p><img src="body_params.png" alt="" /></p>
+<p><strong>Result:</strong>
+<img src="https://res.cloudinary.com/ovac/image/upload/w_1000/v1556624368/Screen_Shot_2019-04-30_at_11.36.16_AM_ewombw.png" alt="Result" /></p>
 <p>Note: a random value will be used as the value of each parameter in the example requests. If you'd like to specify an example value, you can do so by adding <code>Example: your-example</code> to the end of your description. For instance:</p>
 <pre><code class="language-php">    /**
      * @pathParam location_id required The id of the location.
