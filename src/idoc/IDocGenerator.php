@@ -2,6 +2,7 @@
 
 namespace OVAC\IDoc;
 
+use Faker\Factory;
 use Illuminate\Routing\Route;
 use Mpociot\Reflection\DocBlock;
 use Mpociot\Reflection\DocBlock\Tag;
