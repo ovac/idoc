@@ -3,6 +3,7 @@
 namespace OVAC\IDoc\Tools\ResponseStrategies;
 
 use Illuminate\Routing\Route;
+use Illuminate\Support\Arr;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
@@ -79,7 +80,7 @@ class TransformerTagsStrategy
      */
     private function getClassToBeTransformed(array $tags, ReflectionMethod $transformerMethod)
     {
-        $modelTag = array_first(array_filter($tags, function ($tag) {
+        $modelTag = Arr::first(Arr::filter($tags, function ($tag) {
             return ($tag instanceof Tag) && strtolower($tag->getName()) == 'transformermodel';
         }));
 
@@ -87,7 +88,7 @@ class TransformerTagsStrategy
         if ($modelTag) {
             $type = $modelTag->getContent();
         } else {
-            $parameter = array_first($transformerMethod->getParameters());
+            $parameter = Arr::first($transformerMethod->getParameters());
             if ($parameter->hasType() && !$parameter->getType()->isBuiltin() && class_exists((string) $parameter->getType())) {
                 // ladies and gentlemen, we have a type!
                 $type = (string) $parameter->getType();
@@ -133,11 +134,11 @@ class TransformerTagsStrategy
     private function getTransformerTag(array $tags)
     {
         $transFormerTags = array_values(
-            array_filter($tags, function ($tag) {
+            Arr::filter($tags, function ($tag) {
                 return ($tag instanceof Tag) && in_array(strtolower($tag->getName()), ['transformer', 'transformercollection']);
             })
         );
 
-        return array_first($transFormerTags);
+        return Arr::first($transFormerTags);
     }
 }

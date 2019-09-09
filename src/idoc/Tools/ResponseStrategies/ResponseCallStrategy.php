@@ -6,6 +6,7 @@ use Dingo\Api\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Route;
+use Illuminate\Support\Str;
 use OVAC\IDoc\Tools\Traits\ParamHelpers;
 
 /**
@@ -321,7 +322,7 @@ class ResponseCallStrategy
         $prefix = 'HTTP_';
         foreach ($headers as $name => $value) {
             $name = strtr(strtoupper($name), '-', '_');
-            if (!starts_with($name, $prefix) && $name !== 'CONTENT_TYPE') {
+            if (!Str::startsWith($name, $prefix) && $name !== 'CONTENT_TYPE') {
                 $name = $prefix . $name;
             }
             $server[$name] = $value;
