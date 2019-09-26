@@ -289,7 +289,7 @@ class IDocGenerator
                 return $faker->boolean();
             },
             'string' => function () use ($faker) {
-                return str_random();
+                return $faker->asciify('************');
             },
             'array' => function () {
                 return '[]';
