@@ -7,9 +7,9 @@
 </p>
 
 <p align="center">
-<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/idoc/v/stable" alt="Latest Stable Version" class="inline"></a>
-<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/idoc/downloads" alt="Total Downloads" class="inline"></a>
-<a href="https://packagist.org/packages/ovac/hubtel-payment"><img src="https://poser.pugx.org/ovac/idoc/license" alt="License" class="inline"></a>
+<a href="https://packagist.org/packages/ovac/idoc"><img src="https://poser.pugx.org/ovac/idoc/v/stable" alt="Latest Stable Version" class="inline"></a>
+<a href="https://packagist.org/packages/ovac/idoc"><img src="https://poser.pugx.org/ovac/idoc/downloads" alt="Total Downloads" class="inline"></a>
+<a href="https://packagist.org/packages/ovac/idoc"><img src="https://poser.pugx.org/ovac/idoc/license" alt="License" class="inline"></a>
 </p>
 
 ```md
