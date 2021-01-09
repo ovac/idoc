@@ -124,6 +124,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | iDoc tag groups
+    |--------------------------------------------------------------------------
+    |
+    | This is used to separate groups in sections in the side menu.
+    | Before you use it, make sure you add all tags to a group, since a tag that is not in a group, 
+    | will not be displayed at all!
+    |
+     */
+
+    'tag_groups' => [
+        // ["name"=> "Accounts", "tags"=>["Authentication", "Users"]]
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | iDoc languages tab.
     |--------------------------------------------------------------------------
     | Each tab is used to generate a request template for a given language.

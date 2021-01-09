@@ -465,6 +465,8 @@ class IDocGeneratorCommand extends Command
             'servers' => config('idoc.servers'),
 
             'paths' => $paths,
+
+            'x-tagGroups' => config('idoc.tag_groups'),
         ];
 
         return json_encode($collection);
