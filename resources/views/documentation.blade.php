@@ -22,7 +22,7 @@
   </head>
   <body>
     <div id="redoc_container"></div>
-    <script src="https://redocpro-cdn.redoc.ly/v1.0.0-beta.7/redocpro-standalone.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@redoc/redoc-pro@1.0.0-beta.38/dist/redocpro-standalone.min.js"></script>
     <script>
       RedocPro.init(
         "{{config('idoc.output') . "/openapi.json"}}", {
