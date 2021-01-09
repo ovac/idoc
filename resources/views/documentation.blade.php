@@ -22,13 +22,13 @@
   </head>
   <body>
     <div id="redoc_container"></div>
-    <script src="https://redocpro-cdn.redoc.ly/v1.0.0-beta.7/redocpro-standalone.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/redoc@2.0.0-rc.23/bundles/redoc.standalone.js"></script>
     <script>
-      RedocPro.init(
+      Redoc.init(
         "{{config('idoc.output') . "/openapi.json"}}", {
           "showConsole": true,
           "pathInMiddlePanel": true,
-          "redocExport": "RedocPro",
+          "redocExport": "Redoc",
           "layout": { "scope": "section" },
           "unstable_externalDescription": '{{route('idoc.info')}}',
           "hideDownloadButton" : {{config('idoc.hide_download_button') ?: 0}}
