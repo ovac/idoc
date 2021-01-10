@@ -151,6 +151,19 @@ This is where you can set languages used to write request samples. Each item in 
 'resources/views/vendor/idoc/languages/LANGUAGE.blade.php',
 ```
 
+- `security`
+This is where you specify authentication and authorization schemes, by default the HTTP authentication scheme using Bearer is setting but you can modify it, add others or even define it as null according to the requirements of your project. For more information, please visit [Swagger Authentication](https://swagger.io/docs/specification/authentication/).
+
+ ```php
+ 'security' => [
+        'BearerAuth' => [
+            'type' => 'http',
+            'scheme' => 'bearer',
+            'bearerFormat' => 'JWT',
+        ],
+    ],
+```
+
 - `routes`
 This is where you specify what rules documentation should be generated for. You specify routes to be parsed by defining conditions that the routes should meet and rules that should be applied when generating documentation. These conditions and rules are specified in groups, allowing you to apply different rules to different routes.
 

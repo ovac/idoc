@@ -163,6 +163,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | iDoc security
+    |
+    | In here you can define the authentication and authorization schemes that your API use.
+    | You just need to use the OpenAPI security definitions or simply set as null.
+    |
+    |--------------------------------------------------------------------------
+    | 
+     */
+
+    'security' => [
+        'BearerAuth' => [
+            'type' => 'http',
+            'scheme' => 'bearer',
+            'bearerFormat' => 'JWT',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | iDoc routes: The routes for which documentation should be generated.
     |--------------------------------------------------------------------------
     | Each group contains rules defining which routes should be included

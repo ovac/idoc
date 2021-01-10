@@ -281,7 +281,9 @@ class IDocGeneratorCommand extends Command
                             (
                                 $route['authenticated']
                                 ? ['security' => [
-                                    ['BearerAuth' => []],
+                                   collect(config('idoc.security'))->map(function () {
+                                    return [];
+                                }),
                                 ]]
                                 : []
                             )
@@ -381,13 +383,8 @@ class IDocGeneratorCommand extends Command
             ],
 
             'components' => [
-                'securitySchemes' => [
-                    'BearerAuth' => [
-                        'type' => 'http',
-                        'scheme' => 'bearer',
-                        'bearerFormat' => 'JWT',
-                    ],
-                ],
+
+                'securitySchemes' => config('idoc.security'),
 
                 'schemas' => $routes->mapWithKeys(function ($routeGroup, $groupName) {
 
