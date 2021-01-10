@@ -92,7 +92,7 @@ $ php artisan idoc:generate
 Before you can generate your documentation, you'll need to configure a few things in your `config/idoc.php`.
 
  - `path`
-This will be used to register the necessary routes for the package. Default: **idoc**
+This will be used to register the necessary routes for the package.
  ```php
  'path' => 'idoc',
  ```
@@ -112,11 +112,33 @@ Here, you can specify the title to place on the documentation page.
 - `description`
 This will place a description on top of the documentation.
 ```php
- 'description' => 'iDoc Api secification and documentation.',
-```
+'description' => 'iDoc Api secification and documentation.',
+ ```
 
 - `version`
 Documentation version number.
+
+- `terms_of_service`
+This is the url to the terms and conditions for use your API.
+
+- `contact`
+Here you can configure contact information for support.
+```php
+'contact' => [
+        'name' => 'API Support',
+        'email' => 'iamovac@gmail.com',
+        'url' => 'http://www.ovac4u.com'
+],
+ ```
+
+- `license`
+A short and simple permissive license with conditions only requiring preservation of copyright and license notices
+```php
+'license' => [
+        'name' => 'MIT',
+        'url' => 'https://github.com/ovac/idoc/blob/master/LICENSE.md'
+],
+ ```
 
 - `output`
 This package can automatically generate an Open-API 3.0 specification file for your routes, along with the documentation. This is the file path where the generated documentation will be written to. Default: **public/docs** 
@@ -140,7 +162,7 @@ The servers array can be used to add multiple endpoints on the documentation so 
         'description' => 'App test server.',
     ],
 ],
-```
+ ```
 
 - `tag_groups`
 This array is used to separate groups that you have defined in little sections in the side menu. If you want to use it, make sure you add all groups because the unadded group will not be displayed.
@@ -149,7 +171,7 @@ This array is used to separate groups that you have defined in little sections i
 This is where you can set languages used to write request samples. Each item in array is used to generate a request template for a given language. New languages can be added and the existing ones modified after. You can add or edit new languages tabs by publishing the view files and editing them or adding custom view files to:
  ```php
 'resources/views/vendor/idoc/languages/LANGUAGE.blade.php',
-```
+ ```
 
 - `security`
 This is where you specify authentication and authorization schemes, by default the HTTP authentication scheme using Bearer is setting but you can modify it, add others or even define it as null according to the requirements of your project. For more information, please visit [Swagger Authentication](https://swagger.io/docs/specification/authentication/).
@@ -162,7 +184,7 @@ This is where you specify authentication and authorization schemes, by default t
             'bearerFormat' => 'JWT',
         ],
     ],
-```
+ ```
 
 - `routes`
 This is where you specify what rules documentation should be generated for. You specify routes to be parsed by defining conditions that the routes should meet and rules that should be applied when generating documentation. These conditions and rules are specified in groups, allowing you to apply different rules to different routes.
