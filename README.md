@@ -109,15 +109,24 @@ Here, you can specify the title to place on the documentation page.
 'title' => 'iDoc API Reference',
  ```
  
- - `description`
- This will place a discription on top of the documnetation.
- ```php
+- `description`
+This will place a description on top of the documentation.
+```php
  'description' => 'iDoc Api secification and documentation.',
- ```
- 
+```
+
+- `version`
+Documentation version number.
+
 - `output`
-This is the file path where the generated documentation will be written to. Default: **public/docs**
- 
+This package can automatically generate an Open-API 3.0 specification file for your routes, along with the documentation. This is the file path where the generated documentation will be written to. Default: **public/docs** 
+
+ - `hide_download_button`
+This section is where you can configure if you want a download button visible on the documentation.
+
+- `router`
+The router to use when processing the route (can be Laravel or Dingo. Defaults to **Laravel**)
+
 - `servers`
 The servers array can be used to add multiple endpoints on the documentation so that the user can switch between endpoints. For example, This could be a test server and the live server.
  ```php
@@ -133,11 +142,14 @@ The servers array can be used to add multiple endpoints on the documentation so 
 ],
 ```
 
-- `collection`
-This package can automatically generate an Open-API 3.0 specification file for your routes, along with the documentation. This section is where you can configure if you want a download button visible on the documentation.
+- `tag_groups`
+This array is used to separate groups that you have defined in little sections in the side menu. If you want to use it, make sure you add all groups because the unadded group will not be displayed.
 
-- `router`
-The router to use when processing the route (can be Laravel or Dingo. Defaults to **Laravel**)
+- `language-tabs`
+This is where you can set languages used to write request samples. Each item in array is used to generate a request template for a given language. New languages can be added and the existing ones modified after. You can add or edit new languages tabs by publishing the view files and editing them or adding custom view files to:
+ ```php
+'resources/views/vendor/idoc/languages/LANGUAGE.blade.php',
+```
 
 - `routes`
 This is where you specify what rules documentation should be generated for. You specify routes to be parsed by defining conditions that the routes should meet and rules that should be applied when generating documentation. These conditions and rules are specified in groups, allowing you to apply different rules to different routes.
