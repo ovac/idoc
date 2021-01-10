@@ -143,7 +143,7 @@ The servers array can be used to add multiple endpoints on the documentation so 
 ```
 
 - `tag_groups`
-This array is used to separate groups that you define in little sections in the side menu. If you want to use it, make sure you add all groups because the unadded group will not be displayed.
+This array is used to separate groups that you have defined in little sections in the side menu. If you want to use it, make sure you add all groups because the unadded group will not be displayed.
 
 - `language-tabs`
 This is where you can set languages used to write request samples. Each item in array is used to generate a request template for a given language. New languages can be added and the existing ones modified after. You can add or edit new languages tabs by publishing the view files and editing them or adding custom view files to:
