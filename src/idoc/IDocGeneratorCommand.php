@@ -375,6 +375,9 @@ class IDocGeneratorCommand extends Command
                 'title' => config('idoc.title'),
                 'version' => config('idoc.version'),
                 'description' => config('idoc.description'),
+                'termsOfService' => config('idoc.terms_of_service'),
+                "license" =>  !empty(config('idoc.license')) ? config('idoc.license') : null,
+                "contact" =>  config('idoc.contact'), 
                 "x-logo" => [
                     "url" => config('idoc.logo'),
                     "altText" => config('idoc.title'),
