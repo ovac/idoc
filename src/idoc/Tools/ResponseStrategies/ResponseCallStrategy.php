@@ -69,17 +69,18 @@ class ResponseCallStrategy
         $routeMethods = $this->getMethods($route);
         $method = array_shift($routeMethods);
         $cookies = isset($rulesToApply['cookies']) ? $rulesToApply['cookies'] : [];
-        $request = Request::create($uri, $method, [], $cookies, [], $this->transformHeadersToServerVars($rulesToApply['headers'] ?? []));
-        $request = $this->addHeaders($request, $route, $rulesToApply['headers'] ?? []);
 
         // Mix in parsed parameters with manually specified parameters.
         $queryParams = collect($this->cleanParams($queryParams))->merge($rulesToApply['query'] ?? [])->toArray();
         $bodyParams = collect($this->cleanParams($bodyParams))->merge($rulesToApply['body'] ?? [])->toArray();
-
+        
+        $request = Request::create($uri, $method, [], $cookies, [], $this->transformHeadersToServerVars($rulesToApply['headers'] ?? []), json_encode($bodyParams));
+        $request = $this->addHeaders($request, $route, $rulesToApply['headers'] ?? []);
         $request = $this->addQueryParameters($request, $queryParams);
         $request = $this->addBodyParameters($request, $bodyParams);
 
         return $request;
+
     }
 
     /**

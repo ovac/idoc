@@ -57,19 +57,32 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | iDoc Title / Description
+    | iDoc principal information
     |--------------------------------------------------------------------------
     |
-    | This is the title and description that will be visible on the
-    | documentation.
+    | This is the principal information  that will be visible on the  documentation like
+    | title, description , version, license, etc.
     |
      */
 
     'title' => 'iDoc API Reference',
 
     'description' => 'iDoc Api secification and documentation.',
+    
+    'version' => '',
+        
+    'terms_of_service' => '',
+    
+    'contact' => [
+        // 'name' => 'YOUR_NAME',
+        // 'email' => 'YOUR_EMAIL',
+        // 'url' => 'YOUR_URL'
+    ],
 
-    'version' => 'v1',
+    'license' => [
+        // 'name' => 'YOUR_LICENSE',
+        // 'url' => 'YOUR_URL_LICENSE'
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -163,8 +176,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | iDoc security
+    |--------------------------------------------------------------------------
+    |
+    | Here you can define the authentication and authorization schemes that your API use.
+    | You just need to use the OpenAPI security definitions or simply set as null.
+    |
+    | 
+     */
+
+    'security' => [
+        'BearerAuth' => [
+            'type' => 'http',
+            'scheme' => 'bearer',
+            'bearerFormat' => 'JWT',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | iDoc routes: The routes for which documentation should be generated.
     |--------------------------------------------------------------------------
+    |
     | Each group contains rules defining which routes should be included
     | ('match', 'include' and 'exclude' sections) and rules which
     | should be applied to them ('apply' section).
