@@ -320,6 +320,13 @@ return [
                     'body' => [
                         // 'key' => 'value',
                     ],
+
+                    /*
+                     * Disable middlewares for API Call.
+                     */
+                    'without_middleware' =>[
+                        // \App\Http\Middleware\Authenticate::class
+                    ]
                 ],
             ],
         ],

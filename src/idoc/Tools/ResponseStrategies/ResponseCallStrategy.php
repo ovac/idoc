@@ -26,6 +26,9 @@ class ResponseCallStrategy
     public function __invoke(Route $route, array $tags, array $routeProps)
     {
         $rulesToApply = $routeProps['rules']['response_calls'] ?? [];
+
+        $this->rulesToApply = $rulesToApply;
+
         if (!$this->shouldMakeApiCall($route, $rulesToApply)) {
             return;
         }
@@ -275,7 +278,32 @@ class ResponseCallStrategy
     private function callLaravelRoute(Request $request): \Symfony\Component\HttpFoundation\Response
     {
         $kernel = app(\Illuminate\Contracts\Http\Kernel::class);
+
+        //Disable middlewares
+        $without_middleware =  $this->rulesToApply['without_middleware'];
+
+        if (! empty($without_middleware)) {
+            
+            if (in_array("*",$without_middleware)) {
+
+                $kernel->getApplication()->instance("middleware.disable", true);
+
+            }else{
+
+                foreach ((array) $without_middleware as $abstract) {
+                    $kernel->getApplication()->instance($abstract, new class {
+                        public function handle($request, $next)
+                        {
+                            return $next($request);
+                        }
+                    });
+                }
+
+            }
+        }
+
         $response = $kernel->handle($request);
+
         $kernel->terminate($request, $response);
 
         return $response;

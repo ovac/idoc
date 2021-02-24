@@ -599,6 +599,7 @@ response by making a request to the route (a "response call"). A few things to n
 - Parameters in URLs (example: `/users/{user}`, `/orders/{id?}`) will be replaced with '1' by default. You can configure this, however. Put the parameter names (including curly braces and question marks) as the keys and their replacements as the values in the `bindings` key.
 - You can configure environment variables (this is useful so you can prevent external services like notifications from being triggered). By default the APP_ENV is set to 'documentation'. You can add more variables in the `env` key.
 - By default, the package will generate dummy values for your documented body and query parameters and send in the request. (If you specified example values using `@bodyParam` or `@queryParam`, those will be used instead.) You can configure what headers and additional query and parameters should be sent when making the request (the `headers`, `query`, and `body` keys respectively).
+- By default all middlewares are enabled, but you can set the `without_middleware` array to specify the middlewares you prefer to disable, you can even use ['*'] to disable all.
 
 
 ### Open-API 3.0 spec file
