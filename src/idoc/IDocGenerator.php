@@ -349,9 +349,14 @@ class IDocGenerator
             return false;
         }
 
+        if (($type=='array' || $type=='object')){
+            return json_decode($value);
+        }
+
         if (isset($casts[$type])) {
             return $casts[$type]($value);
         }
+
 
         return $value;
     }

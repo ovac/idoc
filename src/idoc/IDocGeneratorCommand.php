@@ -169,14 +169,6 @@ class IDocGeneratorCommand extends Command
                             $type = 'number';
                         }
 
-                        if ($type === 'json') {
-                            $type = 'object';
-                        }
-
-                        if (($type === 'array' || $type === 'object') && $default) {
-                            $default = json_decode($default);
-                        }
-
                         return [
                             'in' => 'formData',
                             'name' => $name,
