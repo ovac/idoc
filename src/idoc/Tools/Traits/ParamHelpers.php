@@ -18,9 +18,12 @@ trait ParamHelpers
     {
         $values = [];
         foreach ($params as $name => $details) {
-            $this->cleanValueFrom($name, $details['value'], $values);
+            $value = $details["value"];
+            if(($details['type']=='array' || $details['type']=='object') && (!is_array($details["value"]) && !is_object($details["value"]))){
+                $value = json_decode($details["value"]);
+            }
+            $this->cleanValueFrom($name, $value, $values);
         }
-
         return $values;
     }
 
