@@ -169,8 +169,11 @@ class IDocGeneratorCommand extends Command
                             $type = 'number';
                         }
 
-                        if ($type === 'json' && $default) {
+                        if ($type === 'json') {
                             $type = 'object';
+                        }
+
+                        if (($type === 'array' || $type === 'object') && $default) {
                             $default = json_decode($default);
                         }
 
@@ -386,80 +389,7 @@ class IDocGeneratorCommand extends Command
             ],
 
             'components' => [
-
                 'securitySchemes' => config('idoc.security'),
-
-                'schemas' => $routes->mapWithKeys(function ($routeGroup, $groupName) {
-
-                    if ($groupName != 'Payment processors') {
-                        return [];
-                    }
-
-                    return collect($routeGroup)->mapWithKeys(function ($route) use ($groupName, $routeGroup) {
-
-                        $bodyParameters = collect($route['bodyParameters'])->map(function ($schema, $name) {
-
-                            $type = $schema['type'];
-
-                            if ($type === 'float') {
-                                $type = 'number';
-                            }
-
-                            if ($type === 'json') {
-                                $type = 'object';
-                            }
-
-                            return [
-                                'in' => 'formData',
-                                'name' => $name,
-                                'description' => $schema['description'],
-                                'required' => $schema['required'],
-                                'type' => $type,
-                                'default' => $schema['value'],
-                            ];
-                        });
-
-                        return ["PM{$route['paymentMethod']->id}" => ['type' => 'object']
-
-                             + (
-                                count($required = $bodyParameters
-                                        ->values()
-                                        ->where('required', true)
-                                        ->pluck('name'))
-                                ? ['required' => $required]
-                                : []
-                            )
-
-                             + (
-                                count($properties = $bodyParameters
-                                        ->values()
-                                        ->filter()
-                                        ->mapWithKeys(function ($parameter) {
-                                            return [
-                                                $parameter['name'] => [
-                                                    'type' => $parameter['type'],
-                                                    'example' => $parameter['default'],
-                                                    'description' => $parameter['description'],
-                                                ],
-                                            ];
-                                        }))
-                                ? ['properties' => $properties]
-                                : []
-                            )
-
-                             + (
-                                count($properties = $bodyParameters
-                                        ->values()
-                                        ->filter()
-                                        ->mapWithKeys(function ($parameter) {
-                                            return [$parameter['name'] => $parameter['default']];
-                                        }))
-                                ? ['example' => $properties]
-                                : []
-                            )
-                        ];
-                    });
-                })->filter(),
             ],
 
             'servers' => config('idoc.servers'),

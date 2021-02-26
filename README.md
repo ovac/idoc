@@ -342,7 +342,7 @@ class UserController extends Controller
 ### Specifying request parameters
 
 To specify a list of valid parameters your API route accepts, use the `@bodyParam`, `@queryParam` and `@pathParam` annotations.
-- The `@bodyParam` annotation takes the name of the parameter, its type, an optional "required" label, and then its description. 
+- The `@bodyParam` annotation takes the name of the parameter (`string`, `integer`, `boolean`, `float`, `object` or `array`), its type, an optional "required" label, and then its description.
 - The `@queryParam` annotation takes the name of the parameter, an optional "required" label, and then its description
 - The `@pathParam` annotation takes the name of the parameter, an optional "required" label, and then its description
 
@@ -378,8 +378,14 @@ class ItemController extends Controller
      * @bodyParam name string required
      * The name of the item. Example: Samsung Galaxy s10
      *
-     * @bodyParam price number required
+     * @bodyParam price float required
      * The price of the item. Example: 100.00
+     *
+     * @bodyParam dimensions object
+     * Item dimensions. Example: {"length": 1,"width":2,"height":3}
+     *
+     * @bodyParam colors array
+     * Available colors of the item. Example: ["black","white"]
      *
      * @authenticated
      * @response {
@@ -389,6 +395,15 @@ class ItemController extends Controller
      *          "id": 10,
      *          "price": 100.00,
      *          "name": "Samsung Galaxy s10"
+     *          "dimensions": {
+     *              "length": 1,
+     *              "width": 2,
+     *              "height": 3
+     *           },
+     *           "colors": [
+     *              "black",
+     *              "white"
+     *           ],
      *      }
      * }
      *
@@ -440,7 +455,7 @@ Note: a random value will be used as the value of each parameter in the example 
     /**
      * @pathParam location_id required The id of the location.
      * @queryParam user_id required The id of the user. Example: me
-     * @queryParam page required The page number. Example: 4
+     * @queryParam page required The page integer. Example: 4
      * @bodyParam user_id int required The id of the user. Example: 9
      * @bodyParam room_id string The id of the room.
      * @bodyParam forever boolean Whether to ban the user forever. Example: false
