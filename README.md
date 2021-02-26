@@ -342,7 +342,7 @@ class UserController extends Controller
 ### Specifying request parameters
 
 To specify a list of valid parameters your API route accepts, use the `@bodyParam`, `@queryParam` and `@pathParam` annotations.
-- The `@bodyParam` annotation takes the name of the parameter (`string`, `integer`, `boolean`, `float`, `object` or `array`), its type, an optional "required" label, and then its description.
+- The `@bodyParam` annotation takes the name of the parameter, its type (`string`, `integer`, `boolean`, `float`, `object` or `array`), an optional "required" label, and then its description.
 - The `@queryParam` annotation takes the name of the parameter, an optional "required" label, and then its description
 - The `@pathParam` annotation takes the name of the parameter, an optional "required" label, and then its description
 
@@ -648,7 +648,7 @@ This software uses the following open source packages:
 
 ## You may also like...
 
-- [Laravel Api Documentation Generator](mpociot/laravel-apidoc-generator) - A laravel api documentation generator.
+- [Laravel Api Documentation Generator](/mpociot/laravel-apidoc-generator) - A laravel api documentation generator.
 
 ## License
 
