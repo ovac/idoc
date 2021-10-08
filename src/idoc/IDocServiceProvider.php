@@ -34,7 +34,7 @@ class IDocServiceProvider extends ServiceProvider
      *
      * @return array
      */
-    private function registerRoutes()
+    protected function registerRoutes()
     {
         Route::group($this->routeConfiguration(), function () {
             $this->loadRoutesFrom(__DIR__ . '/../../resources/routes/idoc.php', 'idoc');
@@ -46,7 +46,7 @@ class IDocServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    private function registerPublishing()
+    protected function registerPublishing()
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
@@ -68,7 +68,7 @@ class IDocServiceProvider extends ServiceProvider
      *
      * @return array
      */
-    private function routeConfiguration()
+    protected function routeConfiguration()
     {
         return [
             'domain' => config('idoc.domain', null),
