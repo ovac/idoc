@@ -31,6 +31,9 @@
         "league/fractal": "^0.17.0"
     },
     "autoload": {
+        "files": [
+            "helpers/helpers.php"
+        ],
         "psr-4": {
             "OVAC\\IDoc\\": "src/idoc"
         }

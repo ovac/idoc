@@ -76,7 +76,8 @@ This will create an `idoc.php` file in your `config` folder.
 ### Lumen
 - Register the service provider in your `bootstrap/app.php`:
 ```php
-$app->register(\OVAC\IDoc\IDocServiceProvider::class);
+$app->bind('path.public', function ($app) { return $app->basePath('../your-public-path'); });
+$app->register(\OVAC\IDoc\IDocLumenServiceProvider::class);
 ```
 - Copy the config file from `vendor/ovac/idoc/config/idoc.php` to your project as `config/idoc.php`. Then add to your `bootstrap/app.php`:
 ```php

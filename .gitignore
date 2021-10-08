@@ -2,6 +2,7 @@
 composer.lock
 .php_cs.cache
 /vendor/
+/.idea
 /public
 .couscous/
 .phpintel/
