@@ -324,23 +324,21 @@ class IDocGeneratorCommand extends Command
                                         ->toArray()
                                 ),
 
-                                'responses' => [
-                                    200 => [
-                                        'description' => 'success',
-                                    ] +
-                                    (
-                                        count($route['response'] ?? [])
-                                        ? ['content' => [
-                                            'application/json' => [
-                                                'schema' => [
-                                                    'type' => 'object',
-                                                    'example' => json_decode($route['response'][0]['content'], true),
-                                                ],
-                                            ],
-                                        ]]
-                                        : []
-                                    ),
-                                ],
+                                'responses' => collect($route['response'])->mapWithKeys(function($item) {
+                                    return [
+                                        (int) $item['status'] => [
+                                            'description' => in_array($item['status'], range(200,299)) ? 'success' : 'error',
+                                            'content' => [
+                                                'application/json' => [
+                                                    'schema' => [
+                                                        'type' => 'object',
+                                                        'example' => json_decode($item['content'])
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ];
+                                })->all(),
 
                                 'x-code-samples' => collect(config('idoc.language-tabs'))->map(function ($name, $lang) use ($route) {
                                     return [
@@ -377,7 +375,7 @@ class IDocGeneratorCommand extends Command
                 'description' => config('idoc.description'),
                 'termsOfService' => config('idoc.terms_of_service'),
                 "license" =>  !empty(config('idoc.license')) ? config('idoc.license') : null,
-                "contact" =>  config('idoc.contact'), 
+                "contact" =>  config('idoc.contact'),
                 "x-logo" => [
                     "url" => config('idoc.logo'),
                     "altText" => config('idoc.title'),
