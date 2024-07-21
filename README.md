@@ -168,6 +168,18 @@ The servers array can be used to add multiple endpoints on the documentation so 
 - `tag_groups`
 This array is used to separate groups that you have defined in little sections in the side menu. If you want to use it, make sure you add all groups because the unadded group will not be displayed.
 
+- `external_description`
+This option allows you to specify a route name for an external description that will be used in the documentation. If not provided, it will default to the route `idoc.info`. By default, it is set to `idoc.info`.
+
+```php
+'external_description' => 'idoc.info', // Route name for external description, leave empty to use default description
+```
+
+Example usage:
+```php
+'external_description' => 'idoc.info',
+```
+
 - `language-tabs`
 This is where you can set languages used to write request samples. Each item in array is used to generate a request template for a given language. New languages can be added and the existing ones modified after. You can add or edit new languages tabs by publishing the view files and editing them or adding custom view files to:
  ```php
@@ -622,6 +634,146 @@ APP_URL=http://yourapp.app
 ## Further modification
 
 The info file in the view folder can be further modified to add introductions and further documentation.
+
+## Using the Custom Configuration Generator
+
+The `idoc:custom` command allows you to generate API documentation using a custom configuration file. This is useful when you need to generate documentation with different settings without modifying the default configuration.
+
+### Command Signature
+
+The command signature is:
+
+```sh
+php artisan idoc:custom {config?}
+```
+
+
+- `config` (optional): The name of the custom configuration file (without the `.php` extension) located in the `config` directory.
+
+### How to Use
+
+1. **Create a Custom Configuration File:**
+
+   Create a custom configuration file in the `config` directory. The file should follow the naming convention `idoc.{config}.php`, where `{config}` is the name you will use when running the command.
+
+   Example for `config/idoc.ecommerce.php`:
+   ```php
+   // config/idoc.ecommerce.php
+   return [
+       'title' => 'E-commerce API Documentation',
+       'version' => '1.0.0',
+       'description' => 'API documentation for e-commerce.',
+       'terms_of_service' => 'https://example.com/terms',
+       'contact' => [
+           'name' => 'E-commerce API Support',
+           'email' => 'support@example.com',
+           'url' => 'https://example.com',
+       ],
+       'license' => [
+           'name' => 'MIT',
+           'url' => 'https://opensource.org/licenses/MIT',
+       ],
+       'output' => '/docs/ecommerce', // Ensure this path is unique
+       'hide_download_button' => false,
+       'external_description' => route('ecommerce-doc-description'),
+       'routes' => [
+           [
+               'match' => [
+                   'domains' => ['*'],
+                   'prefixes' => ['api/ecommerce/*'],
+                   'versions' => ['v1'],
+               ],
+               'include' => [],
+               'exclude' => [],
+               'apply' => [
+                   'headers' => [
+                       'Authorization' => 'Bearer {token}',
+                   ],
+                   'response_calls' => [
+                       'methods' => ['*'],
+                       'bindings' => [],
+                       'env' => [
+                           'APP_ENV' => 'documentation',
+                           'APP_DEBUG' => false,
+                       ],
+                       'headers' => [
+                           'Content-Type' => 'application/json',
+                           'Accept' => 'application/json',
+                       ],
+                       'query' => [],
+                       'body' => [],
+                       'without_middleware' => [],
+                   ],
+               ],
+           ],
+       ],
+   ];
+   ```
+
+2. **Run the Command:**
+
+   Run the command with the name of your custom configuration file (without the `.php` extension).
+
+   Example:
+   ```bash
+   php artisan idoc:custom ecommerce
+   ```
+
+   If the custom configuration file exists, it will be loaded and merged with the default configuration. The command will then generate the API documentation using the merged configuration.
+
+3. **Check the Output:**
+
+   The generated documentation will be saved to the path specified in the `output` configuration option of your custom configuration file. Ensure that the output path is unique for each custom documentation to avoid conflicts.
+
+### Managing Multiple API Documentation Sets
+
+The custom configuration generator can also help you manage multiple sets of API documentation for different applications within the same Laravel application. This is particularly useful if you have different API sets for different applications or modules.
+
+#### Example Scenario
+
+Suppose you have a Laravel application that serves multiple APIs for different applications, such as a user management API, and an e-commerce API. You can create separate configuration files for each API and use the custom configuration generator to generate the documentation accordingly.
+
+1. **Create Configuration Files:**
+
+   - `config/idoc.ecommerce.php`
+   - `config/idoc.user.php`
+
+2. **Run the Command for Each API:**
+
+   ```bash
+   php artisan idoc:custom ecommerce
+   php artisan idoc:custom user
+   ```
+
+   This will generate the API documentation for each application using the respective configuration file.
+
+3. **Check the Output:**
+
+   The generated documentation will be saved to the paths specified in the `output` configuration options of your custom configuration files. Ensure that each output path is unique to avoid conflicts. This is relative to the public directory.
+
+   - E-commerce API documentation: `/docs/ecommerce`, will save the open-api spec file to `public/docs/ecommerce/openapi.json` and the documentation to `public/docs/ecommerce/index.html`.
+   - User Management API documentation: `/docs/user` will save the open-api spec file to `public/docs/user/openapi.json` and the documentation to `public/docs/user/index.html`.
+
+By using the custom configuration generator, you can easily manage and generate multiple sets of API documentation for different applications within the same Laravel application. This approach allows you to maintain separate configurations and documentation outputs for each API, ensuring clarity and organization.
+
+### Defining Custom Documentation Routes
+
+To serve the generated documentation for each custom configuration, you need to define routes in your `routes/web.php` or a similar routes file. This ensures that each set of documentation is accessible via a unique URL.
+
+Example for `idoc.ecommerce.php` configuration:
+
+```php
+// routes/web.php
+
+// Documentation for the ecommerce routes
+Route::group([], function () {
+    // Set the idoc config to the ecommerce config
+    config(['idoc' => config('idoc.ecommerce')]);
+
+    // Define the route for the user documentation
+    Route::view(config('idoc.path'), 'idoc::documentation');
+});
+```
 
 ## Credits
 

@@ -68,11 +68,11 @@ return [
     'title' => 'iDoc API Reference',
 
     'description' => 'iDoc Api secification and documentation.',
-    
+
     'version' => '',
-        
+
     'terms_of_service' => '',
-    
+
     'contact' => [
         // 'name' => 'YOUR_NAME',
         // 'email' => 'YOUR_EMAIL',
@@ -101,6 +101,27 @@ return [
     'output' => '',
 
     'hide_download_button' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | iDoc external description
+    |--------------------------------------------------------------------------
+    |
+    | This is the external description/info for the documentation. By default
+    | it uses the 'idoc.info' route in the documentation but you can
+    | override it with your own route name or leave it empty to use the
+    | default description. It must be a route name.
+    |
+    | For best results, format the file using Markdown.
+    |
+    | examples:
+    | -  Using route name:
+    |   'external_description' => 'idoc.info'
+    |
+    | -  You can also leave empty to use default description
+    */
+
+    'external_description' => 'idoc.info',
 
     /*
     |--------------------------------------------------------------------------
@@ -141,7 +162,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | This is used to separate groups in sections in the side menu.
-    | Before you use it, make sure you add all tags to a group, since a tag that is not in a group, 
+    | Before you use it, make sure you add all tags to a group, since a tag that is not in a group,
     | will not be displayed at all!
     |
      */
@@ -182,7 +203,7 @@ return [
     | Here you can define the authentication and authorization schemes that your API use.
     | You just need to use the OpenAPI security definitions or simply set as null.
     |
-    | 
+    |
      */
 
     'security' => [
@@ -324,7 +345,7 @@ return [
                     /*
                      * Disable middlewares for API Call.
                      */
-                    'without_middleware' =>[
+                    'without_middleware' => [
                         // \App\Http\Middleware\Authenticate::class
                     ]
                 ],

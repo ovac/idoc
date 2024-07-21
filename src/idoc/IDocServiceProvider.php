@@ -25,6 +25,7 @@ class IDocServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 IDocGeneratorCommand::class,
+                IDocCustomConfigGeneratorCommand::class,
             ]);
         }
     }
