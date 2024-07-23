@@ -16,9 +16,10 @@ class IDocGenerator
     use ParamHelpers;
 
     /**
-     * @param Route $route
+     * Get the URI of the given route.
      *
-     * @return mixed
+     * @param Route $route
+     * @return string
      */
     public function getUri(Route $route)
     {
@@ -26,9 +27,10 @@ class IDocGenerator
     }
 
     /**
-     * @param Route $route
+     * Get the HTTP methods of the given route, excluding 'HEAD'.
      *
-     * @return mixed
+     * @param Route $route
+     * @return array
      */
     public function getMethods(Route $route)
     {
@@ -36,15 +38,26 @@ class IDocGenerator
     }
 
     /**
-     * @param  \Illuminate\Routing\Route $route
-     * @param array $apply Rules to apply when generating documentation for this route
+     * Process the given route to generate documentation.
      *
+     * @param Route $route
+     * @param array $rulesToApply Rules to apply when generating documentation for this route
      * @return array
      */
     public function processRoute(Route $route, array $rulesToApply = [])
     {
         $routeAction = $route->getAction();
-        list($class, $method) = explode('@', $routeAction['uses']);
+
+        // Handle both old and new routing patterns
+        if (is_string($routeAction['uses'])) {
+            list($class, $method) = explode('@', $routeAction['uses']);
+        } elseif (is_array($routeAction['uses']) && count($routeAction['uses']) === 2) {
+            $class = $routeAction['uses'][0];
+            $method = $routeAction['uses'][1];
+        } else {
+            throw new \InvalidArgumentException('Invalid route action format.');
+        }
+
         $controller = new ReflectionClass($class);
         $method = $controller->getMethod($method);
 
@@ -84,8 +97,9 @@ class IDocGenerator
     }
 
     /**
-     * @param array $tags
+     * Extract path parameters from the given doc block tags.
      *
+     * @param array $tags
      * @return array
      */
     protected function getPathParametersFromDocBlock(array $tags)
@@ -122,8 +136,9 @@ class IDocGenerator
     }
 
     /**
-     * @param array $tags
+     * Extract body parameters from the given doc block tags.
      *
+     * @param array $tags
      * @return array
      */
     protected function getBodyParametersFromDocBlock(array $tags)
@@ -160,8 +175,9 @@ class IDocGenerator
     }
 
     /**
-     * @param array $tags
+     * Determine if the route requires authentication based on the doc block tags.
      *
+     * @param array $tags
      * @return bool
      */
     protected function getAuthStatusFromDocBlock(array $tags)
@@ -175,9 +191,10 @@ class IDocGenerator
     }
 
     /**
+     * Get the route group from the controller or method doc block.
+     *
      * @param ReflectionClass $controller
      * @param ReflectionMethod $method
-     *
      * @return string
      */
     protected function getRouteGroup(ReflectionClass $controller, ReflectionMethod $method)
@@ -207,8 +224,9 @@ class IDocGenerator
     }
 
     /**
-     * @param array $tags
+     * Extract query parameters from the given doc block tags.
      *
+     * @param array $tags
      * @return array
      */
     protected function getQueryParametersFromDocBlock(array $tags)
@@ -245,8 +263,9 @@ class IDocGenerator
     }
 
     /**
-     * @param ReflectionMethod $method
+     * Parse the doc block of the given method.
      *
+     * @param ReflectionMethod $method
      * @return array
      */
     protected function parseDocBlock(ReflectionMethod $method)
@@ -261,6 +280,12 @@ class IDocGenerator
         ];
     }
 
+    /**
+     * Normalize the parameter type to a standard format.
+     *
+     * @param string $type
+     * @return string
+     */
     private function normalizeParameterType($type)
     {
         $typeMap = [
@@ -272,6 +297,12 @@ class IDocGenerator
         return $type ? ($typeMap[$type] ?? $type) : 'string';
     }
 
+    /**
+     * Generate a dummy value for the given parameter type.
+     *
+     * @param string $type
+     * @return mixed
+     */
     private function generateDummyValue(string $type)
     {
         $faker = Factory::create();
@@ -305,12 +336,10 @@ class IDocGenerator
     }
 
     /**
-     * Allows users to specify an example for the parameter by writing 'Example: the-example',
-     * to be used in example requests and response calls.
+     * Parse the description to extract the example value.
      *
      * @param string $description
      * @param string $type The type of the parameter. Used to cast the example provided, if any.
-     *
      * @return array The description and included example.
      */
     private function parseDescription(string $description, string $type)
@@ -331,7 +360,6 @@ class IDocGenerator
      *
      * @param string $value
      * @param string $type
-     *
      * @return mixed
      */
     private function castToType(string $value, string $type)
@@ -344,7 +372,7 @@ class IDocGenerator
         ];
 
         // First, we handle booleans. We can't use a regular cast,
-        //because PHP considers string 'false' as true.
+        // because PHP considers string 'false' as true.
         if ($value == 'false' && $type == 'boolean') {
             return false;
         }
