@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\File;
 class IDocCustomConfigGeneratorCommand extends Command
 {
     // Command signature and description
-    protected $signature = 'idoc:custom {config?}';
+    protected $signature = 'idoc:custom {config?} {--force}';
     protected $description = 'Generate API documentation for custom configuration';
 
     /**
@@ -47,8 +47,11 @@ class IDocCustomConfigGeneratorCommand extends Command
             $this->info('No configuration provided, using default iDoc configuration.');
         }
 
-        // Execute the 'idoc:generate' Artisan command
-        Artisan::call('idoc:generate');
+        // Check if the --force option is provided
+        $force = $this->option('force') ? ['--force' => true] : [];
+
+        // Execute the 'idoc:generate' Artisan command with the --force option if provided
+        Artisan::call('idoc:generate', $force);
 
         // Get the output of the Artisan command
         $output = Artisan::output();

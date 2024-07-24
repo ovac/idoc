@@ -210,7 +210,7 @@ return [
   
      /*
      * The routes for which documentation should be generated.
-     * Each group contains rules defining which routes should be included ('match', 'include' and 'exclude' sections)
+     * Each group contains rules defining what routes should be included ('match', 'include' and 'exclude' sections)
      * and rules which should be applied to them ('apply' section).
      */
     'routes' => [
@@ -631,6 +631,100 @@ If you are referring to the environment setting as shown above, then you should 
 APP_URL=http://yourapp.app
 ```
 
+## Documenting Complex Responses with @responseResource
+
+The `@responseResource` annotation allows you to easily document complex response structures using Laravel API Resources. This feature streamlines the process of generating comprehensive API documentation for nested and complex data structures, including automatic generation of example responses.
+
+### Usage
+
+To use the `@responseResource` annotation, add it to your controller method's PHPDoc block:
+
+```php
+/**
+ * @responseResource App\Http\Resources\OrderResource
+ */
+public function show($id)
+{
+    return new OrderResource(Order::findOrFail($id));
+}
+```
+
+You can also specify a status code:
+
+```php
+/**
+ * @responseResource 201 App\Http\Resources\OrderResource
+ */
+public function store(Request $request)
+{
+    $order = Order::create($request->all());
+    return new OrderResource($order);
+}
+```
+
+### Documenting the Resource Class
+
+In your API Resource class, use the following tags in the class-level DocBlock to provide metadata about the resource:
+
+- `@resourceName`: Specifies a custom name for the resource in the documentation.
+- `@resourceDescription`: Provides a description of the resource.
+- `@resourceStatus`: Sets a default HTTP status code for the resource.
+
+Example:
+
+```php
+/**
+ * @resourceName Order
+ * @resourceDescription Represents an order in the system
+ * @resourceStatus 200
+ */
+class OrderResource extends JsonResource
+{
+    public function toArray($request)
+    {
+        return [
+            /**
+             * @responseParam id integer required The ID of the order. Example: 1
+             */
+            'id' => $this->id,
+            /**
+             * @responseParam status string required The status of the order. Enum: [pending, processing, shipped, delivered]. Example: processing
+             */
+            'status' => $this->status,
+            /**
+             * @responseParam items array required The items in the order.
+             */
+            'items' => $this->items->map(function ($item) {
+                return [
+                    /**
+                     * @responseParam id integer required The ID of the item. Example: 101
+                     */
+                    'id' => $item->id,
+                    /**
+                     * @responseParam name string required The name of the item. Example: Ergonomic Keyboard
+                     */
+                    'name' => $item->name,
+                    /**
+                     * @responseParam price float required The price of the item. Example: 129.99
+                     */
+                    'price' => $item->price,
+                ];
+            }),
+        ];
+    }
+}
+```
+
+Use `@responseParam` annotations within the `toArray` method to document individual fields of the resource. You can specify the following for each field:
+
+- Type (e.g., integer, string, array)
+- Whether it's required
+- Description
+- Example value
+- Enum values (if applicable)
+
+The `@responseResource` annotation automatically parses your API Resource class to generate a detailed schema of your response structure, including nested relationships and complex data types. Additionally, it automatically generates an example response based on the provided example values or default values for each field type.
+
 ## Further modification
 
 The info file in the view folder can be further modified to add introductions and further documentation.
@@ -652,6 +746,122 @@ php artisan idoc:custom {config?}
 
 ### How to Use
 
+1. **Create a Custom Configuration File:**
+
+   Create a custom configuration file in the `config` directory. The file should follow the naming convention `idoc.{config}.php`, where `{config}` is the name you will use when running the command.
+
+   Example for `config/idoc.ecommerce.php`:
+   ```
+   // config/idoc.ecommerce.php
+   return [
+       'title' => 'E-commerce API Documentation',
+       'version' => '1.0.0',
+       'description' => 'API documentation for e-commerce.',
+       'terms_of_service' => 'https://example.com/terms',
+       'contact' => [
+           'name' => 'E-commerce API Support',
+           'email' => 'support@example.com',
+           'url' => 'https://example.com',
+       ],
+       'license' => [
+           'name' => 'MIT',
+           'url' => 'https://opensource.org/licenses/MIT',
+       ],
+       'output' => '/docs/ecommerce', // Ensure this path is unique
+       'hide_download_button' => false,
+       'external_description' => route('ecommerce-doc-description'),
+       'routes' => [
+           [
+               'match' => [
+                   'domains' => ['*'],
+                   'prefixes' => ['api/ecommerce/*'],
+                   'versions' => ['v1'],
+               ],
+               'include' => [],
+               'exclude' => [],
+               'apply' => [
+                   'headers' => [
+                       'Authorization' => 'Bearer {token}',
+                   ],
+                   'response_calls' => [
+                       'methods' => ['*'],
+                       'bindings' => [],
+                       'env' => [
+                           'APP_ENV' => 'documentation',
+                           'APP_DEBUG' => false,
+                       ],
+                       'headers' => [
+                           'Content-Type' => 'application/json',
+                           'Accept' => 'application/json',
+                       ],
+                       'query' => [],
+                       'body' => [],
+                       'without_middleware' => [],
+                   ],
+               ],
+           ],
+       ],
+   ];
+   ```
+
+2. **Run the Command:**
+
+   Run the command with the name of your custom configuration file (without the `.php` extension).
+
+   Example:
+   ```
+   php artisan idoc:custom ecommerce
+   ```
+
+   If the custom configuration file exists, it will be loaded and merged with the default configuration. The command will then generate the API documentation using the merged configuration.
+
+3. **Check the Output:**
+
+   The generated documentation will be saved to the path specified in the `output` configuration option of your custom configuration file. Ensure that the output path is unique for each custom documentation to avoid conflicts. This is relative to the public directory.
+
+   - E-commerce API documentation: `/docs/ecommerce`, will save the open-api spec file to `public/docs/ecommerce/openapi.json` and the documentation to `public/docs/ecommerce/index.html`.
+   - User Management API documentation: `/docs/user` will save the open-api spec file to `public/docs/user/openapi.json` and the documentation to `public/docs/user/index.html`.
+
+By using the custom configuration generator, you can easily manage and generate multiple sets of API documentation for different applications within the same Laravel application. This approach allows you to maintain separate configurations and documentation outputs for each API, ensuring clarity and organization.
+
+### Managing Multiple API Documentation Sets
+
+The custom configuration generator can also help you manage multiple sets of API documentation for different applications within the same Laravel application. This is particularly useful if you have different API sets for different applications or modules.
+
+#### Example Scenario
+
+Suppose you have a Laravel application that serves multiple APIs for different applications, such as a user management API, and an e-commerce API. You can create separate configuration files for each API and use the custom configuration generator to generate the documentation accordingly.
+
+1. **Create Configuration Files:**
+
+   - `config/idoc.ecommerce.php`
+   - `config/idoc.user.php`
+
+2. **Run the Command for Each API:**
+
+   ```
+   php artisan idoc:custom ecommerce
+   php artisan idoc:custom user
+   ```
+
+   This will generate the API documentation for each application using the respective configuration file.
+
+3. **Check the Output:**
+
+   The generated documentation will be saved to the paths specified in the `output` configuration options of your custom configuration files. Ensure that each output path is unique to avoid conflicts. This is relative to the public directory.
+
+   - E-commerce API documentation: `/docs/ecommerce`, will save the open-api spec file to `public/docs/ecommerce/openapi.json` and the documentation to `public/docs/ecommerce/index.html`.
+   - User Management API documentation: `/docs/user` will save the open-api spec file to `public/docs/user/openapi.json` and the documentation to `public/docs/user/index.html`.
+
+By using the custom configuration generator, you can easily manage and generate multiple sets of API documentation for different applications within the same Laravel application. This approach allows you to maintain separate configurations and documentation outputs for each API, ensuring clarity and organization.
+
+### Defining Custom Documentation Routes
+
+To serve the generated documentation for each custom configuration, you need to define routes in your `routes/web.php` or a similar routes file. This ensures that each set of documentation is accessible via a unique URL.
+
+Example for `idoc.ecommerce.php` configuration:
+
+```
 1. **Create a Custom Configuration File:**
 
    Create a custom configuration file in the `config` directory. The file should follow the naming convention `idoc.{config}.php`, where `{config}` is the name you will use when running the command.

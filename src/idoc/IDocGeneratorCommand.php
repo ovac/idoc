@@ -13,7 +13,7 @@ use ReflectionException;
 
 /**
  * This custom generator will parse and generate a beautiful
- * interractive documentation with openAPI schema.
+ * interactive documentation with openAPI schema.
  */
 class IDocGeneratorCommand extends Command
 {
@@ -31,7 +31,7 @@ class IDocGeneratorCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Generate interractive api documentation.';
+    protected $description = 'Generate interactive api documentation.';
 
     private $routeMatcher;
 
@@ -324,8 +324,52 @@ class IDocGeneratorCommand extends Command
                                         ->toArray()
                                 ),
 
-                                'responses' => collect($route['response'])->mapWithKeys(function($item) {
-                                    return [
+                                'responses' => collect($route['response'])->mapWithKeys(function($item) use ($route) {
+
+                            $schemas = collect($route['schemas'])->values()->mapWithKeys(function($schema){
+                                        $requiredFields = [];
+                                        return [
+                                            $schema['statusCode'] => [
+                                                'description' => $schema['name'],
+                                                'content' => [
+                                                    'application/json' => [
+                                                        'schema' => [
+                                                            'title' => $schema['name'],
+                                                            'type' => 'object',
+                                                            'description' => $schema['description'],
+                                                            'example' => $schema['example'],
+                                                            'properties' => collect($schema['properties'])
+                                                                ->map(function($item, $key) use (&$requiredFields) {
+                                                                    
+                                                                    if($item['required']) $requiredFields[] = $key;
+                                                                    
+                                                                    $property = [
+                                                                        'type' => $item['type'],
+                                                                        'description' => $item['description'],
+                                                                        'example' => $item['example']
+                                                                    ];
+
+                                                                    if ($item['type'] === 'object' && isset($item['properties'])) {
+                                                                        $property = $this->processNestedProperties($item['properties'], $property);
+                                                                    }
+
+                                                                    if ($item['type'] === 'array' && isset($item['items'])) {
+                                                                        $property = $this->processArrayItems($item['items'], $property);
+                                                                    }
+
+                                                                    return $property;
+                                                                })
+                                                                ->toArray(), 
+                                                            'required' => $requiredFields,
+                                                        ]
+                                                    ]
+                                                
+                                                ]
+                                            ]
+                                        ];
+                                    });
+
+                                    return $schemas->toArray() + [
                                         (int) $item['status'] => [
                                             'description' => in_array($item['status'], range(200,299)) ? 'success' : 'error',
                                             'content' => [
@@ -336,7 +380,7 @@ class IDocGeneratorCommand extends Command
                                                     ]
                                                 ]
                                             ]
-                                        ]
+                                        ] 
                                     ];
                                 })->all(),
 
@@ -345,7 +389,7 @@ class IDocGeneratorCommand extends Command
                                         'lang' => $name,
                                         'source' => view('idoc::languages.' . $lang, compact('route'))->render(),
                                     ];
-                                })->values()->toArray(),
+                                })->values(),
                             ]
                         ),
                     ];
@@ -416,46 +460,6 @@ class IDocGeneratorCommand extends Command
                                 'default' => $schema['value'],
                             ];
                         });
-
-                        return ["PM{$route['paymentMethod']->id}" => ['type' => 'object']
-
-                             + (
-                                count($required = $bodyParameters
-                                        ->values()
-                                        ->where('required', true)
-                                        ->pluck('name'))
-                                ? ['required' => $required]
-                                : []
-                            )
-
-                             + (
-                                count($properties = $bodyParameters
-                                        ->values()
-                                        ->filter()
-                                        ->mapWithKeys(function ($parameter) {
-                                            return [
-                                                $parameter['name'] => [
-                                                    'type' => $parameter['type'],
-                                                    'example' => $parameter['default'],
-                                                    'description' => $parameter['description'],
-                                                ],
-                                            ];
-                                        }))
-                                ? ['properties' => $properties]
-                                : []
-                            )
-
-                             + (
-                                count($properties = $bodyParameters
-                                        ->values()
-                                        ->filter()
-                                        ->mapWithKeys(function ($parameter) {
-                                            return [$parameter['name'] => $parameter['default']];
-                                        }))
-                                ? ['example' => $properties]
-                                : []
-                            )
-                        ];
                     });
                 })->filter(),
             ],
@@ -468,5 +472,80 @@ class IDocGeneratorCommand extends Command
         ];
 
         return json_encode($collection);
+    }
+
+    /**
+     * Process nested properties for an object type.
+     *
+     * @param array $properties The nested properties to process
+     * @param array $property The parent property to update
+     * @return array The updated property with processed nested properties
+     */
+    private function processNestedProperties(array $properties, array $property): array
+    {
+        $nestedRequiredFields = [];
+        $property['properties'] = collect($properties)
+            ->map(function($nestedItem, $nestedKey) use (&$nestedRequiredFields) {
+                if($nestedItem['required']) $nestedRequiredFields[] = $nestedKey;
+                $processedItem = [
+                    'type' => $nestedItem['type'],
+                    'description' => $nestedItem['description'],
+                    'example' => $nestedItem['example']
+                ];
+
+                // Recursive call for nested objects
+                if ($nestedItem['type'] === 'object' && isset($nestedItem['properties'])) {
+                    $processedItem = $this->processNestedProperties($nestedItem['properties'], $processedItem);
+                }
+
+                // Recursive call for nested arrays
+                if ($nestedItem['type'] === 'array' && isset($nestedItem['items'])) {
+                    $processedItem = $this->processArrayItems($nestedItem['items'], $processedItem);
+                }
+
+                return $processedItem;
+            })
+            ->toArray();
+        $property['required'] = $nestedRequiredFields;
+        return $property;
+    }
+
+    /**
+     * Process items for an array type.
+     *
+     * @param array $items The array items to process
+     * @param array $property The parent property to update
+     * @return array The updated property with processed array items
+     */
+    private function processArrayItems(array $items, array $property): array
+    {
+        $nestedRequiredFields = [];
+        $property['items'] = [
+            'type' => 'object',
+            'properties' => collect($items)
+                ->map(function($nestedItem, $nestedKey) use (&$nestedRequiredFields) {
+                    if($nestedItem['required']) $nestedRequiredFields[] = $nestedKey;
+                    $processedItem = [
+                        'type' => $nestedItem['type'],
+                        'description' => $nestedItem['description'],
+                        'example' => $nestedItem['example']
+                    ];
+
+                    // Recursive call for nested objects
+                    if ($nestedItem['type'] === 'object' && isset($nestedItem['properties'])) {
+                        $processedItem = $this->processNestedProperties($nestedItem['properties'], $processedItem);
+                    }
+
+                    // Recursive call for nested arrays
+                    if ($nestedItem['type'] === 'array' && isset($nestedItem['items'])) {
+                        $processedItem = $this->processArrayItems($nestedItem['items'], $processedItem);
+                    }
+
+                    return $processedItem;
+                })
+                ->toArray(),
+        ];
+        $property['required'] = $nestedRequiredFields;
+        return $property;
     }
 }

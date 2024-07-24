@@ -7,6 +7,7 @@ use Illuminate\Routing\Route;
 use Mpociot\Reflection\DocBlock;
 use Mpociot\Reflection\DocBlock\Tag;
 use OVAC\IDoc\Tools\ResponseResolver;
+use OVAC\IDoc\Tools\SchemaParser;
 use OVAC\IDoc\Tools\Traits\ParamHelpers;
 use ReflectionClass;
 use ReflectionMethod;
@@ -14,6 +15,13 @@ use ReflectionMethod;
 class IDocGenerator
 {
     use ParamHelpers;
+
+    protected $schemaParser;
+
+    public function __construct()
+    {
+        $this->schemaParser = new SchemaParser();
+    }
 
     /**
      * Get the URI of the given route.
@@ -72,6 +80,9 @@ class IDocGenerator
             'query' => $queryParameters,
         ]);
 
+        // Extract schema documentation
+        $schemas = $this->schemaParser->getSchemaDocumentation($docBlock['tags']);
+
         $parsedRoute = [
             'id' => md5($this->getUri($route) . ':' . implode($this->getMethods($route))),
             'group' => $routeGroup,
@@ -85,6 +96,7 @@ class IDocGenerator
             'authenticated' => $authenticated = $this->getAuthStatusFromDocBlock($docBlock['tags']),
             'response' => $content,
             'showresponse' => !empty($content),
+            'schemas' => $schemas,
         ];
 
         if (!$authenticated && array_key_exists('Authorization', ($rulesToApply['headers'] ?? []))) {
@@ -326,6 +338,9 @@ class IDocGenerator
                 return '[]';
             },
             'object' => function () {
+                return '{}';
+            },
+            'json' => function () {
                 return '{}';
             },
         ];
