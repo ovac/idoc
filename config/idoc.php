@@ -67,7 +67,7 @@ return [
 
     'title' => 'iDoc API Reference',
 
-    'description' => 'iDoc Api secification and documentation.',
+    'description' => 'iDoc Api specification and documentation.',
 
     'version' => '',
 
@@ -92,7 +92,7 @@ return [
     | The output path for the generated Open API 3.0 collection file.
     | This path is relative to the public path.
     |
-    | In order To disable the  the open-api-3 download button
+    | In order To disable the open-api-3 download button
     | on the  documentation, the `hide_download_button`
     | option should be set to true.
     |
@@ -108,7 +108,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | This is the external description/info for the documentation. By default
-    | it uses the 'idoc.info' route in the documentation but you can
+    | it uses the 'idoc.info' route in the documentation, but you can
     | override it with your own route name or leave it empty to use the
     | default description. It must be a route name.
     |
