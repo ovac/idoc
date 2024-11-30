@@ -38,11 +38,6 @@
 
       var constantMock = window.fetch;
       window.fetch = function() {
-
-        if (/\/api/.test(arguments[0]) && !arguments[1].headers.Accept) {
-          arguments[1].headers.Accept = 'application/json';
-        }
-
         return constantMock.apply(this, arguments)
       }
     </script>
