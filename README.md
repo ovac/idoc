@@ -1,3 +1,29 @@
+<p align="center" style="border: 2px dotted #000000">
+    <a href="https://https://www.openapis.org/" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50/v1553976486/1_Qf94xFwde421J_ZSmdPJDw_soee3m.png" class="inline"></a>
+    <br/>
+<a href="https://https://www.openapis.org/" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50/v1553975330/C2I2EFN2_400x400_qcuyop.jpg" class="inline"></a><a href="#" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_120/v1506828786/logo-composer-transparent_zjgal0.png" class="inline"></a><a href="#" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50,w_60,c_fill/v1506832992/laravel-logo_atlvfw.png" class="inline"></a>
+    <br/>
+    <a href="https://www.ovac4u.com/idoc" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/r_200,w_300,h_50,c_fill/v1506828380/logo_size_invert_jelh74.jpg" class="inline"></a>
+</p>
+
+<p align="center">
+<a href="https://packagist.org/packages/ovac/idoc"><img src="https://poser.pugx.org/ovac/idoc/v/stable" alt="Latest Stable Version" class="inline"></a>
+<a href="https://packagist.org/packages/ovac/idoc"><img src="https://poser.pugx.org/ovac/idoc/downloads" alt="Total Downloads" class="inline"></a>
+<a href="https://packagist.org/packages/ovac/idoc"><img src="https://poser.pugx.org/ovac/idoc/license" alt="License" class="inline"></a>
+</p>
+
+```md
+              Follow me anywhere @ovac4u                         | GitHub
+              _________                          _________       | Twitter
+             |   ___   |.-----.--.--.---.-.----.|  |  |.--.--.   | Facboook
+             |  |  _   ||  _  |  |  |  _  |  __||__    |  |  |   | Instagram
+             |  |______||_____|\___/|___._|____|   |__||_____|   | Github + @ovac
+             |_________|                        www.ovac4u.com   | Facebook + @ovacposts
+```
+
+<br/>
+<br/>
+
 <div align="center">
     
 <h2>Laravel IDoc - The API Documentation Generator</h2>
@@ -7,9 +33,6 @@
 
 <br/>
 <br/>
-
-## With resolved Issue (ovac/idoc)
-1. https://github.com/ovac/idoc/issues/47
 
 
 # Introduction.
