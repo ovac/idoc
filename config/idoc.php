@@ -42,6 +42,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | iDoc Try It Out
+    |--------------------------------------------------------------------------
+    |
+    | This option enables the "Try it out" feature on the documentation,
+    | allowing users to make API calls directly from the documentation interface.
+    | You can enable or disable this feature by setting the value to true or false.
+    |
+     */
+    'tryit' => [
+        'enabled' => env('IDOC_TRYIT_ENABLED', true),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | iDoc logo url
     |--------------------------------------------------------------------------
     |

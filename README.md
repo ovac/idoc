@@ -57,6 +57,10 @@ Laravel IDoc generator (interactive documentation generator) is a seamless and c
 - High-level grouping in side-menu.
 - Branding/customizations.
 
+- Redoc OSS for fast, beautiful reading
+- Optional Swagger UI side panel for live "Try it" requests
+- Tag or operation aware, stays in sync while you navigate
+
 
 ## Installation
 > Note: PHP 7 and Laravel 5.5 or higher are the minimum dependencies.
