@@ -411,6 +411,7 @@
           deepLinking: true,
           tryItOutEnabled: true,
           displayRequestDuration: true,
+          persistAuthorization: true,
           requestInterceptor: (req) => {
             if (!req.headers) req.headers = {};
             if (/\/api/.test(req.url) && !req.headers['Accept']) {
@@ -420,7 +421,12 @@
             // ✅ Inject Authorization from Swagger UI "Authorize" modal (so 401s stop)
             if (!req.headers['Authorization']) {
               const bearer = getSwaggerBearer && getSwaggerBearer();
-              if (bearer) req.headers['Authorization'] = bearer;
+              if (bearer) {
+                req.headers['Authorization'] = bearer;
+              } else {
+                const tok = localStorage.getItem('idoc_bearer_token');
+                if (tok) req.headers['Authorization'] = tok.match(/^Bearer\s/i) ? tok : `Bearer ${tok}`;
+              }
             }
 
             // ✅ Inject Extra headers from LIVE textarea (fallback to localStorage)
@@ -451,6 +457,32 @@
             return req;
           }
         });
+
+        // Mirror token changes to a simple key so requestInterceptor can read it fast
+        setInterval(() => {
+          try {
+            if (!ui || !ui.authSelectors || !ui.authSelectors.authorized) return;
+            const state = ui.authSelectors.authorized();
+            const js = typeof state?.toJS === 'function' ? state.toJS() : state;
+            const entry = js?.BearerAuth;
+            let token = null;
+            if (typeof entry?.value === 'string') token = entry.value;
+            else if (entry?.value?.token) token = entry.value.token;
+            if (token) localStorage.setItem('idoc_bearer_token', token);
+          } catch (_) {}
+        }, 500);
+
+        // Re-apply BearerAuth on every mount from either Swagger's persisted store
+        // or your own custom localStorage key (fallback).
+        setTimeout(() => {
+          try {
+            const token = getSavedBearerToken(); // defined below
+            if (token) {
+              // Works for http bearer and apiKey styles as long as the scheme name matches
+              ui.preauthorizeApiKey && ui.preauthorizeApiKey('BearerAuth', token);
+            }
+          } catch (_) {}
+        }, 0);
 
         // After mount, enhance response blocks with Copy/Download
         setTimeout(enhanceResponses, 300);
@@ -659,6 +691,30 @@
         el.addEventListener('change', handler);
         // Initial validity paint
         handler();
+
+        /* =========================================================
+           10) Extra: Bearer token persistence helper
+           ========================================================= */
+        // Returns the raw token without "Bearer " prefix
+        function getSavedBearerToken() {
+          // 1) Prefer Swagger UI’s own persisted store, if available
+          try {
+            if (ui && ui.authSelectors && ui.authSelectors.authorized) {
+              const state = ui.authSelectors.authorized();
+              const js = typeof state?.toJS === 'function' ? state.toJS() : state;
+              const entry = js?.BearerAuth;
+              if (entry) {
+                const v = entry.value ?? entry;
+                if (typeof v === 'string') return v.replace(/^Bearer\s+/i, '');
+                if (v && v.token) return v.token;
+              }
+            }
+          } catch (_) {}
+
+          // 2) Fallback to your own local key if you decide to store it there
+          const fromCustom = localStorage.getItem('idoc_bearer_token');
+          return fromCustom ? fromCustom.replace(/^Bearer\s+/i, '') : '';
+        }
       })();
       @endif
     </script>
