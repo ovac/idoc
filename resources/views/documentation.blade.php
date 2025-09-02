@@ -412,22 +412,33 @@
           tryItOutEnabled: true,
           displayRequestDuration: true,
           requestInterceptor: (req) => {
-            // Example header normalization for your APIs
             if (!req.headers) req.headers = {};
             if (/\/api/.test(req.url) && !req.headers['Accept']) {
               req.headers['Accept'] = 'application/json';
             }
 
-            // Inject extra headers JSON (persisted)
+            // ✅ Inject Authorization from Swagger UI "Authorize" modal (so 401s stop)
+            if (!req.headers['Authorization']) {
+              const bearer = getSwaggerBearer && getSwaggerBearer();
+              if (bearer) req.headers['Authorization'] = bearer;
+            }
+
+            // ✅ Inject Extra headers from LIVE textarea (fallback to localStorage)
             try {
-              const raw = localStorage.getItem('idoc_extra_headers') || '{}';
-              const extras = JSON.parse(raw);
-              if (extras && typeof extras === 'object') {
-                Object.keys(extras).forEach(k => {
-                  if (k && extras[k] != null && String(extras[k]).length) {
-                    req.headers[k] = String(extras[k]);
-                  }
-                });
+              const el = document.getElementById('extraHeadersInput');
+              const raw = (el && el.value.trim().length ? el.value.trim()
+                        : (localStorage.getItem('idoc_extra_headers') || '')).trim();
+
+              const obj = parseJsonStrict(raw);
+              setHeadersInputValidity && setHeadersInputValidity(el, obj !== null);
+
+              if (obj && typeof obj === 'object') {
+                for (const k of Object.keys(obj)) {
+                  if (!k) continue;
+                  const v = obj[k];
+                  if (v === undefined || v === null) continue;
+                  req.headers[k] = String(v);
+                }
               }
             } catch (_) {
               // Ignore malformed JSON; user can correct in the box
@@ -593,6 +604,62 @@
         document.getElementById('swagger'),
         { childList: true, subtree: true }
       );
+
+      /* =========================================================================
+         8) Optional: Bearer token helper
+         ========================================================================= */
+      // Example: if you store an API token in localStorage, you can auto-inject it
+      // into the Swagger UI requests. Adjust to your auth scheme and storage.
+      // To use, uncomment the requestInterceptor lines above and this function.=
+      
+      function getSwaggerBearer() {
+        try {
+          if (!ui || !ui.authSelectors || !ui.authSelectors.authorized) return null;
+          // authorized() can be an Immutable Map or a plain object depending on version
+          const authState = ui.authSelectors.authorized();
+          const authObj = typeof authState?.toJS === 'function' ? authState.toJS() : authState;
+
+          // Your scheme name is "BearerAuth" (http, bearer) per idoc config
+          const entry = authObj?.BearerAuth;
+          if (!entry) return null;
+
+          const value = entry.value ?? entry; // string or object
+          if (typeof value === 'string') return `Bearer ${value}`;
+          if (value && value.token) return `${value.token_type || 'Bearer'} ${value.token}`;
+        } catch (_) {}
+        return null;
+      }
+
+      /* =========================================================
+          9) Extra headers input box (persisted in localStorage)
+          ========================================================= */
+      function parseJsonStrict(s) {
+        try { return s ? JSON.parse(s) : {}; } catch { return null; }
+      }
+      function setHeadersInputValidity(el, ok) {
+        if (!el) return;
+        el.style.borderColor = ok ? '#e5e7eb' : '#ef4444';
+        el.title = ok ? '' : 'Invalid JSON';
+      }
+      (function bindExtraHeaders(){
+        const el = document.getElementById('extraHeadersInput');
+        if (!el) return;
+
+        // Load saved value
+        const saved = localStorage.getItem('idoc_extra_headers');
+        if (saved != null) el.value = saved;
+
+        // Save on each keystroke and show validity
+        const handler = () => {
+          const val = el.value.trim();
+          localStorage.setItem('idoc_extra_headers', val);
+          setHeadersInputValidity(el, parseJsonStrict(val) !== null);
+        };
+        el.addEventListener('input', handler);
+        el.addEventListener('change', handler);
+        // Initial validity paint
+        handler();
+      })();
       @endif
     </script>
   </body>
