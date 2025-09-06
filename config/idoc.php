@@ -56,6 +56,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | iDoc AI Chat assistant (optional)
+    |--------------------------------------------------------------------------
+    |
+    | Enable a simple AI assistant that can answer questions about your API
+    | using your generated OpenAPI spec and optional extra context from a view.
+    | Requires OPENAI_API_KEY to be set in the environment.
+    |
+    */
+
+    'chat' => [
+        'enabled'   => env('IDOC_CHAT_ENABLED', false),
+        'model'     => env('IDOC_CHAT_MODEL', 'gpt-4o-mini'),
+        // Optional: the view used as extra context for chat (rendered to text)
+        'info_view' => env('IDOC_CHAT_INFO_VIEW'), // eg. 'idoc.info'
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | iDoc logo url
     |--------------------------------------------------------------------------
     |

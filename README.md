@@ -93,6 +93,11 @@ $app->configure('idoc');
 $ php artisan idoc:generate
 ```
 
+### Theme
+- The docs page includes a single Theme toggle (Auto → Dark → Light) that applies to both Redoc and the Swagger UI Try-It panel.
+- Auto follows your OS theme and updates live when the OS theme changes.
+- The choice persists in your browser via localStorage; no backend configuration is required.
+
 ## Configuration
 Before you can generate your documentation, you'll need to configure a few things in your `config/idoc.php`.
 

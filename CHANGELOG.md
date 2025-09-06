@@ -1,26 +1,35 @@
-
----
-
-# 4) Add release notes
-
-Create or update `CHANGELOG.md` and your GitHub Release body.
-
 **CHANGELOG.md** (top):
 
 ```markdown
-## v2.3.0 — Hybrid Redoc + Try it
+## [v2.0.0] — 2025-08-31
+
+### Breaking
+- All prior versions are non-functional due to the discontinued Redoc CDN.
+  The docs view now ships with a supported Redoc bundle and a new hybrid renderer.
+  Action required: publish the new view and redeploy.
 
 ### Added
-- New hybrid documentation view that keeps Redoc OSS for reading and mounts a Swagger UI console in a slide-in panel.
-- Console auto-detects the active tag or operation by hash or scroll.
-- Config key `idoc.tryit.enabled` to toggle the panel.
+- Hybrid documentation view: Redoc OSS for reading + a slide-in Swagger UI “Try it” panel.
+- Context awareness: console follows `#/tag/...` and `#/tag/.../operation/...` and updates on scroll.
+- Extra request headers (JSON) input in the panel header, persisted and auto-injected into requests.
+- Click-to-copy and Download buttons for Swagger responses.
+- Extensive inline documentation in the Blade view for maintainers.
 
 ### Changed
-- Shrunk Swagger UI title size for a tighter header.
+- Reduced Swagger UI title size for a tighter header.
+- Updated default Markdown docs to document the hybrid model and quick start.
+- Safer fetch normalization adds `Accept: application/json` to `/api` calls when missing.
 
 ### Fixed
-- Safer fetch wrapper to normalize `Accept: application/json` on /api requests without breaking Redoc.
+- Redoc CDN 404 errors (legacy CDN removed). Now using `redoc@next/bundles/redoc.standalone.js`.
 
-### Notes
-- No breaking changes. Existing routes and config continue to work.
-- If you self host the JS bundles, update the script tags in the Blade view.
+### Migration Notes
+- Run `composer update ovac/idoc`.
+- `php artisan vendor:publish --tag=idoc-views --force` to replace `documentation.blade.php`.
+- (If needed) `php artisan vendor:publish --tag=idoc-config` and set:
+  - `IDOC_TRYIT_ENABLED=true`
+  - `IDOC_TITLE="API Reference"`
+- Ensure your spec is at `public/docs/openapi.json` or update `config('idoc.output')`.
+- Clear caches: `php artisan view:clear && php artisan cache:clear`.
+
+[Full Changelog]: v1.7.0...v2.0.0

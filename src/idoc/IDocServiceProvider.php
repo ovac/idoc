@@ -39,6 +39,14 @@ class IDocServiceProvider extends ServiceProvider
     {
         Route::group($this->routeConfiguration(), function () {
             $this->loadRoutesFrom(__DIR__ . '/../../resources/routes/idoc.php', 'idoc');
+
+            // Optionally load chat route when enabled
+            if (config('idoc.chat.enabled', false)) {
+                $chatRoutes = __DIR__ . '/../../resources/routes/chat.php';
+                if (is_file($chatRoutes)) {
+                    $this->loadRoutesFrom($chatRoutes, 'idoc');
+                }
+            }
         });
     }
 
@@ -61,6 +69,11 @@ class IDocServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/../../config/idoc.php' => app()->basePath() . '/config/idoc.php',
             ], 'idoc-config');
+
+            // Optionally allow publishing of package routes for customization
+            $this->publishes([
+                __DIR__ . '/../../resources/routes' => app()->basePath() . '/routes/vendor/idoc',
+            ], 'idoc-routes');
         }
     }
 
