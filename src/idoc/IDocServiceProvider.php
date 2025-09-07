@@ -74,6 +74,11 @@ class IDocServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/../../resources/routes' => app()->basePath() . '/routes/vendor/idoc',
             ], 'idoc-routes');
+
+            // Publish default prompts so apps can customize the chat system prompt
+            $this->publishes([
+                __DIR__ . '/../../resources/prompts' => app()->basePath() . '/resources/vendor/idoc/prompts',
+            ], 'idoc-prompts');
         }
     }
 

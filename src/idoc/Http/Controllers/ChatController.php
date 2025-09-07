@@ -10,23 +10,41 @@ use Illuminate\Support\Facades\Log;
  * iDoc AI Chat Controller
  *
  * Purpose
- * - Exposes a minimal chat endpoint that answers questions about your API
- *   using the generated OpenAPI document (and optionally, extra context from a
- *   Blade view) via OpenAI's Chat Completions API.
+ * - Provides a provider-agnostic chat endpoint that can answer questions about
+ *   your API using the generated OpenAPI document (and optional extra context),
+ *   and returns structured metadata used by the docs UI.
+ *
+ * Key capabilities
+ * - Providers: DeepSeek, OpenAI, Google Gemini, Groq, Hugging Face
+ *   Inference API, Together, and OpenAI-compatible servers.
+ * - Streaming: Supports server-sent events (SSE) for OpenAI-compatible providers.
+ * - Attachments: Accepts text/json/image/url attachments. Text/JSON are injected
+ *   into the system context (first 4000 chars). Images are accepted when the
+ *   selected provider/model supports vision and are attached to the user turn on
+ *   OpenAI-compatible providers. Else they are dropped with meta warnings.
+ * - Edit & Resend: When `replaces_message_id` is present, the replaced user
+ *   message and its immediate assistant reply are pruned from prompt history.
+ * - Action hints: When the assistant content contains a heading such as
+ *   "### METHOD /path", an `actionHints` object is returned under `data.meta`:
+ *     { endpoint: { method, path, anchor? },
+ *       tryIt: { method, path, prefill: { pathParams?, query?, headers?, body? }, autoExecute: true } }
+ *   The UI uses these hints to render “Open endpoint” and “Try it with this data”.
  *
  * Configuration (config/idoc.php)
  * - idoc.chat.enabled   bool   Enable/disable the endpoint (default: false)
- * - idoc.chat.model     string Model id (default: gpt-4o-mini; override with IDOC_CHAT_MODEL)
- * - idoc.chat.info_view string Optional view name (eg. 'idoc.info') to render as extra context
- * - Required env var:   OPENAI_API_KEY
+ * - idoc.chat.provider  string Provider id
+ * - idoc.chat.model     string Model id
+ * - idoc.chat.base_url  string Base URL override (for OpenAI-compatible servers)
+ * - idoc.chat.info_view string Optional Blade view rendered into system context
+ * - idoc.chat.api_key_env string Optional env var name for provider key
  *
  * Route
- * - POST /{idoc.path}/chat (name: idoc.chat). Loaded conditionally when enabled.
+ * - POST /{idoc.path}/chat (name: idoc.chat). Loaded when enabled.
  *
- * Responses
+ * Responses (JSON or SSE)
  * - 403: Feature disabled
- * - 500: Missing key or provider error
- * - 200: { status: 'success', data: { reply: string } }
+ * - 500: Chat provider error (misconfig, network, etc.)
+ * - 200: { status: 'success', message: 'ok', data: { reply: string, meta: { warnings?: string[], actionHints?: object } } }
  */
 class ChatController extends Controller
 {
@@ -52,6 +70,22 @@ class ChatController extends Controller
 
         $data = $request->validate([
             'message' => 'required|string',
+            'history' => 'sometimes|array',
+            'history.*.role' => 'required_with:history|string|in:user,assistant',
+            'history.*.content' => 'required_with:history|string',
+            'stream' => 'sometimes|boolean',
+            'history.*.id' => 'sometimes|string',
+            'replaces_message_id' => 'sometimes|string',
+            'attachments' => 'sometimes|array',
+            'attachments.*.name' => 'sometimes|string',
+            'attachments.*.type' => 'sometimes|string|in:text,json,image,url',
+            'attachments.*.mime' => 'sometimes|string',
+            'attachments.*.content' => 'sometimes|string',
+            'attachments.*.url' => 'sometimes|string',
+            'attachments.*.bytes' => 'sometimes|integer',
+            'temperature' => 'sometimes|numeric|min:0|max:1',
+            'max_tokens' => 'sometimes|integer|min:1|max:4096',
+            'system_override' => 'sometimes|string',
         ]);
 
         $apiKey = $this->resolveApiKey();
@@ -61,8 +95,14 @@ class ChatController extends Controller
 
         $ctx = $this->buildContext();
 
-        // System prompt to keep answers concise and aligned to the spec
-        $system = "You are an API assistant for this project. Answer concisely, referencing endpoint paths, methods, and required parameters. Prefer examples that match the current docs. If unsure, say so briefly.";
+        // System prompt (loaded from configurable Markdown file with a safe fallback)
+        $system = $this->getSystemPrompt();
+        if (!empty($data['system_override'])) {
+            $system = (string) $data['system_override'];
+        }
+        if (!empty($data['system_override'])) {
+            $system = (string) $data['system_override'];
+        }
 
         // Compose messages in Chat Completions format
         $messages = [ ['role' => 'system', 'content' => $system] ];
@@ -75,31 +115,102 @@ class ChatController extends Controller
             if ($ops = $this->selectRelevantOperations($ctx['spec'], $data['message'])) {
                 $messages[] = ['role' => 'system', 'content' => "Matched operations (from OpenAPI):\n".$ops];
             }
+            // Provide explicit headings the model should include at the top
+            if ($cands = $this->headingCandidatesForQuery($ctx['spec'], (string) ($data['message'] ?? ''), 3)) {
+                $lines = implode("\n", $cands);
+                $messages[] = ['role' => 'system', 'content' => "Begin your reply with one or more of these headings, exactly as written (one per relevant endpoint):\n".$lines];
+            }
         }
 
         if (!empty($ctx['info_full'])) {
             $messages[] = ['role' => 'system', 'content' => "Docs info:\n".$ctx['info_full']];
         }
 
-        $messages[] = ['role' => 'user', 'content' => $data['message']];
+        // Append prior conversation (optional), with edit replace support
+        $history = [];
+        if (!empty($data['history']) && is_array($data['history'])) {
+            // Keep the most recent 12 turns to control prompt size
+            $history = array_slice($data['history'], -12);
+            if (!empty($data['replaces_message_id'])) {
+                $history = $this->pruneEditedHistory($history, (string) $data['replaces_message_id']);
+                try {
+                    Log::info('IdocChat: edit-resend applied', ['replaces_message_id' => (string) $data['replaces_message_id']]);
+                } catch (\Throwable $e) {
+                }
+            }
+            foreach ($history as $m) {
+                $r = $m['role'] ?? null;
+                $c = $m['content'] ?? '';
+                if (($r === 'user' || $r === 'assistant') && $c !== '') {
+                    $messages[] = [ 'role' => $r, 'content' => (string) $c ];
+                }
+            }
+        }
+        // Attachment system messages will be inserted before the new user message
 
         try {
-            $provider = strtolower((string) config('idoc.chat.provider', env('IDOC_CHAT_PROVIDER', 'openai')));
-            $model = (string) config('idoc.chat.model', env('IDOC_CHAT_MODEL', 'gpt-4o-mini'));
-            $temperature = 0.2;
-            $maxTokens = 600;
+            $provider = strtolower((string) (config('idoc.chat.provider', env('IDOC_CHAT_PROVIDER', 'openai'))));
+            $model = (string) (config('idoc.chat.model', env('IDOC_CHAT_MODEL', 'gpt-4o-mini')));
+            $temperature = is_numeric($data['temperature'] ?? null) ? (float) $data['temperature'] : 0.2;
+            $maxTokens = is_numeric($data['max_tokens'] ?? null) ? (int) $data['max_tokens'] : 600;
+            $wantStream = (bool) ($data['stream'] ?? true);
 
             $baseUrl = rtrim((string) (config('idoc.chat.base_url') ?: $this->defaultBaseUrl($provider)), '/').'/';
             $headers = [ 'Content-Type: application/json' ];
             if (!in_array($provider, ['google'], true)) {
                 $headers[] = 'Authorization: Bearer '.$apiKey;
             }
+
+            $meta = [ 'warnings' => [] ];
+            if (!empty($data['attachments']) && is_array($data['attachments'])) {
+                $vision = $this->supportsVision($provider, $model);
+                $images = [];
+                foreach ($data['attachments'] as $att) {
+                    $type = strtolower((string) ($att['type'] ?? 'text'));
+                    $name = (string) ($att['name'] ?? $type);
+                    if (in_array($type, ['text','json'], true)) {
+                        $content = (string) ($att['content'] ?? '');
+                        if ($content !== '') {
+                            $snippet = mb_substr($content, 0, 4000);
+                            $messages[] = ['role' => 'system', 'content' => "[Attachment: {$name}] First 4000 chars below:
+
+".$snippet];
+                        }
+                    } elseif ($type === 'image') {
+                        if ($vision) {
+                            $images[] = $att;
+                        } else {
+                            $meta['warnings'][] = "Dropped image attachment '".$name."' because the current model does not support images.";
+                        }
+                    } elseif ($type === 'url') {
+                        $url = (string) ($att['url'] ?? '');
+                        if ($url) {
+                            $messages[] = ['role' => 'system', 'content' => "Attachment URL ({$name}): 
+".$url];
+                        }
+                    }
+                }
+            }
+            $userIndex = count($messages);
+            $messages[] = ['role' => 'user', 'content' => $data['message']];
+            if (!empty($images)) {
+                if ($provider !== 'huggingface' && $provider !== 'google') {
+                    $parts = [['type' => 'text', 'text' => (string) $messages[$userIndex]['content'] ]];
+                    foreach ($images as $img) {
+                        $url = (string) ($img['url'] ?? '');
+                        if ($url) {
+                            $parts[] = ['type' => 'input_image', 'image_url' => ['url' => $url]];
+                        }
+                    }
+                    $messages[$userIndex]['content'] = $parts;
+                }
+            }
             $endpoint = '';
             $bodyArr = [];
 
             if (in_array($provider, ['openai','groq','openai_compat','deepseek'], true)) {
                 $endpoint = $baseUrl.'chat/completions';
-                $bodyArr = [ 'model' => $model, 'messages' => $messages, 'temperature' => $temperature, 'max_tokens' => $maxTokens ];
+                $bodyArr = [ 'model' => $model, 'messages' => $messages, 'temperature' => $temperature, 'max_tokens' => $maxTokens, 'stream' => $wantStream ];
             } elseif ($provider === 'huggingface') {
                 $endpoint = rtrim($baseUrl, '/').'/models/'.rawurlencode($model);
                 $prompt = $this->messagesToPrompt($messages);
@@ -117,7 +228,61 @@ class ChatController extends Controller
                 throw new \RuntimeException('Unsupported provider: '.$provider);
             }
 
+
+
+            // Stream for OpenAI‑compatible when requested
+            if ($wantStream && in_array($provider, ['openai','groq','openai_compat','deepseek'], true)) {
+                $headersOut = [
+                    'Content-Type' => 'text/event-stream',
+                    'Cache-Control' => 'no-cache',
+                    'Connection' => 'keep-alive',
+                ];
+                return response()->stream(function () use ($endpoint, $headers, $payload) {
+                    $ch = curl_init($endpoint);
+                    curl_setopt_array($ch, [
+                        CURLOPT_POST => true,
+                        CURLOPT_HTTPHEADER => $headers,
+                        CURLOPT_POSTFIELDS => $payload,
+                        CURLOPT_WRITEFUNCTION => function ($ch, $chunk) {
+                            echo $chunk;
+                            @ob_flush();
+                            flush();
+                            return strlen($chunk);
+                        },
+                        CURLOPT_TIMEOUT => 0,
+                    ]);
+                    curl_exec($ch);
+                    curl_close($ch);
+                }, 200, $headersOut);
+            }
             $payload = json_encode($bodyArr, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+            // Stream for OpenAI‑compatible when requested
+            if ($wantStream && in_array($provider, ['openai','groq','openai_compat','deepseek'], true)) {
+                $headersOut = [
+                    'Content-Type' => 'text/event-stream',
+                    'Cache-Control' => 'no-cache',
+                    'Connection' => 'keep-alive',
+                ];
+                return response()->stream(function () use ($endpoint, $headers, $payload) {
+                    $ch = curl_init($endpoint);
+                    curl_setopt_array($ch, [
+                        CURLOPT_POST => true,
+                        CURLOPT_HTTPHEADER => $headers,
+                        CURLOPT_POSTFIELDS => $payload,
+                        CURLOPT_WRITEFUNCTION => function ($ch, $chunk) {
+                            // Pass-through provider SSE to client
+                            echo $chunk;
+                            @ob_flush();
+                            flush();
+                            return strlen($chunk);
+                        },
+                        CURLOPT_TIMEOUT => 0,
+                    ]);
+                    curl_exec($ch);
+                    curl_close($ch);
+                }, 200, $headersOut);
+            }
 
             $ch = curl_init($endpoint);
             curl_setopt_array($ch, [
@@ -164,10 +329,16 @@ class ChatController extends Controller
                 }
                 $answer = trim(implode("\n", $texts));
             }
+            // Build actionHints from assistant answer and last user input
+            $actionHints = $this->buildActionHints($answer, $data['message'] ?? '', $data['attachments'] ?? [], $ctx['spec'] ?? null);
+            if (!empty($actionHints)) {
+                $meta['actionHints'] = $actionHints;
+            }
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'ok',
-                'data' => [ 'reply' => $answer ],
+                'data' => [ 'reply' => $answer, 'meta' => $meta ],
             ]);
         } catch (\Throwable $e) {
             Log::warning('IdocChat error', ['e' => $e->getMessage()]);
@@ -326,7 +497,7 @@ class ChatController extends Controller
                     $name = $p['name'] ?? '';
                     $schemaType = $p['schema']['type'] ?? '';
                     $desc = trim((string) ($p['description'] ?? ''));
-                    $out[] = sprintf('- `%s` (%s, %s) %s%s', $name, $group, $req, $schemaType ? "type: $schemaType" : '', $desc ? " — $desc" : '');
+                    $out[] = sprintf('- `%s` (%s, %s) %s%s', $name, $group, $req, $schemaType ? "type: $schemaType" : '', $desc ? " - $desc" : '');
                 }
             }
         }
@@ -339,7 +510,7 @@ class ChatController extends Controller
                 $t = $def['type'] ?? '';
                 $d = $def['description'] ?? '';
                 $req = in_array($name, $required, true) ? 'required' : 'optional';
-                $fields[] = sprintf('- `%s` (%s) %s%s', $name, $req, $t ? "type: $t" : '', $d ? " — $d" : '');
+                $fields[] = sprintf('- `%s` (%s) %s%s', $name, $req, $t ? "type: $t" : '', $d ? " - $d" : '');
             }
             if ($fields) {
                 $out[] = '**Body Fields:**';
@@ -347,6 +518,44 @@ class ChatController extends Controller
             }
         }
         return implode("\n", $out);
+    }
+
+    /**
+     * Build '### METHOD /path' heading candidates for the current query.
+     * Returns up to $max lines the model should include at the start.
+     */
+    protected function headingCandidatesForQuery(array $spec, string $query, int $max = 3): array
+    {
+        if (!$query) {
+            return [];
+        }
+        $ops = [];
+        foreach (($spec['paths'] ?? []) as $path => $methods) {
+            foreach ($methods as $method => $op) {
+                if (!is_array($op)) {
+                    continue;
+                }
+                $summary = (string) ($op['summary'] ?? '');
+                $desc    = (string) ($op['description'] ?? '');
+                $tags    = array_map('strval', $op['tags'] ?? []);
+                $hay = strtoupper($method.' '.$path.' '.implode(' ', $tags).' '.$summary.' '.$desc);
+                $score = $this->scoreQuery($hay, $query);
+                if ($score <= 0) {
+                    continue;
+                }
+                $ops[] = [ 'score' => $score, 'method' => strtoupper($method), 'path' => $path ];
+            }
+        }
+        if (!$ops) {
+            return [];
+        }
+        usort($ops, fn ($a, $b) => $b['score'] <=> $a['score']);
+        $ops = array_slice($ops, 0, max(1, $max));
+        $out = [];
+        foreach ($ops as $op) {
+            $out[] = sprintf('### %s %s', $op['method'], $op['path']);
+        }
+        return $out;
     }
 
     protected function missingKeyPayload(): array
@@ -475,7 +684,7 @@ class ChatController extends Controller
     /** Resolve API key using config/env fallbacks. */
     protected function resolveApiKey(): ?string
     {
-        $provider = strtolower((string) config('idoc.chat.provider', env('IDOC_CHAT_PROVIDER', 'openai')));
+        $provider = strtolower((string) (config('idoc.chat.provider', env('IDOC_CHAT_PROVIDER', 'openai'))));
         $envKey = config('idoc.chat.api_key_env');
         if ($envKey && ($v = env($envKey))) {
             return $v;
@@ -551,5 +760,277 @@ class ChatController extends Controller
         }
         $lines[] = 'Assistant:';
         return implode("\n\n", $lines);
+    }
+
+    /**
+     * Load the default system prompt from a Markdown file.
+     * Order: configured path → bundled default → hardcoded fallback.
+     */
+    protected function getSystemPrompt(): string
+    {
+        $maxBytes = 200 * 1024; // 200 KiB safety limit
+        $path = (string) (config('idoc.chat.system_prompt_md') ?: '');
+        $contents = '';
+        if ($path) {
+            try {
+                $real = realpath($path);
+                if ($real && is_file($real) && is_readable($real)) {
+                    $raw = file_get_contents($real, false, null, 0, $maxBytes);
+                    if (is_string($raw)) {
+                        $contents = $this->sanitizePrompt($raw);
+                    }
+                }
+            } catch (\Throwable $e) { /* ignore and fall back */
+            }
+        }
+        if ($contents === '') {
+            // Prefer a published prompt if present: resources/vendor/idoc/prompts/chat-system.md
+            try {
+                $published = realpath(base_path('resources/vendor/idoc/prompts/chat-system.md')) ?: base_path('resources/vendor/idoc/prompts/chat-system.md');
+                if ($published && is_file($published) && is_readable($published)) {
+                    $raw = file_get_contents($published, false, null, 0, $maxBytes);
+                    if (is_string($raw)) {
+                        $contents = $this->sanitizePrompt($raw);
+                    }
+                }
+            } catch (\Throwable $e) { /* ignore and fall back to package default */
+            }
+        }
+        if ($contents === '') {
+            try {
+                $default = realpath(__DIR__.'/../../../../resources/prompts/chat-system.md');
+                if ($default && is_file($default) && is_readable($default)) {
+                    $raw = file_get_contents($default, false, null, 0, $maxBytes);
+                    if (is_string($raw)) {
+                        $contents = $this->sanitizePrompt($raw);
+                    }
+                }
+            } catch (\Throwable $e) { /* ignore */
+            }
+        }
+        if ($contents === '') {
+            $contents = "You are an API assistant for this project. Answer concisely and only with information supported by the current documentation. If unsure, say so briefly.\n\nStrict formatting rules:\n- Start your answer with one or more markdown H3 headings in the exact form: '### METHOD /path'.\n- Do not put any text before the first '### METHOD /path' heading.\n- For POST/PUT/PATCH, include a minimal JSON body example in a fenced code block:```json\n{ }\n```\n- For GET, show the relevant query parameters or a sample URL.\n- Use regular markdown headings and do not escape the hashes.\n";
+        }
+        return $contents;
+    }
+
+    protected function sanitizePrompt(string $raw): string
+    {
+        $raw = str_replace("\0", '', $raw);
+        return trim($raw);
+    }
+
+    /** Extract action hints from assistant content and the last user message. */
+    protected function buildActionHints(string $assistant, string $userText, array $attachments, ?array $spec): array
+    {
+        $hint = [];
+        // Detect first ###/#### METHOD /path heading
+        $method = null;
+        $path = null;
+        if (preg_match('/^#{3,4}\s+(GET|POST|PUT|PATCH|DELETE)\s+(\/[^\s#]+)/mi', $assistant, $m)) {
+            $method = strtoupper($m[1]);
+            $path = $m[2];
+        }
+        if ($method && $path) {
+            $endpoint = [ 'method' => $method, 'path' => $path ];
+            $anchor = $this->resolveDocsAnchor($spec, $method, $path);
+            if ($anchor) {
+                $endpoint['anchor'] = $anchor;
+            }
+            $hint['endpoint'] = $endpoint;
+
+            // Build Try-it prefill from user text and attachments
+            $prefill = $this->buildTryItPrefill($method, $path, $userText, $attachments);
+            $hint['tryIt'] = [
+                'method' => $method,
+                'path' => $path,
+                'prefill' => $prefill,
+                'autoExecute' => true,
+            ];
+        }
+        return $hint;
+    }
+
+    /** Resolve a docs anchor (operation/ID) from spec if possible. */
+    protected function resolveDocsAnchor(?array $spec, string $method, string $path): ?string
+    {
+        try {
+            if (!$spec || empty($spec['paths'])) {
+                return null;
+            }
+            $m = strtolower($method);
+            if (!isset($spec['paths'][$path][$m])) {
+                return null;
+            }
+            $op = $spec['paths'][$path][$m];
+            $opId = $op['operationId'] ?? null;
+            return $opId ? ('operation/'.$opId) : null;
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /** Build a best-effort prefill object from user text and attachments. */
+    protected function buildTryItPrefill(string $method, string $path, string $userText, array $attachments): array
+    {
+        $prefill = [ 'pathParams' => [], 'query' => [], 'headers' => [], 'body' => null ];
+
+        // 1) fenced ```json ... ```
+        $body = null;
+        if (preg_match('/```\s*json\s*([\s\S]*?)```/i', $userText, $m)) {
+            $body = $this->tryJsonDecode(trim($m[1]));
+        }
+        // 2) any JSON object
+        if ($body === null) {
+            $first = $this->extractFirstJsonObject($userText);
+            if ($first !== null) {
+                $body = $first;
+            }
+        }
+        // 3) key:value pairs lines
+        $kv = [];
+        if ($body === null) {
+            $kv = $this->parseKeyValueLines($userText);
+            if (!empty($kv)) {
+                $body = $kv;
+            }
+        }
+        // 5) attachments text/json as body
+        if ($body === null && !empty($attachments)) {
+            foreach ($attachments as $att) {
+                $t = strtolower((string) ($att['type'] ?? ''));
+                if ($t === 'json') {
+                    $try = $this->tryJsonDecode((string) ($att['content'] ?? ''));
+                    if ($try !== null) {
+                        $body = $try;
+                        break;
+                    }
+                }
+                if ($t === 'text') {
+                    $txt = (string) ($att['content'] ?? '');
+                    $first = $this->extractFirstJsonObject($txt);
+                    if ($first !== null) {
+                        $body = $first;
+                        break;
+                    }
+                    $body = $txt !== '' ? mb_substr($txt, 0, 4000) : null;
+                    if ($body !== null) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 4) path params from {param}
+        if (preg_match_all('/\{([^}]+)\}/', $path, $pm)) {
+            $candidates = is_array($body) ? $body : (is_array($kv) ? $kv : []);
+            foreach ($pm[1] as $p) {
+                $v = $candidates[$p] ?? null;
+                if ($v !== null && !is_array($v)) {
+                    $prefill['pathParams'][$p] = (string) $v;
+                }
+            }
+        }
+
+        // 6) GET: move scalars into query
+        if (strtoupper($method) === 'GET') {
+            if (is_array($body)) {
+                foreach ($body as $k => $v) {
+                    if (!is_array($v)) {
+                        $prefill['query'][$k] = (string) $v;
+                    }
+                }
+                $body = null;
+            }
+        }
+
+        if ($body !== null) {
+            $prefill['body'] = $body;
+        }
+        return $prefill;
+    }
+
+    protected function tryJsonDecode(string $text)
+    {
+        $text = trim($text);
+        if ($text === '') {
+            return null;
+        }
+        $val = json_decode($text, true);
+        return (json_last_error() === JSON_ERROR_NONE) ? $val : null;
+    }
+
+    protected function extractFirstJsonObject(string $text)
+    {
+        $text = trim($text);
+        $start = strpos($text, '{');
+        $end = strrpos($text, '}');
+        if ($start === false || $end === false || $end <= $start) {
+            return null;
+        }
+        $raw = substr($text, $start, $end - $start + 1);
+        $val = json_decode($raw, true);
+        return (json_last_error() === JSON_ERROR_NONE) ? $val : null;
+    }
+
+    protected function parseKeyValueLines(string $text): array
+    {
+        $out = [];
+        foreach (preg_split('/\r?\n/', $text) as $line) {
+            if (preg_match('/^\s*([^:\n]+?)\s*:\s*(.+)\s*$/', $line, $m)) {
+                $out[trim($m[1])] = trim($m[2]);
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * Determine whether the current provider/model likely supports image inputs.
+     * Conservative defaults: disable for Google/HF until a proper parts mapping is implemented.
+     */
+    protected function supportsVision(string $provider, string $model): bool
+    {
+        $p = strtolower($provider);
+        $m = strtolower($model);
+        if (in_array($p, ['google','huggingface'], true)) {
+            return false; // not wired in current request shaping
+        }
+        if ($p === 'deepseek') {
+            return str_contains($m, 'vl'); // e.g., deepseek-vl
+        }
+        if ($p === 'groq') {
+            return str_contains($m, 'vision') || str_contains($m, 'llama-3.2');
+        }
+        // openai/openai-compatible
+        return str_contains($m, 'gpt-4o') || str_contains($m, 'o3') || str_contains($m, 'o4') || str_contains($m, 'gpt-4.1');
+    }
+
+    /**
+     * Prune history for Edit & Resend.
+     * Drops the original user message (by id) and the immediate assistant reply following it.
+     */
+    protected function pruneEditedHistory(array $history, string $replacesId): array
+    {
+        if ($replacesId === '' || empty($history)) {
+            return $history;
+        }
+        $out = [];
+        $skipNextAssistant = false;
+        foreach ($history as $i => $item) {
+            $id = (string) ($item['id'] ?? '');
+            $role = (string) ($item['role'] ?? '');
+            if ($id !== '' && $id === $replacesId && $role === 'user') {
+                // Skip this user entry and mark to skip the immediate assistant
+                $skipNextAssistant = true;
+                continue;
+            }
+            if ($skipNextAssistant && $role === 'assistant') {
+                // Drop the first assistant right after the replaced user
+                $skipNextAssistant = false; // only skip one assistant
+                continue;
+            }
+            $out[] = $item;
+        }
+        return $out;
     }
 }

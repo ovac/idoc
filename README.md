@@ -106,6 +106,19 @@ The docs page ships with an optional, provider-agnostic AI assistant (ChatGPT‑
 - Chat UI with Markdown + syntax highlighting; Copy action on AI replies; works across light/dark themes.
 - Built‑in Request Tester panel (inside Chat) to call any route, auto‑merging Authorization from Swagger Authorize and your extra headers; renders formatted responses.
 - Provider chooser appears in Chat if no key is configured, with one‑click guides and copyable .env snippets.
+ - Edit & Resend: quickly update your last message and resubmit. The backend prunes the replaced turn to keep context clean.
+ - Attachments: attach text, JSON, image (vision-capable models only), or URL. Text/JSON are added as short context snippets; images are included on user turns for OpenAI-compatible providers.
+ - Endpoint-aware actions: when an assistant reply includes a heading like `### GET /path`, the UI shows “Open endpoint” and “Try it with this data”. Try It auto-fills parameters/body from your message and executes.
+- Exports: download the chat as plain text, Markdown, or JSON (`{ version: "idoc-1", messages: [...] }`).
+
+### Customizing the chat system prompt
+- You can supply your own Markdown file that defines the default system prompt used to shape assistant replies.
+- Easiest path: publish and edit the bundled prompt. iDoc will automatically use the published copy if it exists.
+  ```bash
+  php artisan vendor:publish --tag=idoc-prompts
+  # Edit resources/vendor/idoc/prompts/chat-system.md
+  ```
+- Optional override: point to any file by setting the `IDOC_CHAT_SYSTEM_PROMPT` env var or `idoc.chat.system_prompt_md` in config.
 
 ### Quick start (DeepSeek default)
 Add to your .env:
@@ -167,6 +180,14 @@ php artisan config:clear && php artisan cache:clear
   ```
 
 Tip: If Chat isn’t required, disable it by setting `IDOC_CHAT_ENABLED=false`.
+
+### Capability gating (attachments/vision)
+- The UI disables image selection when the current model does not support vision.
+- For providers that do not support attachments, the attachment row is hidden.
+- You can switch the active model/provider at runtime by dispatching:
+  ```js
+  window.dispatchEvent(new CustomEvent('idoc:chat-model-changed', { detail: { provider: 'openai', model: 'gpt-4o-mini' } }));
+  ```
 
 ## Configuration
 Before you can generate your documentation, you'll need to configure a few things in your `config/idoc.php`.

@@ -1,11 +1,28 @@
 **CHANGELOG.md** (top):
 
 ```markdown
-## [v2.1.0] — 2025-09-07
+## [v2.1.1] - 2025-09-07
+
+### Added
+- Endpoint-aware actions in Chat: "Open endpoint" and "Try it with this data" when replies include `### METHOD /path`.
+- Attachment capability gating: hide attachments UI for unsupported providers; disable images when model lacks vision.
+- Export conversation as plain text, Markdown, or JSON.
+- Configurable system prompt via Markdown file (env `IDOC_CHAT_SYSTEM_PROMPT` or `idoc.chat.system_prompt_md`). If you publish the default prompt (`idoc-prompts`), iDoc will automatically read the published file at `resources/vendor/idoc/prompts/chat-system.md` when present.
+
+### Changed
+- Headings are not escaped; assistant headings render as Markdown.
+- Enhanced system prompt to encourage endpoint headings and JSON examples.
+
+### Fixed
+- Removed em dashes from user-facing strings.
+
+---
+
+## [v2.1.0] - 2025-09-07
 
 ### Added
 - Optional AI Chat assistant integrated into the documentation view.
-  - Provider‑agnostic backend (configurable via `idoc.chat.*`): DeepSeek (default), OpenAI (ChatGPT), Google Gemini, Groq, Hugging Face Inference API, Together AI, and OpenAI‑compatible local servers (LM Studio, llama.cpp server).
+  - Provider‑agnostic backend (configurable via `idoc.chat.*`): DeepSeek, OpenAI (ChatGPT), Google Gemini, Groq, Hugging Face Inference API, Together AI, and OpenAI‑compatible local servers (LM Studio, llama.cpp server).
   - Provider chooser UI appears when no API key is configured; clicking a provider shows a tailored setup guide with a copyable `.env` snippet.
   - Chat UI enhancements: Markdown rendering with syntax highlighting, Copy action on assistant replies, event‑delegated buttons remain interactive after theme changes, stable floating action stack.
   - Request Tester panel inside Chat: make HTTP calls to your routes, automatically merge Authorization from Swagger Authorize and your Extra headers, and render formatted responses with status and timing.
@@ -38,7 +55,7 @@
 **CHANGELOG.md** (top):
 
 ```markdown
-## [v2.0.0] — 2025-08-31
+## [v2.0.0] - 2025-08-31
 
 ### Breaking
 - All prior versions are non-functional due to the discontinued Redoc CDN.

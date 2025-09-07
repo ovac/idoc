@@ -105,6 +105,13 @@ return [
         // Env var to read API key from; if null, sensible defaults are used per provider
         // e.g. 'OPENAI_API_KEY', 'GROQ_API_KEY', 'HF_API_TOKEN', 'GOOGLE_API_KEY'
         'api_key_env' => env('IDOC_CHAT_API_KEY'),
+
+        // Optional: absolute path to a Markdown file that contains the default
+        // system prompt for the AI assistant. If null, iDoc will use the
+        // package's bundled prompt at resources/prompts/chat-system.md.
+        // Example env override:
+        //   IDOC_CHAT_SYSTEM_PROMPT=/absolute/path/to/chat-system.md
+        'system_prompt_md' => env('IDOC_CHAT_SYSTEM_PROMPT'),
     ],
 
     /*

@@ -15,7 +15,7 @@
   UX MODEL
   --------
   - Users read the docs in Redoc as usual.
-  - A floating action stack (bottom‑right) contains Theme / Chat / Try it.
+  - A floating action stack (bottom-right) contains Theme / Chat / Try it.
     • Chat opens a right-hand panel with a conversational assistant.
     • Try it opens a right-hand panel with Swagger UI.
   - The console is context-aware:
@@ -26,11 +26,28 @@
   - Chat notes:
       • If no API key is configured, the assistant shows a clickable provider
         chooser (DeepSeek, OpenAI, Google Gemini, Groq, Hugging Face, Together,
-        Free/Open‑Source self‑hosted). Clicking a provider displays a tailored
+        Free/Open-Source self-hosted). Clicking a provider displays a tailored
         setup guide with a copyable .env snippet.
-      • Chat bubbles are Markdown‑aware with syntax highlighting; Copy buttons
+      • Chat bubbles are Markdown-aware with syntax highlighting; Copy buttons
         are available on assistant messages; buttons remain interactive across
         theme changes.
+      • Headings like "### GET /path" render as headings (hashes are not escaped).
+      • Endpoint-aware actions: when an assistant reply explains a specific
+        endpoint using a heading, we render two inline actions:
+          1) Open endpoint - closes chat and scrolls docs to the operation.
+          2) Try it with this data - closes chat, opens Try it, prefills
+             parameters/body from the chat context, and auto-executes.
+      • Edit & Resend is available for the most recent user message once a
+        reply exists. It moves the text back into the composer and resubmits,
+        pruning the original user+assistant turn from the backend prompt.
+      • Attachments: users can attach text, JSON, images (vision-capable
+        models only), and URLs. Text/JSON are sent as system snippets;
+        images are included on the user turn for OpenAI-compatible providers.
+        The UI disables image selection when the current model lacks vision and
+        can hide the attachments UI entirely for providers that do not support
+        attachments.
+      • Export: click Export to download the conversation as plain text, Markdown,
+        or JSON (`{ version: "idoc-1", messages: [...] }`).
 
   NOTE ON REDOCLY PRO
   -------------------
@@ -77,6 +94,8 @@
   -------------------
   - CSS: You can tune typography or theme in the <style> blocks below.
   - JS:  If your Redoc build uses different anchor IDs, edit getHeadings().
+  - JS:  `window.getSelectedModelCapabilities()` returns `{ vision, attachments }`
+         derived from the configured provider/model for this page load.
 
   ACCESSIBILITY
   -------------
@@ -175,6 +194,9 @@
       body.theme-dark .headers-popover { background: #0f172a; border-color: #1f2937; color: #e5e7eb; }
       body.theme-dark .headers-popover textarea { background: #0b1220; color: #e5e7eb; border: 1px solid #374151; }
 
+      body.theme-dark .react-tabs__tab--selected { color: black !important; }
+      body.theme-dark .iupIzr { color: #ccf !important; }
+
       /* Swagger UI dark tweaks */
       body.theme-dark .swagger-ui, body.theme-dark .swagger-ui .topbar { background: #0b1220; }
       body.theme-dark .swagger-ui .info, body.theme-dark .swagger-ui .markdown, body.theme-dark .swagger-ui .opblock, body.theme-dark .swagger-ui .opblock .opblock-summary, body.theme-dark .swagger-ui .responses-inner { color: #e5e7eb; background-color: #0f172a; }
@@ -203,6 +225,12 @@
       .idoc-chat-input { flex:1; min-height:42px; max-height:180px; resize:vertical; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; font-size:14px; line-height:1.4; }
       .idoc-chat-input:focus { outline:2px solid #2563eb; outline-offset:1px; }
       .idoc-chat-send { padding:10px 14px; border-radius:10px; }
+      .idoc-stale { opacity: .5; filter: grayscale(20%); }
+      .idoc-edit-hint { font-size:12px; color:#6b7280; margin: 4px 0 0; }
+      .idoc-attach-chips { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+      .idoc-chip-attach { display:inline-flex; gap:6px; align-items:center; padding:4px 8px; border:1px solid #e5e7eb; border-radius:9999px; background:#f9fafb; font-size:12px; }
+      .idoc-chip-attach button { font-size:12px; border:none; background:transparent; cursor:pointer; }
+      body.theme-dark .idoc-chip-attach { background:#1f2937; border-color:#374151; color:#e5e7eb; }
       .typing { display:inline-block; min-width:18px; }
       .typing span { display:inline-block; width:4px; height:4px; margin:0 1px; background:#9ca3af; border-radius:50%; animation: blink 1.2s infinite ease-in-out; }
       .typing span:nth-child(2){ animation-delay:.2s; }
@@ -350,12 +378,21 @@
           <button class="btn btn-secondary" id="chatExport" title="Export chat">Export</button>
           <button class="btn btn-secondary" id="closeChat">Close</button>
         </div>
-        <div class="tryit-body" id="chatBody" style="display:flex; flex-direction:column; height:calc(100% - 60px); padding-bottom:14px;">
+        <div class="tryit-body" id="chatBody" style="display:flex; flex-direction:column; height:calc(97% - 60px); padding-bottom:14px;">
           <div id="chatMessages" class="idoc-chat-list"></div>
+          <div class="idoc-edit-hint" id="editHint" style="display:none;">Editing your last message <button class="btn btn-secondary" id="editCancel" style="margin-left:6px;">Cancel</button></div>
           <div class="idoc-chat-inputrow">
             <textarea id="chatInput" class="idoc-chat-input" rows="1" placeholder="Ask about endpoints, params, errors... (Shift+Enter for newline)"></textarea>
             <button id="chatSend" class="btn idoc-chat-send">Send</button>
+            <button id="chatStop" class="btn btn-secondary idoc-chat-send" style="display:none;">Stop</button>
           </div>
+          <div class="idoc-chat-inputrow" id="attachRow" style="align-items:center;">
+            <input type="file" id="attachInput" multiple style="display:none;" accept=".json,.txt,image/*" />
+            <button class="btn btn-secondary" id="attachBtn">Attach</button>
+            <button class="btn btn-secondary" id="attachUrlBtn" title="Add URL">Add URL</button>
+            <div class="idoc-req-help" id="attachModelTip" style="margin-left:8px;"></div>
+          </div>
+          <div class="idoc-attach-chips" id="attachChips"></div>
         </div>
       </div>
     @endif
@@ -503,7 +540,7 @@
       function filterSpecByTag(spec, tag) {
         const filtered = {
           openapi: spec.openapi || "3.0.0",
-          info: { ...(spec.info || {}), title: ((spec.info?.title || "API") + " — " + tag) },
+        info: { ...(spec.info || {}), title: ((spec.info?.title || "API") + " - " + tag) },
           servers: spec.servers || [],
           tags: (spec.tags || []).filter(t => t.name === tag),
           components: spec.components ? JSON.parse(JSON.stringify(spec.components)) : undefined,
@@ -525,7 +562,7 @@
       function filterSpecByOperationId(spec, operationId) {
         const filtered = {
           openapi: spec.openapi || "3.0.0",
-          info: { ...(spec.info || {}), title: ((spec.info?.title || "API") + " — " + operationId) },
+        info: { ...(spec.info || {}), title: ((spec.info?.title || "API") + " - " + operationId) },
           servers: spec.servers || [],
           tags: spec.tags || [],
           components: spec.components ? JSON.parse(JSON.stringify(spec.components)) : undefined,
@@ -867,74 +904,10 @@
       );
 
       /* =========================================================================
-         7) Swagger response enhancements — Copy and Download buttons
+         7) // I removed Swagger Enhansed Button. Let's use this section for something else.
          ========================================================================= */
 
-      function enhanceResponses() {
-        // Target common Swagger UI code blocks inside responses and examples
-        const codeBlocks = document.querySelectorAll(
-          '#swagger .opblock .responses-wrapper .highlight-code, ' +
-          '#swagger .opblock .responses-wrapper pre, ' +
-          '#swagger .model-example .highlight-code'
-        );
-
-        codeBlocks.forEach(block => {
-          if (block.dataset.tools) return;
-
-          // Create a small action bar
-          const bar = document.createElement('div');
-          bar.style.textAlign = 'right';
-          bar.style.margin = '6px 0';
-
-          const copyBtn = document.createElement('button');
-          copyBtn.className = 'btn';
-          copyBtn.textContent = 'Copy JSON';
-
-          const dlBtn = document.createElement('button');
-          dlBtn.className = 'btn';
-          dlBtn.style.marginLeft = '6px';
-          dlBtn.textContent = 'Download';
-
-          bar.appendChild(copyBtn);
-          bar.appendChild(dlBtn);
-
-          // Find the PRE element with the raw text
-          const pre = block.matches('pre') ? block : block.querySelector('pre');
-
-          copyBtn.onclick = async () => {
-            const txt = pre ? pre.textContent : block.textContent || '';
-            try {
-              await navigator.clipboard.writeText(txt || '');
-              copyBtn.textContent = 'Copied!';
-              setTimeout(() => (copyBtn.textContent = 'Copy JSON'), 1200);
-            } catch {
-              copyBtn.textContent = 'Copy failed';
-              setTimeout(() => (copyBtn.textContent = 'Copy JSON'), 1200);
-            }
-          };
-
-          dlBtn.onclick = () => {
-            const txt = pre ? pre.textContent : block.textContent || '';
-            const blob = new Blob([txt], { type: 'application/json' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'response.json';
-            a.click();
-            URL.revokeObjectURL(a.href);
-          };
-
-          // Insert action bar just before the code block
-          block.parentNode.insertBefore(bar, block);
-          block.dataset.tools = '1';
-        });
-      }
-
-      // Watch the Swagger mount for new/updated responses
-      new MutationObserver(() => enhanceResponses()).observe(
-        document.getElementById('swagger'),
-        { childList: true, subtree: true }
-      );
-
+      
       /* =========================================================================
          8) Optional: Bearer token helper
          ========================================================================= */
@@ -1040,12 +1013,22 @@
       const chatMessages = document.getElementById('chatMessages');
       const chatInput = document.getElementById('chatInput');
       const chatSend = document.getElementById('chatSend');
+      // Selected chat provider/model (fixed from config for this page load)
+      let selectedProvider = (String(@json(strtolower(config('idoc.chat.provider', env('IDOC_CHAT_PROVIDER', 'openai')))) || 'openai')).trim();
+      let selectedModel = (String(@json(config('idoc.chat.model', env('IDOC_CHAT_MODEL', 'gpt-4o-mini'))) || 'gpt-4o-mini')).trim();
+      const attachInput = document.getElementById('attachInput');
+      const attachBtn = document.getElementById('attachBtn');
+      const attachUrlBtn = document.getElementById('attachUrlBtn');
+      const attachChips = document.getElementById('attachChips');
+      const attachModelTip = document.getElementById('attachModelTip');
 
       // Configure marked + highlight.js
       try {
         if (window.marked) {
           marked.setOptions({
             breaks: true,
+            mangle: false,
+            headerIds: false,
             highlight: function(code, lang){
               try {
                 if (window.hljs) {
@@ -1069,9 +1052,13 @@
         } catch (_) { return (md || '').replace(/\n/g,'<br>'); }
       }
 
+      function newId(){ return 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2); }
+      function shortName(s){ try{ return (s||'').split('/').pop().split('?')[0]; }catch{ return s||''; } }
       function bubble(role, content, opts={}){
         const row = document.createElement('div');
+        const id = opts.id || newId();
         row.className = `idoc-chat-row ${role==='user'?'user':'ai'}`;
+        row.dataset.messageId = id;
         const avatar = document.createElement('div');
         avatar.className = 'idoc-chat-avatar';
         avatar.textContent = role==='user' ? 'You' : 'AI';
@@ -1085,18 +1072,68 @@
           const copyBtn = document.createElement('button');
           copyBtn.className = 'btn btn-secondary';
           copyBtn.textContent = 'Copy';
+          copyBtn.dataset.action = 'copy';
           copyBtn.onclick = async () => {
-            try { await navigator.clipboard.writeText((content || '').toString()); copyBtn.textContent='Copied!'; setTimeout(()=>copyBtn.textContent='Copy', 1200); }
-            catch { copyBtn.textContent = 'Copy failed'; setTimeout(()=>copyBtn.textContent='Copy', 1200); }
+            try {
+              const ok = await copyText((content || '').toString());
+              copyBtn.textContent = ok ? 'Copied!' : 'Copy failed';
+            } catch { copyBtn.textContent = 'Copy failed'; }
+            setTimeout(()=>copyBtn.textContent='Copy', 1200);
           };
+          // Hide copy while streaming or when copy is unsupported
+          try { copyBtn.style.display = (canCopyNow() && !isStreaming) ? '' : 'none'; } catch {}
           actions.appendChild(copyBtn);
+          // Regenerate for last AI reply
+          const regen = document.createElement('button');
+          regen.className = 'btn btn-secondary'; regen.style.marginLeft='6px'; regen.textContent='Regenerate';
+          regen.onclick = async () => {
+            // Remove last assistant entry and re-ask last user message
+            for (let i = chatHistory.length - 1; i >= 0; i--) { if (chatHistory[i].role === 'assistant') { chatHistory.splice(i,1); break; } }
+            const lastUser = [...chatHistory].reverse().find(x => x.role==='user');
+            if (lastUser) { chatInput.value = lastUser.content; await sendChat(); }
+          };
+          actions.appendChild(regen);
         }
+        // Render backend-provided action hints when present
+        if (role !== 'user' && opts.meta && opts.meta.actionHints) {
+          try { renderActionHintsForRow({ row, body, actions }, opts.meta.actionHints, (content||'').toString()); } catch {}
+        }
+        if (role === 'user') {
+          const editBtn = document.createElement('button');
+          editBtn.className = 'btn btn-secondary'; editBtn.style.marginLeft='6px'; editBtn.textContent='Edit & Resend'; editBtn.dataset.action='edit'; editBtn.dataset.messageId = id;
+          actions.appendChild(editBtn);
+        }
+
         bub.appendChild(meta); bub.appendChild(body); bub.appendChild(actions);
         row.appendChild(avatar); row.appendChild(bub);
         chatMessages.appendChild(row);
         chatMessages.scrollTop = chatMessages.scrollHeight;
-        try { if (window.hljs) row.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el)); } catch(_){}
-        return { row, bub, body };
+        try { if (window.hljs) row.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el)); } catch{}
+        try{ enhanceOperationActionsForRow(row); }catch{}
+        try{ enhanceChatCodeBlocksForRow(row); }catch{}
+        return { row, bub, body, id };
+      }
+
+      function canCopyNow(){
+        try{
+          if (navigator.clipboard && window.isSecureContext) return true;
+        }catch{}
+        try{
+          if (document.queryCommandSupported && document.queryCommandSupported('copy')) return true;
+        }catch{}
+        return false;
+      }
+
+      function updateCopyButtonsVisibility(){
+        try{
+          const show = canCopyNow() && !isStreaming;
+          chatMessages.querySelectorAll('.idoc-chat-row.ai button').forEach(btn => {
+            try{
+              const isCopy = (btn.dataset.action === 'copy') || (btn.dataset.action === 'copy-code') || ((btn.textContent||'').trim() === 'Copy');
+              if (isCopy){ btn.style.display = show ? '' : 'none'; }
+            }catch{}
+          });
+        }catch{}
       }
 
       function typingBubble(){
@@ -1106,14 +1143,286 @@
         return row;
       }
 
-      function openChat(){ chatPanel.classList.add('open'); chatPanel.setAttribute('aria-hidden','false'); chatInput?.focus(); restoreChat(); }
+      // UI actions powered by backend hints
+      function renderActionHintsForRow(ctx, actionHints, msgText){
+        const { row, body, actions } = ctx;
+        const ep = actionHints.endpoint || null;
+        const ti = actionHints.tryIt || null;
+        if (!ep && !ti) return;
+        if (ep){
+          const openBtn = document.createElement('button'); openBtn.className='btn btn-secondary'; openBtn.style.marginLeft='6px'; openBtn.textContent='Open endpoint';
+          openBtn.dataset.action='open-endpoint'; openBtn.dataset.method = (ep.method||'').toLowerCase(); openBtn.dataset.path = ep.path||''; if (ep.anchor) openBtn.dataset.anchor = ep.anchor;
+          actions.appendChild(openBtn);
+        }
+        if (ti){
+          const runBtn = document.createElement('button'); runBtn.className='btn btn-secondary'; runBtn.style.marginLeft='6px'; runBtn.textContent='Try it with this data';
+          runBtn.dataset.action='tryit-run'; runBtn.dataset.method = (ti.method||'').toLowerCase(); runBtn.dataset.path = ti.path||''; try{ runBtn.dataset.prefill = encodeURIComponent(JSON.stringify(ti.prefill||{})); }catch{}
+          actions.appendChild(runBtn);
+        }
+      }
+
+      async function navigateToDocsEndpoint(endpoint){
+        try{
+          // Close chat first
+          chatPanel?.classList.remove('open'); chatPanel?.setAttribute('aria-hidden','true');
+          if (endpoint.anchor){
+            const el = document.getElementById(endpoint.anchor);
+            if (el) { el.scrollIntoView({ behavior:'smooth', block:'start' }); return; }
+          }
+          // Fallback: resolve via spec operationId
+          const spec = (typeof loadSpec==='function') ? await loadSpec() : null;
+          const p = endpoint.path; const m = (endpoint.method||'').toLowerCase();
+          const op = (spec && spec.paths && spec.paths[p] && spec.paths[p][m]) ? spec.paths[p][m] : null;
+          const opId = op?.operationId || '';
+          if (opId){ const el = document.getElementById('operation/'+opId); if (el) { el.scrollIntoView({ behavior:'smooth', block:'start' }); return; } }
+          // Fallback: try tag scroll if available
+          const tag = (op && op.tags && op.tags[0]) ? op.tags[0] : '';
+          if (tag){ const t = document.getElementById('tag/'+tag); if (t) t.scrollIntoView({ behavior:'smooth' }); }
+        }catch{}
+      }
+
+      // Extract a first JSON snippet from assistant text (fenced or naive block)
+      function parseFirstJsonFromText(txt){
+        try{
+          const fence = txt.match(/```\s*json\s*([\s\S]*?)```/i) || txt.match(/```\s*([\s\S]*?)```/);
+          if (fence && fence[1]){
+            const s = fence[1].trim();
+            if (s.startsWith('{') || s.startsWith('[')) return s;
+          }
+          const idx = txt.indexOf('{'); const jdx = txt.lastIndexOf('}');
+          if (idx >= 0 && jdx > idx){ const maybe = txt.slice(idx, jdx+1).trim(); if (maybe.length > 2) return maybe; }
+        }catch{}
+        return '';
+      }
+
+      async function openTryItAndRun(tryIt){
+        try{
+          // Close chat and open try-it
+          chatPanel?.classList.remove('open'); chatPanel?.setAttribute('aria-hidden','true');
+          const panel = document.getElementById('tryitPanel'); panel.classList.add('open'); panel.setAttribute('aria-hidden','false');
+          const tagAndId = (async () =>  {
+            try{
+              if (typeof loadSpec!=='function') return { tag:null, opId:null };
+              const spec = await loadSpec();
+              const op = (spec.paths?.[tryIt.path]||{})[(tryIt.method||'').toLowerCase()];
+              return { tag: (op?.tags && op.tags[0])||null, opId: op?.operationId || null };
+            }catch{ return { tag:null, opId:null }; }
+          })();
+          const target = await tagAndId;
+          await mountSwaggerForContext({ tag: target.tag, operationId: target.opId });
+          // Allow DOM to mount
+          await new Promise(r => setTimeout(r, 150));
+          const blocks = Array.from(document.querySelectorAll('#swagger .opblock'));
+          const blk = blocks.find(b => {
+            const pm = (b.querySelector('.opblock-summary-method')?.textContent||'').trim().toLowerCase();
+            const pp = (b.querySelector('.opblock-summary-path')?.textContent||'').trim();
+            return pm === (tryIt.method||'').toLowerCase() && pp === (tryIt.path||'');
+          }) || blocks[0];
+          if (!blk) return;
+          const summary = blk.querySelector('.opblock-summary'); if (summary && !blk.classList.contains('is-open')) summary.click();
+          await new Promise(r => setTimeout(r, 80));
+          const tryBtn = blk.querySelector('.try-out__btn'); if (tryBtn) tryBtn.click();
+          await new Promise(r => setTimeout(r, 80));
+          const pf = tryIt.prefill || {};
+          // Prefill path/query/header inputs best-effort
+          const paramRows = blk.querySelectorAll('.parameters .parameters-item');
+          paramRows.forEach(row => {
+            try{
+              const name = row.querySelector('.parameters-col_name .parameter__name')?.textContent?.trim();
+              if (!name) return;
+              let v = undefined;
+              if (pf.pathParams && pf.pathParams[name] !== undefined) v = String(pf.pathParams[name]);
+              else if (pf.query && pf.query[name] !== undefined) v = String(pf.query[name]);
+              else if (pf.headers && pf.headers[name] !== undefined) v = String(pf.headers[name]);
+              if (v === undefined) return;
+              const input = row.querySelector('input, textarea, select');
+              if (!input) return;
+              if (input.tagName === 'SELECT') { Array.from(input.options).forEach(o => { if (o.value==v) input.value=v; }); }
+              else { input.value = v; }
+              input.dispatchEvent(new Event('input', { bubbles:true }));
+              input.dispatchEvent(new Event('change', { bubbles:true }));
+            }catch{}
+          });
+          // Headers into Extra headers popover/localStorage
+          try{
+            if (pf.headers){
+              const el = document.getElementById('extraHeadersInput');
+              const current = (()=>{ try{ return JSON.parse(el?.value||localStorage.getItem('idoc_extra_headers')||'{}'); }catch{ return {}; } })();
+              const merged = { ...current, ...pf.headers };
+              const val = JSON.stringify(merged, null, 2);
+              if (el){ el.value = val; el.dispatchEvent(new Event('input', { bubbles:true })); el.dispatchEvent(new Event('change', { bubbles:true })); }
+              localStorage.setItem('idoc_extra_headers', val);
+            }
+          }catch{}
+          // Body
+          try{
+            const body = pf.body;
+            if (body !== undefined && body !== null){
+              const ta = blk.querySelector('textarea');
+              if (ta){
+                const text = (typeof body === 'string') ? body : JSON.stringify(body, null, 2);
+                ta.value = text;
+                ta.dispatchEvent(new Event('input', { bubbles:true }));
+                ta.dispatchEvent(new Event('change', { bubbles:true }));
+              }
+            }
+          }catch{}
+          // Execute
+          const execBtn = blk.querySelector('button.execute'); if (execBtn) execBtn.click();
+        }catch{}
+      }
+
+      function openChat(){ chatPanel.classList.add('open'); chatPanel.setAttribute('aria-hidden','false'); chatInput?.focus(); restoreChat(); try{ rehydrateAllChatActions(); }catch{} try{ updateCopyButtonsVisibility(); }catch{} }
       chatBtn?.addEventListener('click', openChat);
       closeChat?.addEventListener('click', ()=>{ chatPanel.classList.remove('open'); chatPanel.setAttribute('aria-hidden','true'); });
 
       const CHAT_KEY = 'idoc_chat_history';
-      function saveChat(){ try{ localStorage.setItem(CHAT_KEY, chatMessages.innerHTML); }catch(_){} }
-      function restoreChat(){ try{ const v = localStorage.getItem(CHAT_KEY); if (v){ chatMessages.innerHTML = v; chatMessages.scrollTop = chatMessages.scrollHeight; } }catch(_){} }
-      function clearChat(){ chatMessages.innerHTML = ''; saveChat(); }
+      const CHAT_JSON_KEY = 'idoc_chat_history_json';
+      let chatHistory = [];
+      // Ephemeral composer attachments
+      let composerAttachments = [];
+      function saveChat(){
+        try { localStorage.setItem(CHAT_KEY, chatMessages.innerHTML); } catch {}
+        try { localStorage.setItem(CHAT_JSON_KEY, JSON.stringify(chatHistory || [])); } catch {}
+      }
+      function restoreChat(){
+        try { const v = localStorage.getItem(CHAT_KEY); if (v){ chatMessages.innerHTML = v; chatMessages.scrollTop = chatMessages.scrollHeight; } } catch {}
+        try { const j = localStorage.getItem(CHAT_JSON_KEY); if (j){ const arr = JSON.parse(j); if (Array.isArray(arr)) chatHistory = arr; } } catch {}
+      }
+      function clearChat(){ chatMessages.innerHTML = ''; chatHistory = []; saveChat(); clearAttachments(); }
+
+      // ============================
+      // Capabilities and attachments UI + handlers
+      // ============================
+      function supportsVisionFrontend(provider, model){
+        try{
+          const p = String(provider||'').toLowerCase();
+          const m = String(model||'').toLowerCase();
+          if (p === 'google' || p === 'huggingface') return false;
+          if (p === 'deepseek') return m.includes('vl');
+          if (p === 'groq') return m.includes('vision') || m.includes('llama-3.2');
+          // openai/openai_compat and others treated as OpenAI-compatible
+          return m.includes('gpt-4o') || m.includes('o3') || m.includes('o4') || m.includes('gpt-4.1');
+        }catch{ return false; }
+      }
+      function attachmentsSupportedFrontend(provider, model){
+        try{
+          const p = String(provider||'').toLowerCase();
+          // Treat Google and Hugging Face as not supporting user attachments in UI
+          if (p === 'google' || p === 'huggingface') return false;
+          // Default allow for OpenAI, DeepSeek, Groq, Together, openai_compat, etc.
+          return true;
+        }catch{ return true; }
+      }
+      function getSelectedModelCapabilities(){
+        return {
+          vision: !!supportsVisionFrontend(selectedProvider, selectedModel),
+          attachments: !!attachmentsSupportedFrontend(selectedProvider, selectedModel)
+        };
+      }
+      window.getSelectedModelCapabilities = getSelectedModelCapabilities;
+
+      function updateAttachmentAvailability(){
+        const caps = getSelectedModelCapabilities();
+        const vision = !!caps.vision;
+        const attachments = !!caps.attachments;
+        const attachRow = document.getElementById('attachRow');
+        if (attachInput){ attachInput.setAttribute('accept', vision ? '.json,.txt,image/*' : '.json,.txt'); }
+        if (attachBtn){ attachBtn.title = vision ? '' : 'Images are disabled for the current model'; }
+        if (attachModelTip){ attachModelTip.textContent = vision ? '' : 'Images are disabled for the current model'; }
+        // Hide/show entire attachments UI if provider/model does not support attachments at all
+        if (attachRow){ attachRow.style.display = attachments ? 'flex' : 'none'; }
+        if (attachChips){ attachChips.style.display = attachments ? '' : 'none'; }
+        if (attachBtn){ attachBtn.disabled = !attachments || isStreaming; }
+        if (attachUrlBtn){ attachUrlBtn.disabled = !attachments || isStreaming; }
+      }
+      // No runtime switching of provider/model via frontend; capabilities are fixed for this session
+      function updateAttachChips(){
+        try{
+          if (!attachChips) return;
+          attachChips.innerHTML = '';
+          (composerAttachments||[]).forEach(att => {
+            const chip = document.createElement('span'); chip.className='idoc-chip-attach'; chip.dataset.attachId = att.id;
+            const icon = att.type==='image' ? '🖼️' : (att.type==='json' ? '🧩' : (att.type==='url' ? '🔗' : '📄'));
+            const name = att.name || shortName(att.url||'') || att.type;
+            chip.innerHTML = `${icon} <span>${name}</span>`;
+            const del = document.createElement('button'); del.type='button'; del.textContent='✕'; del.title='Remove'; del.onclick = () => removeAttachment(att.id);
+            chip.appendChild(del);
+            if (isStreaming) del.disabled = true;
+            attachChips.appendChild(chip);
+          });
+        }catch{}
+      }
+
+      function removeAttachment(id){ composerAttachments = (composerAttachments||[]).filter(a => a.id !== id); updateAttachChips(); }
+      function clearAttachments(){ composerAttachments = []; updateAttachChips(); }
+      function inferTextType(text, filename){
+        try{ JSON.parse(text); return 'json'; }catch{}
+        if ((filename||'').toLowerCase().endsWith('.json')) return 'json';
+        return 'text';
+      }
+      function addAttachment(att){ att.id = att.id || newId(); composerAttachments.push(att); updateAttachChips(); }
+
+      async function handleFiles(fileList){
+        const caps = getSelectedModelCapabilities();
+        if (!caps.attachments) { if (attachModelTip) attachModelTip.textContent = 'Attachments are disabled for the current model'; return; }
+        const arr = Array.from(fileList||[]);
+        for (const f of arr){
+          try{
+            if ((f.type||'').startsWith('image/')){
+              if (!caps.vision){ if (attachModelTip) attachModelTip.textContent = 'Images are disabled for the current model'; continue; }
+              await new Promise((resolve) => {
+                const r = new FileReader();
+                r.onload = () => { addAttachment({ type:'image', name: f.name||'image', mime: f.type||'', url: r.result, bytes: f.size||undefined }); resolve(); };
+                r.readAsDataURL(f);
+              });
+            } else {
+              await new Promise((resolve) => {
+                const r = new FileReader();
+                r.onload = () => {
+                  const raw = String(r.result||'');
+                  const truncated = raw.length > 3000 ? raw.slice(0,3000) : raw;
+                  const t = inferTextType(truncated, f.name||'');
+                  addAttachment({ type: t, name: f.name||t, mime: f.type||'', content: truncated, bytes: f.size||undefined });
+                  resolve();
+                };
+                r.readAsText(f);
+              });
+            }
+          }catch{}
+        }
+      }
+
+      // Click attach opens picker
+      attachBtn?.addEventListener('click', () => { const caps=getSelectedModelCapabilities(); if (isStreaming || !caps.attachments) return; attachInput?.click(); });
+      attachInput?.addEventListener('change', async () => { try{ await handleFiles(attachInput.files); }finally{ try{ attachInput.value = ''; }catch{} } });
+      // Add URL prompt
+      attachUrlBtn?.addEventListener('click', async () => {
+        const caps = getSelectedModelCapabilities();
+        if (isStreaming || !caps.attachments) return;
+        try{
+          const url = prompt('Enter URL to attach:');
+          if (!url) return;
+          const name = prompt('Optional name for this URL:', shortName(url)) || shortName(url);
+          addAttachment({ type:'url', name, url });
+        }catch{}
+      });
+      // Drag/drop files into chat panel
+      ['dragover','dragenter'].forEach(ev => chatPanel?.addEventListener(ev, (e)=>{ const caps=getSelectedModelCapabilities(); if (!caps.attachments) return; e.preventDefault(); e.dataTransfer.dropEffect='copy'; }));
+      chatPanel?.addEventListener('drop', async (e) => { const caps=getSelectedModelCapabilities(); e.preventDefault(); if (isStreaming || !caps.attachments) return; await handleFiles(e.dataTransfer.files); const uri = e.dataTransfer.getData('text/uri-list'); if (uri) addAttachment({ type:'url', name: shortName(uri), url: uri }); });
+      // Paste images into input
+      chatInput?.addEventListener('paste', async (e) => {
+        try{
+          const caps = getSelectedModelCapabilities();
+          if (!caps.attachments) return;
+          const items = e.clipboardData?.items || [];
+          const files = [];
+          for (const it of items){ if (it.kind === 'file'){ const f = it.getAsFile(); if (f) files.push(f); } }
+          if (files.length){ e.preventDefault(); await handleFiles(files); }
+        }catch{}
+      });
+      updateAttachmentAvailability();
+      updateAttachChips();
 
       // Provider chooser when API key is missing
       // Robust clipboard helper with fallback
@@ -1202,43 +1511,349 @@
         return row;
       }
 
+      let currentChatAbort = null;
+      const chatStop = document.getElementById('chatStop');
+      let isStreaming = false;
+      let editing = { id: null };
+      const editHint = document.getElementById('editHint');
+      const editCancel = document.getElementById('editCancel');
+
+      // ------- Edit mode helpers
+      function getEditableUserId(){
+        try{
+          if (!Array.isArray(chatHistory) || !chatHistory.length) return null;
+          let lastUserIdx = -1;
+          for (let i = chatHistory.length - 1; i >= 0; i--) { if (chatHistory[i].role === 'user') { lastUserIdx = i; break; } }
+          if (lastUserIdx < 0) return null;
+          const hasAssistantAfter = chatHistory.slice(lastUserIdx + 1).some(m => m.role === 'assistant');
+          return hasAssistantAfter ? (chatHistory[lastUserIdx].id || null) : null;
+        }catch{ return null; }
+      }
+
+      function refreshEditVisibility(){
+        try{
+          const editableId = getEditableUserId();
+          chatMessages.querySelectorAll('button[data-action="edit"]').forEach(btn => {
+            const isTarget = (btn.dataset.messageId || '') === (editableId || '');
+            btn.style.display = isTarget ? '' : 'none';
+            btn.disabled = !!isStreaming;
+          });
+          if (attachBtn) attachBtn.disabled = !!isStreaming;
+          if (attachUrlBtn) attachUrlBtn.disabled = !!isStreaming;
+        }catch{}
+      }
+
+      function startEditing(id){
+        if (isStreaming) return;
+        try{
+          const editableId = getEditableUserId();
+          if (!editableId || editableId !== id) return;
+          const msg = (chatHistory || []).find(m => m.id === id && m.role === 'user');
+          if (!msg) return;
+          editing.id = id;
+          chatInput.value = msg.content || '';
+          editHint.style.display = 'block';
+          chatInput.focus();
+        }catch{}
+      }
+
+      function cancelEditing(){ editing.id=null; editHint.style.display='none'; chatInput.focus(); }
+      function submitEditedMessage(id, text){ if (isStreaming) return; editing.id = id; chatInput.value = text || chatInput.value; return sendChat(); }
+
+      editCancel?.addEventListener('click', cancelEditing);
+
       async function sendChat(){
         const msg=(chatInput.value||'').trim(); if(!msg) return;
-        chatSend.disabled = true; chatSend.textContent = 'Sending…';
-        bubble('user', msg); chatInput.value='';
+        chatSend.disabled = true; chatSend.textContent = 'Sending…'; isStreaming = true; refreshEditVisibility();
+        const user = bubble('user', msg); const userId = user.id; const attSnap = (composerAttachments||[]).map(a => ({ id:a.id, name:a.name, type:a.type, mime:a.mime, content:a.content, url:a.url, bytes:a.bytes })); chatHistory.push({ id:userId, role:'user', content: msg, createdAt: Date.now(), edited: !!editing.id, attachments: attSnap }); saveChat(); chatInput.value='';
         const trow = typingBubble();
         try{
+          // Try streaming first
+          const ctrl = new AbortController(); currentChatAbort = ctrl;
+          chatStop.style.display = 'inline-block'; chatStop.onclick = () => { try{ currentChatAbort?.abort(); }catch{} };
           const res = await fetch('{{ route('idoc.chat') }}',{
             method:'POST',
             headers:{ 'Content-Type':'application/json', 'X-CSRF-TOKEN':(document.head.querySelector('meta[name="csrf-token"]').content||'') },
-            body: JSON.stringify({ message: msg })
+            body: JSON.stringify({ message: msg, history: (chatHistory||[]).slice(-12), stream: true, replaces_message_id: editing.id || undefined, attachments: (composerAttachments||[]) }),
+            signal: ctrl.signal
           });
-          const json = await res.json();
-          trow.remove();
-          if (json?.reason === 'missing_api_key' && json?.data?.providers) {
-            renderProviderChooser(json.data);
-          } else if (!res.ok || json?.status === 'error') {
-            bubble('ai', json?.message || 'Error calling assistant', { error:true });
+          if (res.ok && (res.headers.get('Content-Type')||'').includes('text/event-stream')){
+            // Stream SSE from server
+            const reader = res.body.getReader();
+            const dec = new TextDecoder();
+            let acc = '';
+            // Replace typing with empty AI bubble to append into
+            trow.remove();
+            const ai = bubble('ai', '');
+            let full = '';
+            while(true){
+              const {value, done} = await reader.read(); if (done) break;
+              acc += dec.decode(value, {stream:true});
+              const parts = acc.split('\n\n'); acc = parts.pop();
+              for(const chunk of parts){
+                const line = chunk.trim();
+                if (!line) continue;
+                // Expect lines like: data: {...}
+                const m = line.match(/^data:\s*(.*)$/s);
+                if (!m) continue; if (m[1] === '[DONE]') continue;
+                try{
+                  const obj = JSON.parse(m[1]);
+                  const delta = obj?.choices?.[0]?.delta?.content ?? obj?.choices?.[0]?.message?.content ?? '';
+                  if (delta) { full += delta; ai.body.innerHTML = renderMarkdown(full); }
+                }catch{}
+              }
+            }
+            const reply = full || ' ';
+            chatHistory.push({ id: newId(), role:'assistant', content: reply, createdAt: Date.now() }); saveChat();
+            // Mark previous assistant as stale when editing
+            if (editing.id){
+              const userRow = document.querySelector(`.idoc-chat-row.user[data-message-id="${editing.id}"]`);
+              const stale = userRow?.nextElementSibling; if (stale && stale.classList.contains('ai')) stale.classList.add('idoc-stale');
+            }
+          try { await enhanceOperationActionsForRow(ai.row); } catch {}
+          try { enhanceChatCodeBlocksForRow(ai.row); } catch {}
+          try { updateCopyButtonsVisibility(); } catch {}
+          refreshEditVisibility();
           } else {
-            bubble('ai', json?.data?.reply || json?.message || 'No response');
+            // Fallback: non-streaming JSON
+            const json = await res.json();
+            trow.remove();
+            if (json?.reason === 'missing_api_key' && json?.data?.providers) {
+              renderProviderChooser(json.data);
+            } else if (!res.ok || json?.status === 'error') {
+              bubble('ai', json?.message || 'Error calling assistant', { error:true });
+            } else {
+              const reply = json?.data?.reply || json?.message || 'No response';
+              const meta = json?.data?.meta || {};
+              const ai = bubble('ai', reply, { meta });
+              try{ enhanceChatCodeBlocksForRow(ai.row); }catch{}
+              try{ updateCopyButtonsVisibility(); }catch{}
+              chatHistory.push({ id:newId(), role:'assistant', content: reply, createdAt: Date.now(), meta });
+              try{
+                const warns = json?.data?.meta?.warnings || [];
+                if (Array.isArray(warns) && warns.length){ bubble('ai', 'Note: ' + warns.join('\n')); }
+              }catch{}
+              if (editing.id){
+                const userRow = document.querySelector(`.idoc-chat-row.user[data-message-id="${editing.id}"]`);
+                const stale = userRow?.nextElementSibling; if (stale && stale.classList.contains('ai')) stale.classList.add('idoc-stale');
+              }
+            }
+            saveChat();
+            refreshEditVisibility();
           }
-          saveChat();
         }catch(e){
           trow.remove(); bubble('ai', 'Error calling assistant', { error:true }); saveChat();
         } finally {
-          chatSend.disabled = false; chatSend.textContent = 'Send'; chatInput.focus();
+          chatSend.disabled = false; chatSend.textContent = 'Send'; chatInput.focus(); isStreaming = false; refreshEditVisibility(); updateCopyButtonsVisibility();
+          currentChatAbort = null;
+          chatStop.style.display = 'none'; chatStop.onclick = null;
+          if (editing.id){ editing.id=null; editHint.style.display='none'; }
         }
       }
       chatSend?.addEventListener('click', sendChat);
       chatInput?.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendChat(); } });
       chatClear?.addEventListener('click', () => clearChat());
+      // ---------- Export helpers (plain, markdown, json) using in-memory history
+      function cap(s){ try{ s = String(s||''); return s.charAt(0).toUpperCase()+s.slice(1); }catch{ return s; } }
+      function exportPlain(history){
+        try{
+          const lines = [];
+          (history||[]).forEach(m => {
+            const role = (m.role||'').toUpperCase();
+            lines.push(`----- ${role} -----`);
+            lines.push(String(m.content||''));
+            lines.push('');
+          });
+          return lines.join('\n');
+        }catch{ return ''; }
+      }
+      function exportMarkdown(history){
+        try{
+          const blocks = [];
+          (history||[]).forEach(m => {
+            blocks.push(`## ${cap(m.role||'')}`);
+            blocks.push(String(m.content||''));
+            const atts = m.attachments || [];
+            if (Array.isArray(atts) && atts.length){
+              blocks.push('');
+              blocks.push('### Attachments');
+              atts.forEach(a => {
+                const t = (a.type||'').toLowerCase();
+                let extra = '';
+                if (t==='text' || t==='json'){
+                  const s = String(a.content||'');
+                  const preview = s.length>200 ? s.slice(0,200)+'…' : s;
+                  extra = ` - ${preview.replace(/\n/g,' ')}`;
+                } else if (t==='url' && a.url){
+                  extra = ` - ${a.url}`;
+                }
+                blocks.push(`- ${a.name || t || 'attachment'} (${t||'unknown'})${extra}`);
+              });
+            }
+            blocks.push('');
+          });
+          return blocks.join('\n');
+        }catch{ return ''; }
+      }
+      function exportJson(history){
+        try{ return JSON.stringify({ version: 'idoc-1', messages: history||[] }, null, 2); }catch{ return '{"version":"idoc-1","messages":[]}'; }
+      }
+      function downloadUtf8(filename, mime, text){
+        try{
+          const BOM = '\uFEFF';
+          const blob = new Blob([BOM, text||''], { type: `${mime};charset=utf-8` });
+          const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click(); URL.revokeObjectURL(a.href);
+        }catch{}
+      }
       chatExport?.addEventListener('click', () => {
         try{
-          const blob = new Blob([chatMessages.innerText || ''], { type:'text/plain;charset=utf-8' });
-          const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'idoc-chat.txt'; a.click(); URL.revokeObjectURL(a.href);
+          const fmt = (prompt('Export format: txt | md | json','txt')||'txt').trim().toLowerCase();
+          if (fmt === 'md' || fmt === 'markdown'){
+            const md = exportMarkdown(chatHistory||[]);
+            downloadUtf8('idoc-chat.md', 'text/markdown', md);
+          } else if (fmt === 'json'){
+            const js = exportJson(chatHistory||[]);
+            downloadUtf8('idoc-chat.json', 'application/json', js);
+          } else {
+            const txt = exportPlain(chatHistory||[]);
+            downloadUtf8('idoc-chat.txt', 'text/plain', txt);
+          }
         }catch(_){}
       });
       @endif
+
+      // Global click delegation for chat actions (Edit, Open endpoint, Try it)
+      @if (config('idoc.chat.enabled', false))
+      chatMessages.addEventListener('click', async (e) => {
+        const b = e.target.closest('button'); if (!b) return;
+        const action = b.dataset.action || '';
+        if (!action) return;
+        e.preventDefault(); e.stopPropagation();
+        if (action === 'edit'){
+          const id = b.dataset.messageId || null; if (!id) return; startEditing(id); return;
+        }
+        if (action === 'copy-code'){
+          try{
+            const pre = b.closest('pre');
+            const code = pre ? pre.querySelector('code') : null;
+            const txt = code?.innerText || pre?.innerText || '';
+            const ok = await copyText(txt);
+            b.textContent = ok ? 'Copied!' : 'Copy failed';
+            setTimeout(()=> b.textContent='Copy', 1200);
+          }catch{}
+          return;
+        }
+        // Endpoint-aware actions via event delegation so restored buttons work
+        const row = b.closest('.idoc-chat-row');
+        if (action === 'open-endpoint'){
+          const method = (b.dataset.method||'').toUpperCase(); const path = b.dataset.path||''; const opId = b.dataset.opId||'';
+          const endpoint = { method, path, anchor: opId ? ('operation/'+opId) : undefined };
+          try { await navigateToDocsEndpoint(endpoint); } catch {}
+          return;
+        }
+        if (action === 'tryit-run'){
+          const method = (b.dataset.method||'').toUpperCase(); const path = b.dataset.path||'';
+          let prefill = {};
+          try { if (b.dataset.prefill){ prefill = JSON.parse(decodeURIComponent(b.dataset.prefill)); } } catch {}
+          if (!prefill || typeof prefill !== 'object'){ prefill = {}; }
+          try{
+            if (!prefill.body && row){
+              const txt = (row.querySelector('.idoc-chat-body')?.innerText||'');
+              const bodyText = parseFirstJsonFromText(txt);
+              if (bodyText) prefill.body = bodyText;
+            }
+          }catch{}
+          try { await openTryItAndRun({ method, path, prefill, autoExecute: true }); } catch {}
+          return;
+        }
+      });
+      // After restoring chat DOM/JSON, ensure edit button visibility matches the rule
+      restoreChat();
+      refreshEditVisibility();
+      // Rehydrate endpoint actions for restored AI messages (based on headings and meta)
+      try{ rehydrateAllChatActions(); }catch{}
+      @endif
+
+      // Add action buttons for operations found in assistant output
+      async function enhanceOperationActionsForRow(row){
+        try{
+          const body = row.querySelector('.idoc-chat-body'); if (!body) return;
+          const text = body.innerText || '';
+          const re = /^###\s+(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s+(\S+)/gmi;
+          const found = []; let m;
+          while((m = re.exec(text))){ found.push({ method:m[1].toLowerCase(), path:m[2] }); }
+          if (!found.length) return;
+          if (typeof loadSpec !== 'function') return; // only when Try-it is enabled
+          const spec = await loadSpec();
+          const actionsWrap = row.querySelector('.idoc-chat-actions') || body;
+          try{
+            actionsWrap.querySelectorAll('button[data-action="open-endpoint"], button[data-action="tryit-run"]').forEach(b => b.remove());
+            // Remove older inert buttons from previous sessions (by label)
+            actionsWrap.querySelectorAll('button').forEach(btn => {
+              const t = (btn.textContent||'').trim();
+              if (t === 'View in docs' || t === 'Run in Try‑it') btn.remove();
+            });
+          }catch{}
+          for (const f of found){
+            const op = (spec.paths?.[f.path]||{})[f.method]; if (!op) continue;
+            const opId = op.operationId || '';
+            const view = document.createElement('button'); view.className='btn btn-secondary'; view.style.marginLeft='6px'; view.textContent='Open endpoint'; view.dataset.action='open-endpoint'; view.dataset.method=f.method; view.dataset.path=f.path; if (opId) view.dataset.opId=opId;
+            actionsWrap.appendChild(view);
+            if (document.getElementById('tryitPanel')){
+              const run = document.createElement('button'); run.className='btn btn-secondary'; run.style.marginLeft='6px'; run.textContent='Try it with this data'; run.dataset.action='tryit-run'; run.dataset.method=f.method; run.dataset.path=f.path; if (opId) run.dataset.opId=opId;
+              actionsWrap.appendChild(run);
+            }
+          }
+        }catch{}
+      }
+
+      // Add small copy buttons inside code blocks within a chat row
+      function enhanceChatCodeBlocksForRow(row){
+        try{
+          const blocks = row.querySelectorAll('.idoc-chat-body pre');
+          blocks.forEach(pre => {
+            if (pre.dataset.tools === 'codecopy') return;
+            pre.style.position = pre.style.position || 'relative';
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-secondary';
+            btn.textContent = 'Copy';
+            btn.title = 'Copy code';
+            btn.dataset.action = 'copy-code';
+            btn.style.position = 'absolute';
+            btn.style.top = '6px';
+            btn.style.right = '6px';
+            btn.style.padding = '2px 6px';
+            btn.style.fontSize = '12px';
+            btn.style.borderRadius = '6px';
+            // Replace text with a minimal clipboard icon
+            btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+            pre.appendChild(btn);
+            pre.dataset.tools = 'codecopy';
+          });
+          updateCopyButtonsVisibility();
+        }catch{}
+      }
+
+      // Rehydrate actions for restored chat UI (scan headings + meta hints)
+      function rehydrateAllChatActions(){
+        const rows = chatMessages.querySelectorAll('.idoc-chat-row.ai');
+        rows.forEach(async (row) => {
+          try { await enhanceOperationActionsForRow(row); } catch {}
+          try {
+            const id = row.dataset.messageId || '';
+            if (!id) return;
+            const msg = (chatHistory||[]).find(m => m.id === id);
+            if (msg && msg.meta && msg.meta.actionHints){
+              const body = row.querySelector('.idoc-chat-body');
+              const actions = row.querySelector('.idoc-chat-actions') || row;
+              renderActionHintsForRow({ row, body, actions }, msg.meta.actionHints, (msg.content||''));
+            }
+          } catch {}
+          try { enhanceChatCodeBlocksForRow(row); } catch {}
+        });
+      }
+
     </script>
   </body>
 </html>
