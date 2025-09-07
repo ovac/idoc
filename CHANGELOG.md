@@ -1,6 +1,43 @@
 **CHANGELOG.md** (top):
 
 ```markdown
+## [v2.1.0] — 2025-09-07
+
+### Added
+- Optional AI Chat assistant integrated into the documentation view.
+  - Provider‑agnostic backend (configurable via `idoc.chat.*`): DeepSeek (default), OpenAI (ChatGPT), Google Gemini, Groq, Hugging Face Inference API, Together AI, and OpenAI‑compatible local servers (LM Studio, llama.cpp server).
+  - Provider chooser UI appears when no API key is configured; clicking a provider shows a tailored setup guide with a copyable `.env` snippet.
+  - Chat UI enhancements: Markdown rendering with syntax highlighting, Copy action on assistant replies, event‑delegated buttons remain interactive after theme changes, stable floating action stack.
+  - Request Tester panel inside Chat: make HTTP calls to your routes, automatically merge Authorization from Swagger Authorize and your Extra headers, and render formatted responses with status and timing.
+- Dual highlight.js themes (light/dark) and automatic switching based on the current theme.
+
+### Changed
+- Light theme styling for chat bubbles, buttons and code blocks for better contrast and readability.
+- Floating controls (Theme / Chat / Try it) consolidated into a single fixed stack so layout stays stable when features are disabled.
+
+### Migration Notes
+- Views: `php artisan vendor:publish --tag=idoc-views --force` to publish the updated `resources/views/vendor/idoc/documentation.blade.php` if you previously published and customized it.
+- Config: `php artisan vendor:publish --tag=idoc-config` (optional) to review the new `idoc.chat.*` keys. Common `.env` examples:
+  - DeepSeek (default)
+    ```env
+    IDOC_CHAT_ENABLED=true
+    IDOC_CHAT_PROVIDER=deepseek
+    IDOC_CHAT_MODEL=deepseek-chat
+    IDOC_CHAT_BASE_URL=https://api.deepseek.com/v1
+    DEEPSEEK_API_KEY=your_deepseek_key
+    ```
+  - OpenAI (ChatGPT): set `OPENAI_API_KEY` and `IDOC_CHAT_PROVIDER=openai`.
+  - Google Gemini: set `GOOGLE_API_KEY` and `IDOC_CHAT_PROVIDER=google`.
+  - Groq: set `GROQ_API_KEY` and `IDOC_CHAT_PROVIDER=groq`.
+  - HF Inference API: set `HF_API_TOKEN` and `IDOC_CHAT_PROVIDER=huggingface`.
+- Disable Chat if not needed: `IDOC_CHAT_ENABLED=false`.
+- Clear caches after changes: `php artisan config:clear && php artisan cache:clear`.
+
+```
+
+**CHANGELOG.md** (top):
+
+```markdown
 ## [v2.0.0] — 2025-08-31
 
 ### Breaking

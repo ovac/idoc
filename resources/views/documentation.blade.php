@@ -9,16 +9,28 @@
   This Blade view renders your OpenAPI 3.x specification using:
     1) Redoc OSS for a beautiful, fast, read-focused reference.
     2) A slide-in panel that mounts Swagger UI for "Try it" requests.
+    3) An optional AI Chat assistant (ChatGPT‑style) that answers questions
+       about your API using your generated OpenAPI and optional extra context.
 
   UX MODEL
   --------
   - Users read the docs in Redoc as usual.
-  - A floating "Try it" button opens a right-hand panel with Swagger UI.
+  - A floating action stack (bottom‑right) contains Theme / Chat / Try it.
+    • Chat opens a right-hand panel with a conversational assistant.
+    • Try it opens a right-hand panel with Swagger UI.
   - The console is context-aware:
       • If a Redoc click changes the URL hash, we follow that (e.g. #/tag/Auth or
         #/tag/Auth/operation/Login).
       • If the hash does not change during scroll, we infer the active section by
         looking at visible Redoc headings (id="tag/..." or "operation/...").
+  - Chat notes:
+      • If no API key is configured, the assistant shows a clickable provider
+        chooser (DeepSeek, OpenAI, Google Gemini, Groq, Hugging Face, Together,
+        Free/Open‑Source self‑hosted). Clicking a provider displays a tailored
+        setup guide with a copyable .env snippet.
+      • Chat bubbles are Markdown‑aware with syntax highlighting; Copy buttons
+        are available on assistant messages; buttons remain interactive across
+        theme changes.
 
   NOTE ON REDOCLY PRO
   -------------------
@@ -32,11 +44,34 @@
   - idoc.external_description  : Optional route for external description content.
   - idoc.hide_download_button  : Redoc's download button visibility.
   - idoc.tryit.enabled         : Toggle the Swagger UI panel globally.
+  - idoc.chat.enabled          : Toggle the AI Chat panel globally.
+  - idoc.chat.provider         : Chat provider id (e.g., deepseek, openai, google,
+                                 groq, huggingface, openai_compat). Defaults to
+                                 deepseek in this build; override via env.
+  - idoc.chat.model            : Model name for the provider (e.g., deepseek-chat,
+                                 gpt-4o-mini, gemini-1.5-flash, mixtral-8x7b-32768,
+                                 Qwen/Qwen2.5-7B-Instruct).
+  - idoc.chat.base_url         : Optional base URL override (useful for LM Studio,
+                                 llama.cpp server, or other OpenAI‑compatible servers).
+  - idoc.chat.api_key_env      : Optional env var name for the API key (else the
+                                 controller looks for provider‑specific defaults).
+  - idoc.chat.info_view        : Optional Blade view name rendered as extra context
+                                 for the assistant (e.g., 'idoc.info').
+
+  Provider API key envs (examples):
+  - DeepSeek: DEEPSEEK_API_KEY
+  - OpenAI:  OPENAI_API_KEY
+  - Google:  GOOGLE_API_KEY (or GEMINI_API_KEY)
+  - Groq:    GROQ_API_KEY
+  - HF:      HF_API_TOKEN (or HUGGINGFACE_API_KEY)
+  - Local OpenAI‑compatible: set IDOC_CHAT_BASE_URL and a placeholder key
 
   BUNDLES
   -------
   - Redoc OSS:  https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js
   - Swagger UI: https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/
+  - Markdown + sanitize: marked + DOMPurify
+  - Syntax highlight: highlight.js (auto‑switched for dark/light)
 
   CUSTOMIZATION HOOKS
   -------------------
@@ -45,8 +80,8 @@
 
   ACCESSIBILITY
   -------------
-  - The Try it panel uses aria-hidden to signal open/close state.
-  - The toggle button is keyboard accessible.
+  - Both panels use aria-hidden to signal open/close state.
+  - Floating action buttons are keyboard accessible.
 
   CORS / SECURITY
   ---------------
@@ -80,9 +115,9 @@
       /* Hide "API docs by Redocly" badge in OSS build */
       [href="https://redocly.com/redoc/"] { display: none !important; }
 
-      /* Floating buttons */
-      .tryit-toggle { position: fixed; right: 16px; bottom: 16px; z-index: 998; }
-      .theme-toggle { position: fixed; right: 16px; bottom: 64px; z-index: 998; }
+      /* Floating action stack (stable even if some buttons are hidden) */
+      .floating-actions { position: fixed; right: 16px; z-index: 998; bottom:16px; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+      .floating-actions .tryit-toggle { position: static; }
       .btn {
         cursor: pointer; border: 1px solid #e5e7eb; background: #fff;
         padding: 8px 12px; border-radius: 8px;
@@ -148,6 +183,93 @@
       body.theme-dark .swagger-ui .prop-type { color: #93c5fd; }
       body.theme-dark .swagger-ui .response-col_status { color: #60a5fa; }
       body.theme-dark .swagger-ui .btn { background: #1f2937; color: #f9fafb; border-color: #374151; }
+
+      /* ChatGPT-like chat styles */
+      .idoc-chat-list { flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 12px; padding: 6px 0 8px; }
+      .idoc-chat-row { display: flex; gap: 10px; align-items: flex-start; }
+      .idoc-chat-row.ai { flex-direction: row; }
+      .idoc-chat-row.user { flex-direction: row-reverse; }
+      .idoc-chat-avatar { width: 28px; height: 28px; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size:14px; background:#eef2ff; color:#1d4ed8; border:1px solid #e5e7eb; }
+      .idoc-chat-bubble { max-width: min(740px, 86%); border: 1px solid #e5e7eb; border-radius: 14px; padding: 12px 14px; line-height: 1.6; font-size: 14.5px; background: #fff; color: #111827; box-shadow: 0 2px 6px rgba(0,0,0,.06); }
+      .idoc-chat-bubble.user { background:#eef2ff; border-color:#c7d2fe; }
+      .idoc-chat-bubble.ai { background:#fff; border-color:#e5e7eb; }
+      .idoc-chat-bubble.error { background:#fef2f2; border-color:#fecaca; color:#991b1b; }
+      .idoc-chat-meta { font-size: 11px; color:#6b7280; margin-bottom:4px; display:flex; align-items:center; gap:6px; }
+      .idoc-chat-actions { text-align:right; margin-top:6px; }
+      .idoc-chat-actions .btn { padding:4px 8px; font-size:12px; border-radius:6px; }
+      .idoc-chip { padding:8px 14px; border-radius:14px; border:1px solid #e5e7eb; background:#f9fafb; color:#111827; }
+      .idoc-chip:hover { background:#f3f4f6; }
+      .idoc-chat-inputrow { display:flex; gap:8px; align-items:flex-end; margin-top:10px; }
+      .idoc-chat-input { flex:1; min-height:42px; max-height:180px; resize:vertical; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; font-size:14px; line-height:1.4; }
+      .idoc-chat-input:focus { outline:2px solid #2563eb; outline-offset:1px; }
+      .idoc-chat-send { padding:10px 14px; border-radius:10px; }
+      .typing { display:inline-block; min-width:18px; }
+      .typing span { display:inline-block; width:4px; height:4px; margin:0 1px; background:#9ca3af; border-radius:50%; animation: blink 1.2s infinite ease-in-out; }
+      .typing span:nth-child(2){ animation-delay:.2s; }
+      .typing span:nth-child(3){ animation-delay:.4s; }
+      @keyframes blink { 0%,80%,100%{ opacity:.2 } 40%{ opacity:1 } }
+      /* Code blocks: ensure high contrast on light */
+      .idoc-chat-bubble pre { background:#0b1220; color:#e5e7eb; padding:12px; border-radius:10px; overflow:auto; border:1px solid #111827; }
+      .idoc-chat-bubble :not(pre) > code { background:#f1f5f9; padding:2px 4px; border-radius:4px; }
+      /* Light theme fine‑tuning */
+      body:not(.theme-dark) .idoc-chat-avatar { background:#eef2ff; color:#1d4ed8; border-color:#dbeafe; }
+      body:not(.theme-dark) .idoc-chat-bubble { background:#fff; border-color:#e5e7eb; color:#111827; box-shadow: 0 2px 6px rgba(0,0,0,.06); }
+      body:not(.theme-dark) .idoc-chat-bubble.user { background:#eff6ff; border-color:#bfdbfe; }
+      body:not(.theme-dark) .idoc-chat-bubble.ai { background:#fff; border-color:#e5e7eb; }
+      body:not(.theme-dark) .idoc-chat-bubble.error { background:#fef2f2; border-color:#fecaca; color:#991b1b; }
+      body:not(.theme-dark) .idoc-chat-actions .btn { background:#f9fafb; border-color:#e5e7eb; color:#111827; }
+      body:not(.theme-dark) .idoc-chat-actions .btn:hover { background:#f3f4f6; }
+      body:not(.theme-dark) .idoc-chat-input { background:#fff; border-color:#e5e7eb; color:#111827; }
+      body.theme-dark .idoc-chat-avatar { background:#111827; color:#e0e7ff; border-color:#1f2937; }
+      body.theme-dark .idoc-chat-bubble { background:#0f172a; border-color:#1f2937; color:#e5e7eb; }
+      body.theme-dark .idoc-chat-bubble.user { background:#111827; }
+      body.theme-dark .idoc-chat-bubble.error { background:#7f1d1d; border-color:#fecdd3; color:#fee2e2; }
+      body.theme-dark .idoc-chat-bubble :not(pre) > code { background:#1f2937; color:#e5e7eb; }
+
+      /* Redoc sidebar + headings */
+      .swagger-ui .opblock-tag.no-desc[data-tag^="!"],
+      .swagger-ui .opblock[id^="operations-\\!"] span.opblock-summary-method,
+      #redoc_container li[data-item-id^="tag/!"] > label > span:first-child,
+      #redoc_container li[data-item-id^="tag/%21"] > label > span:first-child,
+      #redoc_container [id^="tag/!"] h1,
+      #redoc_container [id^="tag/%21"] h1,
+      #redoc_container li[data-item-id*="/operation/!"] span,
+      #redoc_container h3[id^="operation/!"],
+      #redoc_container div[id^="operation/!"] h2,
+      #redoc_container h2[id^="operation/!"] {
+        position: relative;
+        padding-left: 1.6em;
+        color: #eab308 !important;
+      }
+
+      /* Add caution icon to operation title */
+      .swagger-ui .opblock-tag.no-desc[data-tag^="!"] span::before,
+      #redoc_container li[data-item-id^="tag/!"] > label > span:first-child::before,
+      #redoc_container li[data-item-id^="tag/%21"] > label > span:first-child::before,
+      #redoc_container [id^="tag/!"] h1::before,
+      #redoc_container [id^="tag/%21"] h1::before,
+      #redoc_container li[data-item-id*="/operation/!"] span::before,
+      #redoc_container h3[id^="operation/!"]::before,
+      #redoc_container div[id^="operation/!"] h2::before,
+      #redoc_container h2[id^="operation/!"]::before {
+        content: "⚠️ ";
+        position: absolute;
+        left: 0;
+        font-size: 1.1em;
+      }
+
+      .swagger-ui .opblock[id^="operations-\\!"] span.opblock-summary-method::before {
+        content: "⚠️";
+        position: absolute;
+        left: 4px;
+        top: 50%;
+        transform: translateY(-55%) translateX(50%);
+        font-size: 1.1em;
+      }
+
+      .swagger-ui .information-container.wrapper .info {
+        bachground-color: none !important;
+      }
     </style>
 
     <!-- Favicons -->
@@ -165,23 +287,28 @@
       <!-- Optional libs for nicer chat rendering -->
       <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+      <!-- Syntax highlighting for Markdown code blocks (light + dark themes) -->
+      <link id="hljsLight" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+      <link id="hljsDark" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css" media="not all">
+      <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
     @endif
   </head>
   <body>
     <!-- Redoc root node -->
     <div id="redoc_container"></div>
-    <!-- Theme toggle (cycles Auto → Dark → Light) -->
-    <button class="theme-toggle btn" id="themeBtn" title="Toggle theme">🌗 Auto</button>
 
-    @if (config('idoc.chat.enabled', false))
-      <!-- Floating button to open the Chat assistant -->
-      <button class="tryit-toggle btn" id="chatBtn" style="right:16px; bottom:112px;">💬 Chat</button>
-    @endif
-
+    <!-- Floating action stack: Theme / Chat / Try it -->
+    <div class="floating-actions" id="floatingActions">
+      @if (config('idoc.chat.enabled', false))
+        <button class="btn tryit-toggle" id="chatBtn">💬 Chat</button>
+      @endif
+      @if (config('idoc.tryit.enabled', true))
+        <button class="btn tryit-toggle" id="tryitBtn">⚡️ Try it</button>
+      @endif
+      <button class="btn tryit-toggle" id="themeBtn" title="Toggle theme">🌗 Auto</button>
+    </div>
+    
     @if (config('idoc.tryit.enabled', true))
-      <!-- Floating button to open the Try it console -->
-      <button class="tryit-toggle btn" id="tryitBtn">Try it</button>
-
       <!-- Slide-in panel that hosts Swagger UI. aria-hidden toggles for a11y. -->
       <div class="tryit-panel" id="tryitPanel" aria-hidden="true">
         <div class="tryit-header">
@@ -214,18 +341,20 @@
     @endif
 
     @if (config('idoc.chat.enabled', false))
-      <!-- Slide-in panel that hosts the simple AI chat assistant -->
+      <!-- Slide-in panel that hosts the AI chat assistant (ChatGPT-like) -->
       <div class="tryit-panel" id="chatPanel" aria-hidden="true">
-        <div class="tryit-header">
-          <h2>AI Chat</h2>
+        <div class="tryit-header" style="align-items:center; gap:10px;">
+          <h2 style="display:flex; align-items:center; gap:8px; margin:0;">💬 AI Chat</h2>
           <div class="grow"></div>
-          <button class="btn" id="closeChat">Close</button>
+          <button class="btn btn-secondary" id="chatClear" title="Clear chat">Clear</button>
+          <button class="btn btn-secondary" id="chatExport" title="Export chat">Export</button>
+          <button class="btn btn-secondary" id="closeChat">Close</button>
         </div>
-        <div class="tryit-body" id="chatBody" style="display:flex; flex-direction:column; gap:8px;">
-          <div id="chatMessages" style="min-height:200px; display:flex; flex-direction:column; gap:8px;"></div>
-          <div style="display:flex; gap:8px;">
-            <input id="chatInput" type="text" placeholder="Ask about endpoints, params, errors..." style="flex:1; padding:8px; border:1px solid #e5e7eb; border-radius:8px;" />
-            <button id="chatSend" class="btn">Send</button>
+        <div class="tryit-body" id="chatBody" style="display:flex; flex-direction:column; height:calc(100% - 60px); padding-bottom:14px;">
+          <div id="chatMessages" class="idoc-chat-list"></div>
+          <div class="idoc-chat-inputrow">
+            <textarea id="chatInput" class="idoc-chat-input" rows="1" placeholder="Ask about endpoints, params, errors... (Shift+Enter for newline)"></textarea>
+            <button id="chatSend" class="btn idoc-chat-send">Send</button>
           </div>
         </div>
       </div>
@@ -305,7 +434,21 @@
         } catch (err) { console.error('Redoc init failed:', err); tmp.remove(); }
       }
 
-      async function renderRedocFor(mode){ const isDark = effectiveIsDark(mode); applyPageClass(isDark); if (themeBtn) themeBtn.textContent = labelFor(mode); await mountRedoc(isDark ? redark : relight); }
+      async function renderRedocFor(mode){
+        const isDark = effectiveIsDark(mode);
+        applyPageClass(isDark);
+        if (themeBtn) themeBtn.textContent = labelFor(mode);
+        // Toggle highlight theme
+        try {
+          const light = document.getElementById('hljsLight');
+          const dark = document.getElementById('hljsDark');
+          if (light && dark) {
+            if (isDark) { light.media = 'not all'; dark.media = 'all'; }
+            else { light.media = 'all'; dark.media = 'not all'; }
+          }
+        } catch {}
+        await mountRedoc(isDark ? redark : relight);
+      }
 
       renderRedocFor(getMode()).then(() => observeRedoc());
       if (window.matchMedia) { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (getMode()==='auto') renderRedocFor('auto'); }); }
@@ -887,49 +1030,214 @@
 
       @if (config('idoc.chat.enabled', false))
       // ============================
-      // Simple AI chat integration
+      // AI Chat (ChatGPT-like)
       // ============================
       const chatBtn = document.getElementById('chatBtn');
       const chatPanel = document.getElementById('chatPanel');
       const closeChat = document.getElementById('closeChat');
+      const chatClear = document.getElementById('chatClear');
+      const chatExport = document.getElementById('chatExport');
       const chatMessages = document.getElementById('chatMessages');
       const chatInput = document.getElementById('chatInput');
       const chatSend = document.getElementById('chatSend');
 
+      // Configure marked + highlight.js
+      try {
+        if (window.marked) {
+          marked.setOptions({
+            breaks: true,
+            highlight: function(code, lang){
+              try {
+                if (window.hljs) {
+                  return lang ? hljs.highlight(code, { language: lang }).value : hljs.highlightAuto(code).value;
+                }
+              } catch(_){}
+              return code;
+            }
+          });
+        }
+      } catch(_){}
+
+      function safeHTML(html){ return window.DOMPurify ? DOMPurify.sanitize(html, { ADD_ATTR: ['target'] }) : html; }
       function renderMarkdown(md){
-        try{
-          const html = window.marked ? marked.parse(md) : md.replace(/\n/g,'<br>');
-          return window.DOMPurify ? DOMPurify.sanitize(html) : html;
-        }catch(_){ return md.replace(/\n/g,'<br>'); }
+        try {
+          const raw = window.marked ? marked.parse(md || '') : (md || '').replace(/\n/g,'<br>');
+          const html = safeHTML(raw);
+          const tmp = document.createElement('div'); tmp.innerHTML = html;
+          tmp.querySelectorAll('a[href]').forEach(a => a.setAttribute('target','_blank'));
+          return tmp.innerHTML;
+        } catch (_) { return (md || '').replace(/\n/g,'<br>'); }
       }
-      function appendMsg(role, text){
-        const el = document.createElement('div');
-        el.style.padding='8px'; el.style.border='1px solid #e5e7eb'; el.style.borderRadius='8px';
-        el.style.background = role==='user' ? '#eef2ff' : '#f8fafc';
-        el.innerHTML = role==='user'?('You: '+text):('AI: '+renderMarkdown(text));
-        chatMessages.appendChild(el); chatMessages.scrollTop=chatMessages.scrollHeight; return el;
+
+      function bubble(role, content, opts={}){
+        const row = document.createElement('div');
+        row.className = `idoc-chat-row ${role==='user'?'user':'ai'}`;
+        const avatar = document.createElement('div');
+        avatar.className = 'idoc-chat-avatar';
+        avatar.textContent = role==='user' ? 'You' : 'AI';
+        const bub = document.createElement('div');
+        bub.className = `idoc-chat-bubble ${role==='user'?'user':'ai'}${opts.error?' error':''}`;
+        const meta = document.createElement('div'); meta.className = 'idoc-chat-meta'; meta.textContent = role==='user' ? 'You' : 'AI';
+        const body = document.createElement('div'); body.className = 'idoc-chat-body';
+        body.innerHTML = role==='user' ? (content || '') : renderMarkdown(content || '');
+        const actions = document.createElement('div'); actions.className = 'idoc-chat-actions';
+        if (role !== 'user') {
+          const copyBtn = document.createElement('button');
+          copyBtn.className = 'btn btn-secondary';
+          copyBtn.textContent = 'Copy';
+          copyBtn.onclick = async () => {
+            try { await navigator.clipboard.writeText((content || '').toString()); copyBtn.textContent='Copied!'; setTimeout(()=>copyBtn.textContent='Copy', 1200); }
+            catch { copyBtn.textContent = 'Copy failed'; setTimeout(()=>copyBtn.textContent='Copy', 1200); }
+          };
+          actions.appendChild(copyBtn);
+        }
+        bub.appendChild(meta); bub.appendChild(body); bub.appendChild(actions);
+        row.appendChild(avatar); row.appendChild(bub);
+        chatMessages.appendChild(row);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        try { if (window.hljs) row.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el)); } catch(_){}
+        return { row, bub, body };
       }
-      function openChat(){ chatPanel.classList.add('open'); chatPanel.setAttribute('aria-hidden','false'); }
+
+      function typingBubble(){
+        const { row, body } = bubble('ai', '');
+        const t = document.createElement('div'); t.className = 'typing'; t.innerHTML = '<span></span><span></span><span></span>';
+        body.innerHTML = ''; body.appendChild(t);
+        return row;
+      }
+
+      function openChat(){ chatPanel.classList.add('open'); chatPanel.setAttribute('aria-hidden','false'); chatInput?.focus(); restoreChat(); }
       chatBtn?.addEventListener('click', openChat);
       closeChat?.addEventListener('click', ()=>{ chatPanel.classList.remove('open'); chatPanel.setAttribute('aria-hidden','true'); });
+
+      const CHAT_KEY = 'idoc_chat_history';
+      function saveChat(){ try{ localStorage.setItem(CHAT_KEY, chatMessages.innerHTML); }catch(_){} }
+      function restoreChat(){ try{ const v = localStorage.getItem(CHAT_KEY); if (v){ chatMessages.innerHTML = v; chatMessages.scrollTop = chatMessages.scrollHeight; } }catch(_){} }
+      function clearChat(){ chatMessages.innerHTML = ''; saveChat(); }
+
+      // Provider chooser when API key is missing
+      // Robust clipboard helper with fallback
+      async function copyText(text){
+        try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; } } catch {}
+        try { const ta = document.createElement('textarea'); ta.value = text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.focus(); ta.select(); const ok=document.execCommand('copy'); ta.remove(); return ok; } catch { return false; }
+      }
+
+      // One-time event delegation for provider chooser actions
+      let providerDelegatesBound = false;
+      function bindProviderDelegates(){
+        if (providerDelegatesBound) return; providerDelegatesBound = true;
+        chatMessages.addEventListener('click', (e) => {
+          const btn = e.target.closest('[data-provider-id], [data-action]');
+          if (!btn) return;
+          const row = btn.closest('.idoc-chat-row'); if (!row) return;
+          const body = row.querySelector('.idoc-chat-body'); if (!body) return;
+          const payload = (() => { try{ return JSON.parse(row.dataset.providers || 'null'); }catch{ return null; } })();
+          const postNote = row.dataset.postSetupNote || '';
+          // Provider button clicked
+          if (btn.dataset.providerId) {
+            e.preventDefault(); e.stopPropagation();
+            const p = (payload || []).find(x => (x.id||'') === btn.dataset.providerId);
+            if (!p) return;
+            const envText = (p.env_lines||[]).join('\n');
+            const envSnippet = '```env\n' + envText + '\n```';
+            const md = [
+              `### Set up ${p.title}`,
+              '',
+              `${p.id==='oss_local' ? '- Install: ' : '- Get key: '}<${p.keys_url}>`,
+              `- Docs: <${p.docs_url}>`,
+              '',
+              '**.env entries:**',
+              envSnippet,
+              '',
+              postNote || '',
+            ].join('\n');
+            body.innerHTML = renderMarkdown(md);
+            const actions = document.createElement('div'); actions.className='idoc-chat-actions';
+            const copy = document.createElement('button'); copy.className='btn btn-secondary'; copy.type='button'; copy.dataset.action='copy-env'; copy.dataset.env = envText; copy.textContent='Copy .env';
+            const back = document.createElement('button'); back.className='btn btn-secondary'; back.type='button'; back.dataset.action='back'; back.style.marginLeft='6px'; back.textContent='Back';
+            actions.appendChild(copy); actions.appendChild(back); body.appendChild(actions);
+            return;
+          }
+          // Actions
+          const action = btn.dataset.action;
+          if (action === 'back') {
+            body.innerHTML = '';
+            // Rebuild chooser UI from providers list
+            const title = document.createElement('div'); title.className='idoc-chat-meta'; title.textContent='Choose a chat provider to see setup steps:';
+            const btns = document.createElement('div'); btns.style.display='flex'; btns.style.flexWrap='wrap'; btns.style.gap='8px'; btns.style.margin='8px 0';
+            (payload || []).forEach(p => { const b=document.createElement('button'); b.className='btn btn-secondary idoc-chip'; b.type='button'; b.dataset.providerId=p.id; b.textContent=p.title; btns.appendChild(b); });
+            const hint = document.createElement('div'); hint.style.fontSize='12px'; hint.style.color='#6b7280'; hint.textContent='You can change the provider later via IDOC_CHAT_PROVIDER, or disable chat by setting IDOC_CHAT_ENABLED=false.';
+            body.appendChild(title); body.appendChild(btns); body.appendChild(hint);
+            return;
+          }
+          if (action === 'copy-env') {
+            const ok = btn.dataset.env ? (copyText(btn.dataset.env)) : false;
+            btn.textContent = ok ? 'Copied!' : 'Copy failed';
+            setTimeout(()=> btn.textContent='Copy .env', 1200);
+            return;
+          }
+        }, true);
+      }
+
+      function renderProviderChooser(data){
+        const { providers = [], current_provider = '', post_setup_note = '' } = data || {};
+        const { row, body } = bubble('ai', '');
+        // Persist providers on this row for event delegation to work after theme changes
+        try { row.dataset.providers = JSON.stringify(providers); } catch {}
+        row.dataset.postSetupNote = post_setup_note || '';
+        bindProviderDelegates();
+
+        const title = document.createElement('div');
+        title.className = 'idoc-chat-meta';
+        title.textContent = 'Choose a chat provider to see setup steps:';
+        const btns = document.createElement('div');
+        btns.style.display = 'flex'; btns.style.flexWrap = 'wrap'; btns.style.gap = '8px'; btns.style.margin = '8px 0';
+        (providers||[]).forEach(p => {
+          const b = document.createElement('button'); b.className = 'btn btn-secondary idoc-chip'; b.type='button'; b.textContent = p.title; b.dataset.providerId = p.id;
+          if ((p.id||'') === (current_provider||'')) { b.title = 'Current setting'; }
+          btns.appendChild(b);
+        });
+        const hint = document.createElement('div'); hint.style.fontSize='12px'; hint.style.color='#6b7280'; hint.textContent = 'You can change the provider later via IDOC_CHAT_PROVIDER, or disable chat by setting IDOC_CHAT_ENABLED=false.';
+        body.innerHTML = ''; body.appendChild(title); body.appendChild(btns); body.appendChild(hint);
+        return row;
+      }
+
       async function sendChat(){
         const msg=(chatInput.value||'').trim(); if(!msg) return;
-        appendMsg('user', msg); chatInput.value='';
-        const placeholder=appendMsg('assistant','Thinking...');
+        chatSend.disabled = true; chatSend.textContent = 'Sending…';
+        bubble('user', msg); chatInput.value='';
+        const trow = typingBubble();
         try{
-          const res=await fetch('{{ route('idoc.chat') }}',{
+          const res = await fetch('{{ route('idoc.chat') }}',{
             method:'POST',
             headers:{ 'Content-Type':'application/json', 'X-CSRF-TOKEN':(document.head.querySelector('meta[name="csrf-token"]').content||'') },
             body: JSON.stringify({ message: msg })
           });
-          const json=await res.json();
-          placeholder.innerHTML = 'AI: ' + renderMarkdown(json?.data?.reply || json?.message || 'No response');
+          const json = await res.json();
+          trow.remove();
+          if (json?.reason === 'missing_api_key' && json?.data?.providers) {
+            renderProviderChooser(json.data);
+          } else if (!res.ok || json?.status === 'error') {
+            bubble('ai', json?.message || 'Error calling assistant', { error:true });
+          } else {
+            bubble('ai', json?.data?.reply || json?.message || 'No response');
+          }
+          saveChat();
         }catch(e){
-          placeholder.innerHTML = 'AI: Error calling assistant';
+          trow.remove(); bubble('ai', 'Error calling assistant', { error:true }); saveChat();
+        } finally {
+          chatSend.disabled = false; chatSend.textContent = 'Send'; chatInput.focus();
         }
       }
       chatSend?.addEventListener('click', sendChat);
-      chatInput?.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); sendChat(); }});
+      chatInput?.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendChat(); } });
+      chatClear?.addEventListener('click', () => clearChat());
+      chatExport?.addEventListener('click', () => {
+        try{
+          const blob = new Blob([chatMessages.innerText || ''], { type:'text/plain;charset=utf-8' });
+          const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'idoc-chat.txt'; a.click(); URL.revokeObjectURL(a.href);
+        }catch(_){}
+      });
       @endif
     </script>
   </body>

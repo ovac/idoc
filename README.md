@@ -98,6 +98,76 @@ $ php artisan idoc:generate
 - Auto follows your OS theme and updates live when the OS theme changes.
 - The choice persists in your browser via localStorage; no backend configuration is required.
 
+## AI Chat (optional)
+The docs page ships with an optional, provider-agnostic AI assistant (ChatGPT‑style) that answers questions about your API using your generated OpenAPI document and optional extra context from a Blade view.
+
+### Highlights
+- Provider‑agnostic backend (configurable): DeepSeek (default), OpenAI (ChatGPT), Google Gemini, Groq, Hugging Face Inference API, Together AI, and OpenAI‑compatible self‑hosted servers (LM Studio, llama.cpp server).
+- Chat UI with Markdown + syntax highlighting; Copy action on AI replies; works across light/dark themes.
+- Built‑in Request Tester panel (inside Chat) to call any route, auto‑merging Authorization from Swagger Authorize and your extra headers; renders formatted responses.
+- Provider chooser appears in Chat if no key is configured, with one‑click guides and copyable .env snippets.
+
+### Quick start (DeepSeek default)
+Add to your .env:
+
+```env
+IDOC_CHAT_ENABLED=true
+IDOC_CHAT_PROVIDER=deepseek
+IDOC_CHAT_MODEL=deepseek-chat
+IDOC_CHAT_BASE_URL=https://api.deepseek.com/v1
+DEEPSEEK_API_KEY=your_deepseek_key
+```
+
+Reload config/cache:
+
+```bash
+php artisan config:clear && php artisan cache:clear
+```
+
+### Other providers (examples)
+- OpenAI (ChatGPT)
+  ```env
+  IDOC_CHAT_ENABLED=true
+  IDOC_CHAT_PROVIDER=openai
+  IDOC_CHAT_MODEL=gpt-4o-mini
+  IDOC_CHAT_BASE_URL=https://api.openai.com/v1
+  OPENAI_API_KEY=your_openai_key
+  ```
+- Google Gemini
+  ```env
+  IDOC_CHAT_ENABLED=true
+  IDOC_CHAT_PROVIDER=google
+  IDOC_CHAT_MODEL=gemini-1.5-flash
+  IDOC_CHAT_BASE_URL=https://generativelanguage.googleapis.com/v1beta
+  GOOGLE_API_KEY=your_google_api_key
+  ```
+- Groq (OpenAI‑compatible)
+  ```env
+  IDOC_CHAT_ENABLED=true
+  IDOC_CHAT_PROVIDER=groq
+  IDOC_CHAT_MODEL=mixtral-8x7b-32768
+  IDOC_CHAT_BASE_URL=https://api.groq.com/openai/v1
+  GROQ_API_KEY=your_groq_key
+  ```
+- Hugging Face Inference API (serverless)
+  ```env
+  IDOC_CHAT_ENABLED=true
+  IDOC_CHAT_PROVIDER=huggingface
+  IDOC_CHAT_MODEL=Qwen/Qwen2.5-7B-Instruct
+  IDOC_CHAT_BASE_URL=https://api-inference.huggingface.co
+  HF_API_TOKEN=your_hf_token
+  ```
+- Self‑hosted (OpenAI‑compatible, e.g., llama.cpp server)
+  ```env
+  IDOC_CHAT_ENABLED=true
+  IDOC_CHAT_PROVIDER=openai
+  IDOC_CHAT_BASE_URL=http://127.0.0.1:8000/v1
+  IDOC_CHAT_MODEL=qwen2.5-7b-instruct
+  IDOC_CHAT_API_KEY=localdev
+  ```
+
+Tip: If Chat isn’t required, disable it by setting `IDOC_CHAT_ENABLED=false`.
+
 ## Configuration
 Before you can generate your documentation, you'll need to configure a few things in your `config/idoc.php`.
 

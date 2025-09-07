@@ -61,15 +61,50 @@ return [
     |
     | Enable a simple AI assistant that can answer questions about your API
     | using your generated OpenAPI spec and optional extra context from a view.
-    | Requires OPENAI_API_KEY to be set in the environment.
     |
+    | Provider/API keys
+    | -----------------
+    | This feature is provider‑agnostic. Set `IDOC_CHAT_PROVIDER` and the
+    | corresponding API key for your provider:
+    |   - deepseek  → DEEPSEEK_API_KEY
+    |   - openai    → OPENAI_API_KEY
+    |   - google    → GOOGLE_API_KEY (or GEMINI_API_KEY)
+    |   - groq      → GROQ_API_KEY
+    |   - huggingface → HF_API_TOKEN (or HUGGINGFACE_API_KEY)
+    |   - together  → TOGETHER_API_KEY (with base_url set to Together’s endpoint)
+    |
+    | You may also provide `IDOC_CHAT_API_KEY_ENV` to point to a custom env var.
+    | Disable the feature entirely by setting `IDOC_CHAT_ENABLED=false`.
     */
 
     'chat' => [
-        'enabled'   => env('IDOC_CHAT_ENABLED', false),
-        'model'     => env('IDOC_CHAT_MODEL', 'gpt-4o-mini'),
+        'enabled'   => env('IDOC_CHAT_ENABLED', true),
+
+        // Model name for the chosen provider (override in .env)
+        // Examples: deepseek-chat, gpt-4o-mini, gemini-1.5-flash,
+        //           mixtral-8x7b-32768, Qwen/Qwen2.5-7B-Instruct
+        'model'     => env('IDOC_CHAT_MODEL', 'deepseek-chat'),
+
         // Optional: the view used as extra context for chat (rendered to text)
         'info_view' => env('IDOC_CHAT_INFO_VIEW'), // eg. 'idoc.info'
+
+        // Provider and endpoint configuration
+        // Supported providers:
+        // - 'deepseek'        → DeepSeek OpenAI‑compatible endpoint (default)
+        // - 'openai'          → OpenAI ChatCompletions
+        // - 'google'          → Google Gemini (GenerateContent API)
+        // - 'groq'            → Groq OpenAI‑compatible endpoint
+        // - 'huggingface'     → Hugging Face Inference API (serverless)
+        // - 'together'        → Together AI (OpenAI‑compatible)
+        // - 'openai_compat'   → Any OpenAI‑compatible server (LM Studio, llama.cpp)
+        'provider'  => env('IDOC_CHAT_PROVIDER', 'deepseek'),
+
+        // Base URL override (OpenAI‑compatible servers, Groq, Together, local, etc.)
+        'base_url'  => env('IDOC_CHAT_BASE_URL'),
+
+        // Env var to read API key from; if null, sensible defaults are used per provider
+        // e.g. 'OPENAI_API_KEY', 'GROQ_API_KEY', 'HF_API_TOKEN', 'GOOGLE_API_KEY'
+        'api_key_env' => env('IDOC_CHAT_API_KEY'),
     ],
 
     /*
