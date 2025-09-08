@@ -127,7 +127,7 @@
 
       /* Optional logo in Redoc's sidebar (only if you inject an <img>) */
       #redoc_container .menu-content div>img {
-        padding: 30px 0 30px 0; max-width: 100px; margin: auto; display: block;
+        padding: 30px 15px 30px 15px; width: auto; margin: auto; display: block;
         object-fit: contain; object-position: center;
       }
 
@@ -196,6 +196,7 @@
 
       body.theme-dark .react-tabs__tab--selected { color: black !important; }
       body.theme-dark .iupIzr { color: #ccf !important; }
+      body.theme-dark .lRfdj { color: #cff !important; }
 
       /* Swagger UI dark tweaks */
       body.theme-dark .swagger-ui, body.theme-dark .swagger-ui .topbar { background: #0b1220; }
@@ -1013,6 +1014,8 @@
       const chatMessages = document.getElementById('chatMessages');
       const chatInput = document.getElementById('chatInput');
       const chatSend = document.getElementById('chatSend');
+      // Initialize early to avoid TDZ errors in functions that check it
+      let isStreaming = false;
       // Selected chat provider/model (fixed from config for this page load)
       let selectedProvider = (String(@json(strtolower(config('idoc.chat.provider', env('IDOC_CHAT_PROVIDER', 'openai')))) || 'openai')).trim();
       let selectedModel = (String(@json(config('idoc.chat.model', env('IDOC_CHAT_MODEL', 'gpt-4o-mini'))) || 'gpt-4o-mini')).trim();
@@ -1513,7 +1516,6 @@
 
       let currentChatAbort = null;
       const chatStop = document.getElementById('chatStop');
-      let isStreaming = false;
       let editing = { id: null };
       const editHint = document.getElementById('editHint');
       const editCancel = document.getElementById('editCancel');
