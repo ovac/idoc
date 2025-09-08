@@ -1,7 +1,7 @@
 <p align="center" style="border: 2px dotted #000000">
-    <a href="https://https://www.openapis.org/" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50/v1553976486/1_Qf94xFwde421J_ZSmdPJDw_soee3m.png" class="inline"></a>
+    <a href="https://www.openapis.org/" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50/v1553976486/1_Qf94xFwde421J_ZSmdPJDw_soee3m.png" class="inline"></a>
     <br/>
-<a href="https://https://www.openapis.org/" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50/v1553975330/C2I2EFN2_400x400_qcuyop.jpg" class="inline"></a><a href="#" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_120/v1506828786/logo-composer-transparent_zjgal0.png" class="inline"></a><a href="#" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50,w_60,c_fill/v1506832992/laravel-logo_atlvfw.png" class="inline"></a>
+<a href="https://www.openapis.org/" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50/v1553975330/C2I2EFN2_400x400_qcuyop.jpg" class="inline"></a><a href="#" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_120/v1506828786/logo-composer-transparent_zjgal0.png" class="inline"></a><a href="#" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/h_50,w_60,c_fill/v1506832992/laravel-logo_atlvfw.png" class="inline"></a>
     <br/>
     <a href="https://www.ovac4u.com/idoc" target="_blank"><img src="https://res.cloudinary.com/ovac/image/upload/r_200,w_300,h_50,c_fill/v1506828380/logo_size_invert_jelh74.jpg" class="inline"></a>
 </p>
@@ -15,9 +15,9 @@
 ```md
               Follow me anywhere @ovac4u                         | GitHub
               _________                          _________       | Twitter
-             |   ___   |.-----.--.--.---.-.----.|  |  |.--.--.   | Facboook
+             |   ___   |.-----.--.--.---.-.----.|  |  |.--.--.   | Facebook
              |  |  _   ||  _  |  |  |  _  |  __||__    |  |  |   | Instagram
-             |  |______||_____|\___/|___._|____|   |__||_____|   | Github + @ovac
+             |  |______||_____|\___/|___._|____|   |__||_____|   | GitHub + @ovac
              |_________|                        www.ovac4u.com   | Facebook + @ovacposts
 ```
 
@@ -49,7 +49,7 @@ Laravel IDoc generator (interactive documentation generator) is a seamless and c
 ![](https://raw.githubusercontent.com/Rebilly/ReDoc/master/docs/images/discriminator-demo.gif){.inline}
 - OpenAPI 3.0 support
 - Neat **interactive** documentation for nested objects <br>
-![](https://raw.githubusercontent.com/Rebilly/ReDoc/master/docs/images/nested-demo.gifdocs/images/nested-demo.gif){.inline}
+![](https://raw.githubusercontent.com/Rebilly/ReDoc/master/docs/images/nested-demo.gif){.inline}
 - Automatic code sample support <br>
 ![](https://raw.githubusercontent.com/Rebilly/ReDoc/master/docs/images/code-samples-demo.gif){.inline}
 - Responsive three-panel design with menu/scrolling synchronization
@@ -181,13 +181,16 @@ php artisan config:clear && php artisan cache:clear
 
 Tip: If Chat isn’t required, disable it by setting `IDOC_CHAT_ENABLED=false`.
 
+### Chat route middleware
+
+- Default: chat is stateless. iDoc removes `web` for chat and adds only throttling (`throttle:60,1`).
+- If any iDoc middleware needs session, either remove it from chat via `chat.remove_middleware`, or switch to a session‑backed chat by adding the session trio (EncryptCookies, AddQueuedCookiesToResponse, StartSession) to `chat.middleware`.
+- Because `web` may be included via the `idoc` group, iDoc excludes it for chat at group time when you set `chat.remove_middleware`.
+- See concise recipes in `config/idoc.php`.
+
 ### Capability gating (attachments/vision)
 - The UI disables image selection when the current model does not support vision.
 - For providers that do not support attachments, the attachment row is hidden.
-- You can switch the active model/provider at runtime by dispatching:
-  ```js
-  window.dispatchEvent(new CustomEvent('idoc:chat-model-changed', { detail: { provider: 'openai', model: 'gpt-4o-mini' } }));
-  ```
 
 ## Configuration
 Before you can generate your documentation, you'll need to configure a few things in your `config/idoc.php`.
@@ -213,7 +216,7 @@ Here, you can specify the title to place on the documentation page.
 - `description`
 This will place a description on top of the documentation.
 ```php
-'description' => 'iDoc Api secification and documentation.',
+'description' => 'iDoc API specification and documentation.',
  ```
 
 - `version`
@@ -394,8 +397,8 @@ return [
 
 With the configuration above, routes on the `v1.*` domain will have the `Token` and `Version` headers applied, while routes on the `v2.*` domain will have the `Authorization` and `Api-Version` headers applied.
 
-> Note: the `include` and `exclude` items are arrays of route names. THe &ast; wildcard is supported.
-> Note: If you're using DIngo router, the `versions` parameter is required in each route group. This parameter does not support wildcards. Each version must be listed explicitly,
+> Note: the `include` and `exclude` items are arrays of route names. The * wildcard is supported.
+> Note: If you're using Dingo router, the `versions` parameter is required in each route group. This parameter does not support wildcards. Each version must be listed explicitly.
 
 To generate your API documentation, use the `idoc:generate` artisan command.
 
@@ -582,7 +585,7 @@ public function createPost(MyRequest $request)
 ```
 
 ### Indicating auth status
-You can use the `@authenticated` annotation on a method to indicate if the endpoint is authenticated. A field for authentication token will be made available and marked as required on the interractive documentation.
+You can use the `@authenticated` annotation on a method to indicate if the endpoint is authenticated. A field for authentication token will be made available and marked as required on the interactive documentation.
 
 ### Providing an example response
 You can provide an example response for a route. This will be displayed in the examples section. There are several ways of doing this.

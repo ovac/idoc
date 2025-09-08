@@ -1573,7 +1573,7 @@
           // Try streaming first
           const ctrl = new AbortController(); currentChatAbort = ctrl;
           chatStop.style.display = 'inline-block'; chatStop.onclick = () => { try{ currentChatAbort?.abort(); }catch{} };
-          const res = await fetch('{{ route('idoc.chat') }}',{
+          const res = await fetch('{{ route(config('idoc.chat.route', 'idoc.chat')) }}',{
             method:'POST',
             headers:{ 'Content-Type':'application/json', 'X-CSRF-TOKEN':(document.head.querySelector('meta[name="csrf-token"]').content||'') },
             body: JSON.stringify({ message: msg, history: (chatHistory||[]).slice(-12), stream: true, replaces_message_id: editing.id || undefined, attachments: (composerAttachments||[]) }),

@@ -40,6 +40,11 @@ return [
         'web',
     ],
 
+    // Remove specific middleware from the iDoc group (docs + chat group).
+    // Accepts a single alias/FQCN or an array. Base-name removal is supported
+    // (eg. 'throttle' removes 'throttle:60,1').
+    'remove_middleware' => env('IDOC_REMOVE_MIDDLEWARE', []),
+
     /*
     |--------------------------------------------------------------------------
     | iDoc Try It Out
@@ -112,6 +117,27 @@ return [
         // Example env override:
         //   IDOC_CHAT_SYSTEM_PROMPT=/absolute/path/to/chat-system.md
         'system_prompt_md' => env('IDOC_CHAT_SYSTEM_PROMPT'),
+
+        // Route customization
+        // - route: the full named route used by the frontend to POST messages
+        //          Defaults to 'idoc.chat'. You can change this if you want a
+        //          different name (eg. 'docs.chat').
+        // - uri:   the URI segment appended under the iDoc prefix where the
+        //          endpoint will be exposed (eg. /{idoc.path}/chat).
+        'route' => env('IDOC_CHAT_ROUTE', 'idoc.chat'),
+        'uri'   => env('IDOC_CHAT_URI', 'chat'),
+
+        // Extra middleware for chat only (string or array).
+        // Default is stateless: throttle only. If a middleware you attach to
+        // iDoc needs session, either remove it from chat via
+        // 'chat.remove_middleware' or add the session trio here
+        // (EncryptCookies, AddQueuedCookiesToResponse, StartSession).
+        'middleware' => env('IDOC_CHAT_MIDDLEWARE', 'throttle:60,1'),
+
+        // Middleware to remove for chat only (after global removals). String or
+        // array. Use 'web' (default) for stateless chat, or remove specifics
+        // like VerifyCsrfToken.
+        'remove_middleware' => env('IDOC_CHAT_REMOVE_MIDDLEWARE', 'web'),
     ],
 
     /*
@@ -141,7 +167,7 @@ return [
 
     'title' => 'iDoc API Reference',
 
-    'description' => 'iDoc Api specification and documentation.',
+    'description' => 'iDoc API specification and documentation.',
 
     'version' => '',
 
@@ -214,7 +240,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | The servers that should be added to the documentation. Each should have
-    | a server hostname (and path if neccessary) and a discription of the
+    | a server hostname (and path if necessary) and a description of the
     | host. eg: one for test and another for production.
     |
      */
