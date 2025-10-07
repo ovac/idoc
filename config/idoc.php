@@ -8,7 +8,7 @@ return [
     |
     | This is the subdomain where the documentation will be accessible from.
     | If the setting is null, iDoc will reside under the same domain as the
-    | application. otherwise, this value will be used as the subdomain.
+    | application. Otherwise, this value will be used as the subdomain.
     |
      */
 
@@ -42,7 +42,7 @@ return [
 
     // Remove specific middleware from the iDoc group (docs + chat group).
     // Accepts a single alias/FQCN or an array. Base-name removal is supported
-    // (eg. 'throttle' removes 'throttle:60,1').
+    // (e.g. 'throttle' removes 'throttle:60,1').
     'remove_middleware' => env('IDOC_REMOVE_MIDDLEWARE', []),
 
     /*
@@ -91,7 +91,7 @@ return [
         'model'     => env('IDOC_CHAT_MODEL', 'deepseek-chat'),
 
         // Optional: the view used as extra context for chat (rendered to text)
-        'info_view' => env('IDOC_CHAT_INFO_VIEW'), // eg. 'idoc.info'
+        'info_view' => env('IDOC_CHAT_INFO_VIEW'), // e.g. 'idoc.info'
 
         // Provider and endpoint configuration
         // Supported providers:
@@ -147,7 +147,7 @@ return [
     |
     | This is the logo configuration for the documentation. The logo expects
     | an absolute or relative url to a logo image while the color will
-    | fill any space left depending on the log size.
+    | fill any space left depending on the logo size.
     |
      */
 
@@ -160,7 +160,7 @@ return [
     | iDoc principal information
     |--------------------------------------------------------------------------
     |
-    | This is the principal information  that will be visible on the  documentation like
+    | This is the principal information that will be visible on the documentation like
     | title, description , version, license, etc.
     |
      */
@@ -241,7 +241,7 @@ return [
     |
     | The servers that should be added to the documentation. Each should have
     | a server hostname (and path if necessary) and a description of the
-    | host. eg: one for test and another for production.
+    | host. e.g.: one for test and another for production.
     |
      */
 
@@ -388,7 +388,7 @@ return [
                 ],
 
                 /*
-                 * If no @response or @transformer declaratons are found for the route,
+                 * If no @response or @transformer declarations are found for the route,
                  * we'll try to get a sample response by attempting an API call.
                  * Configure the settings for the API call here,
                  */
