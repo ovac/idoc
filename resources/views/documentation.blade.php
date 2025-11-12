@@ -306,7 +306,7 @@
     <link rel="apple-touch-icon-precomposed" href="/favicon.ico">
 
     <!-- Redoc OSS (read-only renderer) -->
-    <script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/redoc@2.5.1/bundles/redoc.standalone.js"></script>
 
     <!-- Swagger UI (interactive console) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
