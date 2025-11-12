@@ -60,6 +60,9 @@
   - idoc.output                : Directory containing openapi.json (public path).
   - idoc.external_description  : Optional route for external description content.
   - idoc.hide_download_button  : Redoc's download button visibility.
+  - idoc.resources.redoc_standalone_js: Redoc standalone JS bundle location.
+  - idoc.resources.swagger_css : Swagger UI CSS file location.
+  - idoc.resources.swagger_ui_js: Swagger UI JS bundle location.
   - idoc.tryit.enabled         : Toggle the Swagger UI panel globally.
   - idoc.chat.enabled          : Toggle the AI Chat panel globally.
   - idoc.chat.provider         : Chat provider id (e.g., deepseek, openai, google,
@@ -306,11 +309,11 @@
     <link rel="apple-touch-icon-precomposed" href="/favicon.ico">
 
     <!-- Redoc OSS (read-only renderer) -->
-    <script src="https://cdn.jsdelivr.net/npm/redoc@2.5.1/bundles/redoc.standalone.js"></script>
+    <script src="{{ config('idoc.resources.redoc_standalone_js') }}"></script>
 
     <!-- Swagger UI (interactive console) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
-    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <link rel="stylesheet" href="{{ config('idoc.resources.swagger_css') }}">
+    <script src="{{ config('idoc.resources.swagger_ui_js') }}"></script>
 
     @if (config('idoc.chat.enabled', false))
       <!-- Optional libs for nicer chat rendering -->
