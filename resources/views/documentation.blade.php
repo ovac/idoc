@@ -465,11 +465,11 @@
 
       let redocObserver = null;
       function observeRedoc(){ try{ if (redocObserver) redocObserver.disconnect(); redocObserver = new MutationObserver(()=>{}); const el=document.getElementById('redoc_container'); if (el) redocObserver.observe(el, { childList:true, subtree:true }); }catch{} }
-      if(config('idoc.theme.default', "auto") == "ligth"){
+      @if (config('idoc.theme.default', 'auto') === 'light')
         setMode(ORDER[2])
-      }else if(config('idoc.theme.default', "auto") == "dark"){
+      @elseif (config('idoc.theme.default', 'auto') === 'dark')
         setMode(ORDER[1])
-      }
+      @endif
       async function mountRedoc(themeObj){
 
         const old = document.getElementById('redoc_container');
