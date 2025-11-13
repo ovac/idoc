@@ -337,9 +337,11 @@
       @if (config('idoc.tryit.enabled', true))
         <button class="btn tryit-toggle" id="tryitBtn">⚡️ Try it</button>
       @endif
-      <button class="btn tryit-toggle" id="themeBtn" title="Toggle theme">🌗 Auto</button>
+      @if(config('idoc.theme.enabled', true))
+        <button class="btn tryit-toggle" id="themeBtn" title="Toggle theme">🌗 Auto</button>
+      @endif
     </div>
-    
+
     @if (config('idoc.tryit.enabled', true))
       <!-- Slide-in panel that hosts Swagger UI. aria-hidden toggles for a11y. -->
       <div class="tryit-panel" id="tryitPanel" aria-hidden="true">
@@ -463,8 +465,13 @@
 
       let redocObserver = null;
       function observeRedoc(){ try{ if (redocObserver) redocObserver.disconnect(); redocObserver = new MutationObserver(()=>{}); const el=document.getElementById('redoc_container'); if (el) redocObserver.observe(el, { childList:true, subtree:true }); }catch{} }
-
+      if(config('idoc.theme.default', "auto") == "ligth"){
+        setMode(ORDER[2])
+      }else if(config('idoc.theme.default', "auto") == "dark"){
+        setMode(ORDER[1])
+      }
       async function mountRedoc(themeObj){
+
         const old = document.getElementById('redoc_container');
         const tmp = document.createElement('div'); tmp.id = 'redoc_container_tmp';
         old.insertAdjacentElement('afterend', tmp);
@@ -911,14 +918,14 @@
          7) // I removed Swagger Enhansed Button. Let's use this section for something else.
          ========================================================================= */
 
-      
+
       /* =========================================================================
          8) Optional: Bearer token helper
          ========================================================================= */
       // Example: if you store an API token in localStorage, you can auto-inject it
       // into the Swagger UI requests. Adjust to your auth scheme and storage.
       // To use, uncomment the requestInterceptor lines above and this function.=
-      
+
       function getSwaggerBearer() {
         try {
           if (!ui || !ui.authSelectors || !ui.authSelectors.authorized) return null;

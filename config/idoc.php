@@ -58,6 +58,10 @@ return [
     'tryit' => [
         'enabled' => env('IDOC_TRYIT_ENABLED', true),
     ],
+    'theme' => [
+        'default' =>  env('IDOC_THEME_DEFAULT', 'auto'),
+        'enabled' =>  env('IDOC_THEME_ENABLED', true),
+    ],
 
     /*
     |--------------------------------------------------------------------------
