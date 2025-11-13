@@ -58,6 +58,26 @@ return [
     'tryit' => [
         'enabled' => env('IDOC_TRYIT_ENABLED', true),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | iDoc Theme Settings
+    |--------------------------------------------------------------------------
+    |
+    | These options control the visual theme of the documentation interface.
+    | - "default" determines which theme will be applied on initial load:
+    |       • light  → always use light mode
+    |       • dark   → always use dark mode
+    |       • auto   → automatically choose based on the user's system preference
+    |
+    | - "enabled" toggles whether the theme switcher button should appear in
+    |   the UI. Set it to false to hide the toggle and enforce only the default
+    |   theme defined above.
+    |
+    | This allows projects to customize the presentation of their API
+    | documentation and enforce consistent branding or accessibility rules.
+    |
+    */
     'theme' => [
         'default' =>  env('IDOC_THEME_DEFAULT', 'auto'),
         'enabled' =>  env('IDOC_THEME_ENABLED', true),
