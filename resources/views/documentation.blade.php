@@ -257,7 +257,8 @@
       body.theme-dark .idoc-chat-bubble.user { background:#111827; }
       body.theme-dark .idoc-chat-bubble.error { background:#7f1d1d; border-color:#fecdd3; color:#fee2e2; }
       body.theme-dark .idoc-chat-bubble :not(pre) > code { background:#1f2937; color:#e5e7eb; }
-
+      body.theme-dark .iDIVzl * {color:#fee2e2; }
+      body.theme-dark .krDyRf .sc-ikkxIA, .krDyRf .sc-ikkxIA .sc-ikkxIA .sc-ikkxIA, .krDyRf .sc-ikkxIA .sc-ikkxIA .sc-ikkxIA .sc-ikkxIA .sc-ikkxIA {background-color: #0b122000}
       /* Redoc sidebar + headings */
       .swagger-ui .opblock-tag.no-desc[data-tag^="!"],
       .swagger-ui .opblock[id^="operations-\\!"] span.opblock-summary-method,
@@ -469,6 +470,8 @@
         setMode(ORDER[2])
       @elseif (config('idoc.theme.default', 'auto') === 'dark')
         setMode(ORDER[1])
+      @else
+        setMode(ORDER[0])
       @endif
       async function mountRedoc(themeObj){
 
