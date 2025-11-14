@@ -247,7 +247,18 @@ A short and simple permissive license with conditions only requiring preservatio
 - `output`
 This package can automatically generate an Open-API 3.0 specification file for your routes, along with the documentation. This is the file path where the generated documentation will be written to. Default: **public/docs** 
 
- - `hide_download_button`
+- `resources`
+Locations of external resources, that can be customised for self-hosting if required.
+```php
+'resources' => [
+        'fonts' => '//fonts.googleapis.com/css?family=Roboto:400,700',
+        'redoc_standalone_js' => 'https://cdn.jsdelivr.net/npm/redoc@2.5.1/bundles/redoc.standalone.js',
+        'swagger_css' => 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css',
+        'swagger_ui_js' => 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js',
+],
+```
+
+- `hide_download_button`
 This section is where you can configure if you want a download button visible on the documentation.
 
 - `router`

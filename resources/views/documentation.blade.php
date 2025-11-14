@@ -60,6 +60,7 @@
   - idoc.output                : Directory containing openapi.json (public path).
   - idoc.external_description  : Optional route for external description content.
   - idoc.hide_download_button  : Redoc's download button visibility.
+  - idoc.resources.fonts       : Fonts location.
   - idoc.resources.redoc_standalone_js: Redoc standalone JS bundle location.
   - idoc.resources.swagger_css : Swagger UI CSS file location.
   - idoc.resources.swagger_ui_js: Swagger UI JS bundle location.
@@ -88,8 +89,8 @@
 
   BUNDLES
   -------
-  - Redoc OSS:  https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js
-  - Swagger UI: https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/
+  - Redoc OSS:  {{ config('idoc.resources.redoc_standalone_js') }}
+  - Swagger UI: {{ config('idoc.resoures.swagger_ui_js') }}
   - Markdown + sanitize: marked + DOMPurify
   - Syntax highlight: highlight.js (auto‑switched for dark/light)
 
@@ -125,7 +126,7 @@
          ========================= -->
     <style>
       /* System font for speed + Verdana for legibility */
-      @import url(//fonts.googleapis.com/css?family=Roboto:400,700);
+      @import url({{ config('idoc.resources.fonts') }});
       body { margin: 0; padding: 0; font-family: Verdana, Geneva, sans-serif; }
 
       /* Optional logo in Redoc's sidebar (only if you inject an <img>) */
