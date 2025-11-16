@@ -201,6 +201,7 @@ return [
     'output' => '',
 
     'resources' => [
+        'fonts' => '//fonts.googleapis.com/css?family=Roboto:400,700',
         'redoc_standalone_js' => 'https://cdn.jsdelivr.net/npm/redoc@2.5.1/bundles/redoc.standalone.js',
         'swagger_css' => 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css',
         'swagger_ui_js' => 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js',
