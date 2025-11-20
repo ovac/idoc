@@ -90,7 +90,7 @@
   BUNDLES
   -------
   - Redoc OSS:  {{ config('idoc.resources.redoc_standalone_js') }}
-  - Swagger UI: {{ config('idoc.resoures.swagger_ui_js') }}
+  - Swagger UI: {{ config('idoc.resources.swagger_ui_js') }}
   - Markdown + sanitize: marked + DOMPurify
   - Syntax highlight: highlight.js (auto‑switched for dark/light)
 
