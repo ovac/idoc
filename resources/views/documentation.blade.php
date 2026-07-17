@@ -430,7 +430,7 @@
           error: { main: '#ef4444' },
           border: { light: '#27272a', dark: '#a1a1aa' },
           http: { basic: '#71717a', delete: '#ef4444', get: '#22c55e', head: '#d946ef', link: '#06b6d4', options: '#eab308', patch: '#f97316', post: '#3b82f6', put: '#ec4899' },
-          primary: { main: '#71717a' },
+          primary: { main: '#3b82f6' },
           responses: {
             error:   { backgroundColor: 'rgba(239,68,68,0.1)', borderColor: '#fca5a5', color: '#ef4444', tabTextColor: '#ef4444' },
             info:    { backgroundColor: 'rgba(59,131,246,0.1)', borderColor: '#93c5fd', color: '#3b82f6', tabTextColor: '#3b82f6' },
