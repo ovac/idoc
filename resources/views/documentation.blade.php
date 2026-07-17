@@ -444,7 +444,7 @@
         },
         fab: { backgroundColor: '#52525b', color: '#67e8f9' },
         rightPanel: { backgroundColor: '#27272a', servers: { overlay: { backgroundColor: '#27272a' }, url: { backgroundColor: '#18181b' } } },
-        schema: { linesColor: '#d8b4fe', typeNameColor: '#93c5fd', typeTitleColor: '#1d4ed8' },
+        schema: { linesColor: '#d8b4fe', typeNameColor: '#93c5fd', typeTitleColor: '#bfdbfe' },
         sidebar: { activeTextColor: '#ffffff', backgroundColor: '#18181b', textColor: '#a1a1aa' },
         typography: {
           code: { backgroundColor: '#18181b', color: '#fde047' },
